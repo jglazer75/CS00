@@ -1,5 +1,6 @@
 # IDE
 *.code-workspace
+cs00.keys
 
 # Logs
 logs
