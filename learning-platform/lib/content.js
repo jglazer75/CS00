@@ -4,6 +4,7 @@ import matter from 'gray-matter';
 import { remark } from 'remark';
 import html from 'remark-html';
 import toc from 'remark-toc';
+import remarkKeyConcept from './remark-key-concept.mjs';
 
 const contentDirectory = path.join(process.cwd(), 'content');
 
@@ -69,6 +70,7 @@ export async function getPageData(moduleId, slug) {
   const matterResult = matter(fileContents);
 
   const processedContent = await remark()
+    .use(remarkKeyConcept)
     .use(toc)
     .use(html)
     .process(matterResult.content);
