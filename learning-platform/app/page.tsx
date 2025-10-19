@@ -1,6 +1,5 @@
-import Link from 'next/link';
 import { getAllModuleIds, getSortedPagesData } from '@/lib/content';
-import { Container, Grid, Card, CardContent, CardActions, Button, Typography, Box } from '@mui/material';
+import DashboardClient from './components/DashboardClient';
 
 export default async function Home() {
   const moduleIds = await getAllModuleIds();
@@ -20,34 +19,5 @@ export default async function Home() {
     })
   );
 
-  return (
-    <Box component="main" sx={{ py: 4 }}>
-      <Container maxWidth="lg">
-        <Typography variant="h4" component="h1" gutterBottom>
-          Available Modules
-        </Typography>
-        <Grid container spacing={4}>
-          {moduleLinks.map(({ id, href, title, description }) => (
-            <Grid item key={id} xs={12} sm={6} md={4}>
-              <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-                <CardContent sx={{ flexGrow: 1 }}>
-                  <Typography gutterBottom variant="h5" component="h2">
-                    {title}
-                  </Typography>
-                  <Typography>
-                    {description}
-                  </Typography>
-                </CardContent>
-                <CardActions>
-                  <Button component={Link} href={href} size="small" variant="contained">
-                    Start Module
-                  </Button>
-                </CardActions>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
-      </Container>
-    </Box>
-  );
+  return <DashboardClient moduleLinks={moduleLinks} />;
 }
