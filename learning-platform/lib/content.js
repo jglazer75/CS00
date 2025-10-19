@@ -12,7 +12,7 @@ const contentDirectory = path.join(process.cwd(), 'content');
  * @description Reads the names of all subdirectories within the content/ folder (e.g., CS01, CS02).
  * @see ../.gemini/contentengine.md
  */
-export function getAllModuleIds() {
+export async function getAllModuleIds() {
   const moduleNames = fs.readdirSync(contentDirectory);
   return moduleNames.map((moduleName) => {
     return {
@@ -29,7 +29,7 @@ export function getAllModuleIds() {
  * @description Get the metadata for all pages within a *specific* module, sorted correctly for navigation.
  * @see ../.gemini/contentengine.md
  */
-export function getSortedPagesData(moduleId) {
+export async function getSortedPagesData(moduleId) {
   const moduleDirectory = path.join(contentDirectory, moduleId);
   const fileNames = fs.readdirSync(moduleDirectory).filter((fileName) => fileName.endsWith('.md'));
 

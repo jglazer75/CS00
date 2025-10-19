@@ -3,12 +3,12 @@ import ModuleNav from '@/app/components/ModuleNav';
 import { Box, Container, Paper, Typography } from '@mui/material';
 
 export async function generateStaticParams() {
-  const moduleIds = getAllModuleIds();
+  const moduleIds = await getAllModuleIds();
   const paths = [];
 
   for (const { params } of moduleIds) {
     const { moduleId } = params;
-    const pagesData = getSortedPagesData(moduleId);
+    const pagesData = await getSortedPagesData(moduleId);
     for (const pageData of pagesData) {
       paths.push({
         moduleId: moduleId,
@@ -28,7 +28,7 @@ async function getPageContent(moduleId, slug) {
 export default async function Page({ params }) {
   const { moduleId, slug } = params;
   const pageData = await getPageContent(moduleId, slug);
-  const navData = getSortedPagesData(moduleId); // Fetch navigation data here
+  const navData = await getSortedPagesData(moduleId); // Fetch navigation data here
 
   return (
     <Box sx={{ display: 'flex' }}>
