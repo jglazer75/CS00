@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { Container, Card, CardContent, CardActions, Button, Typography, Box } from '@mui/material';
-import Grid from '@mui/material/Grid'; // Corrected import
 
 type ModuleLink = {
   id: string;
@@ -18,9 +17,24 @@ export default function DashboardClient({ moduleLinks }: { moduleLinks: ModuleLi
         <Typography variant="h4" component="h1" gutterBottom>
           Available Modules
         </Typography>
-        <Grid container spacing={4}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: 4, // Spacing between items
+          }}
+        >
           {moduleLinks.map(({ id, href, title, description }) => (
-            <Grid item key={id} xs={12} sm={6} md={4}>
+            <Box
+              key={id}
+              sx={{
+                width: {
+                  xs: '100%', // Full width on extra-small screens
+                  sm: 'calc(50% - 16px)', // Half width on small screens (minus gap)
+                  md: 'calc(33.333% - 22px)', // One-third width on medium screens (minus gap)
+                },
+              }}
+            >
               <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
                 <CardContent sx={{ flexGrow: 1 }}>
                   <Typography gutterBottom variant="h5" component="h2">
@@ -36,9 +50,9 @@ export default function DashboardClient({ moduleLinks }: { moduleLinks: ModuleLi
                   </Button>
                 </CardActions>
               </Card>
-            </Grid>
+            </Box>
           ))}
-        </Grid>
+        </Box>
       </Container>
     </Box>
   );
