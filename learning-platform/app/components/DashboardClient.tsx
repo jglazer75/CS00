@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { Container, Grid, Card, CardContent, CardActions, Button, Typography, Box } from '@mui/material';
+import { Container, Card, CardContent, CardActions, Button, Typography, Box } from '@mui/material';
+import Grid from '@mui/material/Grid'; // Corrected import
 
 type ModuleLink = {
   id: string;
