@@ -3,7 +3,14 @@
 import Link from 'next/link';
 import { Container, Grid, Card, CardContent, CardActions, Button, Typography, Box } from '@mui/material';
 
-export default function DashboardClient({ moduleLinks }) {
+type ModuleLink = {
+  id: string;
+  href: string;
+  title: string;
+  description: string;
+};
+
+export default function DashboardClient({ moduleLinks }: { moduleLinks: ModuleLink[] }) {
   return (
     <Box component="main" sx={{ py: 4 }}>
       <Container maxWidth="lg">
