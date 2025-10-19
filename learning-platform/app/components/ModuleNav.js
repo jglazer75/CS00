@@ -1,28 +1,37 @@
+'use client';
 import Link from 'next/link';
 import { getSortedPagesData } from '@/lib/content';
+import { Box, List, ListItem, ListItemButton, ListItemText, Typography } from '@mui/material';
 
 export default function ModuleNav({ moduleId, activeSlug }) {
   const pages = getSortedPagesData(moduleId);
 
   return (
-    <nav style={{ padding: '1rem', borderRight: '1px solid #ccc', minWidth: '250px' }}>
-      <h2>Module Pages</h2>
-      <ul style={{ listStyle: 'none', padding: 0 }}>
+    <Box component="nav" sx={{ 
+      width: { sm: 280 }, 
+      flexShrink: { sm: 0 },
+      borderRight: '1px solid',
+      borderColor: 'divider',
+      height: 'calc(100vh - 64px)', // Full height minus AppBar
+      position: 'sticky',
+      top: '64px', // Position below AppBar
+      overflowY: 'auto'
+    }}>
+      <Typography variant="h6" sx={{ p: 2 }}>
+        Module Sections
+      </Typography>
+      <List>
         {pages.map(({ slug, title }) => {
           const isActive = slug === activeSlug;
           return (
-            <li key={slug} style={{ margin: '0.5rem 0' }}>
-              <Link href={`/modules/${moduleId}/${slug}`} style={{ 
-                  textDecoration: 'none', 
-                  color: isActive ? 'blue' : 'black',
-                  fontWeight: isActive ? 'bold' : 'normal' 
-                }}>
-                  {title || slug.replace(/-/g, ' ')}
-              </Link>
-            </li>
+            <ListItem key={slug} disablePadding>
+              <ListItemButton component={Link} href={`/modules/${moduleId}/${slug}`} selected={isActive}>
+                <ListItemText primary={title || slug.replace(/-/g, ' ')} />
+              </ListItemButton>
+            </ListItem>
           );
         })}
-      </ul>
-    </nav>
+      </List>
+    </Box>
   );
 }

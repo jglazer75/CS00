@@ -1,5 +1,6 @@
 import { getAllModuleIds, getPageData, getSortedPagesData } from '@/lib/content';
 import ModuleNav from '@/app/components/ModuleNav';
+import { Box, Container, Paper, Typography } from '@mui/material';
 
 export async function generateStaticParams() {
   const moduleIds = getAllModuleIds();
@@ -29,16 +30,31 @@ export default async function Page({ params }) {
   const pageData = await getPageContent(moduleId, slug);
 
   return (
-    <div style={{ display: 'flex' }}>
+    <Box sx={{ display: 'flex' }}>
       <ModuleNav moduleId={moduleId} activeSlug={slug} />
-      <main style={{ flexGrow: 1, padding: '2rem' }}>
-        <article>
-          <h1>{pageData.title}</h1>
-          <div>
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          py: 4,
+          px: 3,
+          bgcolor: 'background.default',
+        }}
+      >
+        <Container maxWidth="lg">
+          <Paper
+            component="article"
+            elevation={0}
+            sx={{ p: 4 }}
+            className="prose lg:prose-xl"
+          >
+            <Typography variant="h4" component="h1" gutterBottom>
+              {pageData.title}
+            </Typography>
             <div dangerouslySetInnerHTML={{ __html: pageData.contentHtml }} />
-          </div>
-        </article>
-      </main>
-    </div>
+          </Paper>
+        </Container>
+      </Box>
+    </Box>
   );
 }
