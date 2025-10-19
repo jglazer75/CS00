@@ -1,11 +1,8 @@
 'use client';
 import Link from 'next/link';
-import { getSortedPagesData } from '@/lib/content';
 import { Box, List, ListItem, ListItemButton, ListItemText, Typography } from '@mui/material';
 
-export default function ModuleNav({ moduleId, activeSlug }) {
-  const pages = getSortedPagesData(moduleId);
-
+export default function ModuleNav({ moduleId, activeSlug, pages }) {
   return (
     <Box component="nav" sx={{ 
       width: { sm: 280 }, 
