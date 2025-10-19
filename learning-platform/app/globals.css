@@ -7,6 +7,13 @@
   --foreground: #171717;
 }
 
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
@@ -18,27 +25,4 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
-}
-
-/* Style for the Key Concept call-out */
-.prose .key-concept {
-  @apply rounded-lg border bg-blue-50 p-6 my-6;
-  border-color: #002D5A; /* MUI Primary Blue */
-}
-
-.prose .key-concept h1,
-.prose .key-concept h2,
-.prose .key-concept h3,
-.prose .key-concept h4,
-.prose .key-concept h5,
-.prose .key-concept h6 {
-  @apply mt-0 mb-2 text-lg font-semibold;
-  color: #002D5A; /* MUI Primary Blue */
-}
-
-.prose .key-concept p,
-.prose .key-concept ul,
-.prose .key-concept ol {
-  @apply text-base;
-  color: #001f3f; /* Darker shade of blue for text */
 }
