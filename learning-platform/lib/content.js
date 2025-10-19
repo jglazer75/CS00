@@ -25,7 +25,7 @@ export async function getAllModuleIds() {
 
 /**
  * @param {string} moduleId
- * @returns {Promise<Array<{id: string, title: string}>>}
+ * @returns {Promise<Array<{slug: string, [key: string]: any}>>}
  * @description Get the metadata for all pages within a *specific* module, sorted correctly for navigation.
  * @see ../.gemini/contentengine.md
  */
