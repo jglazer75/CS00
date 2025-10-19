@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { getSortedPagesData } from '../../lib/content';
+import { getSortedPagesData } from '@/lib/content';
 
 export default function ModuleNav({ moduleId, activeSlug }) {
   const pages = getSortedPagesData(moduleId);
@@ -12,14 +12,12 @@ export default function ModuleNav({ moduleId, activeSlug }) {
           const isActive = slug === activeSlug;
           return (
             <li key={slug} style={{ margin: '0.5rem 0' }}>
-              <Link href={`/modules/${moduleId}/${slug}`}>
-                <a style={{ 
+              <Link href={`/modules/${moduleId}/${slug}`} style={{ 
                   textDecoration: 'none', 
                   color: isActive ? 'blue' : 'black',
                   fontWeight: isActive ? 'bold' : 'normal' 
                 }}>
                   {title || slug.replace(/-/g, ' ')}
-                </a>
               </Link>
             </li>
           );

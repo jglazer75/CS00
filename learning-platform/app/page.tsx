@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { getAllModuleIds, getSortedPagesData } from '../lib/content';
+import { getAllModuleIds, getSortedPagesData } from '@/lib/content';
 
 // This is a Server Component, so we can fetch data directly
 export default function Home() {
@@ -24,11 +24,9 @@ export default function Home() {
       <ul style={{ listStyle: 'none', padding: 0 }}>
         {moduleLinks.map(({ id, href, title }) => (
           <li key={id} style={{ margin: '1rem 0' }}>
-            <Link href={href}>
-              <a style={{ fontSize: '1.25rem', textDecoration: 'none', color: 'blue' }}>
+            <Link href={href} style={{ fontSize: '1.25rem', textDecoration: 'none', color: 'blue' }}>
                 {title}
-              </a>
-            </Link>
+              </Link>
           </li>
         ))}
       </ul>

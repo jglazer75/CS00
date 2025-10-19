@@ -18,12 +18,12 @@ export function getAllModuleIds() {
 }
 
 export function getSortedPagesData(moduleId) {
-    const moduleDir = path.join(contentDirectory, moduleId);
-    const fileNames = fs.readdirSync(moduleDirectory).filter((fileName) => fileName.endsWith('.md'));
+const moduleDirectory = path.join(contentDirectory, moduleId);
+  const fileNames = fs.readdirSync(moduleDirectory).filter((fileName) => fileName.endsWith('.md'));
 
-    const allPagesData = fileNames.map((fileName) => {
-        const slug = fileName.replace(/\.md$/, '');
-        const fullPath = path.join(moduleDir, fileName);
+  const allPagesData = fileNames.map((fileName) => {
+    const slug = fileName.replace(/\.md$/, '');
+    const fullPath = path.join(moduleDirectory, fileName);
         const fileContents = fs.readFileSync(fullPath, 'utf8');
         const matterResult = matter(fileContents);
 
@@ -43,9 +43,8 @@ export function getSortedPagesData(moduleId) {
 }
 
 export async function getPageData(moduleId, slug) {
-    const moduleDir = path.join(contentDirectory, moduleId);
-    const fullPath = path.join(moduleDir, `${slug}.md`);
-    const fileContents = fs.readFileSync(fullPath, 'utf8');
+    const moduleDirectory = path.join(contentDirectory, moduleId);
+      const fullPath = path.join(moduleDirectory, `${slug}.md`);    const fileContents = fs.readFileSync(fullPath, 'utf8');
     const matterResult = matter(fileContents);
 
     const processedContent = await remark()
