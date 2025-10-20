@@ -1,0 +1,9 @@
+## The Why of Entrepreneurship
+
+This first module is to simply acquaint the student with how projects come to be entrepreneurial endeavors - the _why_ of entrepreneurship. Within the context of this case study, the why is obvious - deep subject-matter expertise and a developed prototype make stepping out of the corporate environment easier.
+
+I highlight with my own students the social privilege that this kind of entrepreneurship requires. Not only does it require the time/education to develop the deep expertise, but, more importantly, it requires the family and social privilege of leaving a good-paying job, being able to forego health insurance, and having corporate or personal connections that will make this endeavor significantly easier than if none of these factors exist.
+
+## Conceptual Basics
+
+Moreover, this first module introduces basic concepts in high-growth entrepreneurship. While there are numerous concepts that could be brought up here, this case study highlights two: the role of different kinds of equity (cash v assets v labor) and basic cap-table management. The cap-table management piece can get as crazy as you want with this (as it does in real life :\ ), but it stays relatively simple here (at least until Module 5, but even then it only introduces Employee Stock Option Plans and its impact on the cap-table). A legal class might choose to take a deep dive on the tax consequences of cash/assets v. labor in exchange for equity. My experience with entrepreneurship is that founders are often very willing (and able) to exchange labor for equity, but as the company gains value this trade-off may become prohibitive. A short diversion down the 83b rabbit hole might be fun, if you consider that kind of thing fun.

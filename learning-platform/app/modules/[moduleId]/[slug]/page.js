@@ -1,6 +1,6 @@
 import { getAllModuleIds, getPageData, getSortedPagesData } from '@/lib/content';
 import ModuleNav from '@/app/components/ModuleNav';
-import { Box, Container, Paper, Typography } from '@mui/material';
+import { Box, Container, Paper, Typography, Card, CardContent, CardHeader } from '@mui/material';
 
 export async function generateStaticParams() {
   const moduleIds = await getAllModuleIds();
@@ -43,17 +43,43 @@ export default async function Page({ params }) {
         }}
       >
         <Container maxWidth="lg">
-          <Paper
-            component="article"
-            elevation={0}
-            sx={{ p: 4 }}
-            className="prose lg:prose-xl"
-          >
-            <Typography variant="h4" component="h1" gutterBottom>
-              {pageData.title}
-            </Typography>
-            <div dangerouslySetInnerHTML={{ __html: pageData.contentHtml }} />
-          </Paper>
+          {pageData.contentChunks.map((chunk, index) => (
+            <Card key={index} component="article" sx={{ mb: 3 }}>
+              <CardHeader title={chunk.title} component="h2" />
+              <CardContent>
+                <div
+                  className="prose lg:prose-xl"
+                  dangerouslySetInnerHTML={{ __html: chunk.contentHtml }}
+                />
+              </CardContent>
+            </Card>
+          ))}
+
+          {pageData.instructorNoteHtml && (
+            <Card
+              component="aside"
+              sx={{
+                mb: 3,
+                border: 2,
+                borderColor: 'secondary.main',
+                bgcolor: 'secondary.light',
+              }}
+            >
+              <CardHeader
+                title="Instructor Notes"
+                component="h3"
+                sx={{ color: 'secondary.contrastText' }}
+              />
+              <CardContent>
+                <div
+                  className="prose lg:prose-xl"
+                  dangerouslySetInnerHTML={{
+                    __html: pageData.instructorNoteHtml,
+                  }}
+                />
+              </CardContent>
+            </Card>
+          )}
         </Container>
       </Box>
     </Box>
