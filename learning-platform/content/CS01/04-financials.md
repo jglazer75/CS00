@@ -1,3 +1,19 @@
+---
+title: "Module 4: Startup Finances"
+description: "An overview of essential financial documents for startups, including pro forma statements, projected financials, and competitive analysis."
+learning_concepts:
+  - "Pro Forma Financial Statements"
+  - "Projected Financial Statements"
+  - "Competitive Analysis"
+  - "Pitch Decks"
+learning_objectives:
+  - "Explain the purpose and use of pro forma financial statements"
+  - "Produce and Analyze projected financials for a 6 month, 1 year, and 3 year time horizon."
+  - "Explain the benefits and general processes for performing a robust market competition analysis"
+  - "Explain the purpose of a pitch deck and its synthesis of business models, market analyses, and financial projections."
+author: "Jeffrey M Glazer"
+date: "2025-10-18"
+---
 # Module 4: Startup Finances
 {:.no_toc}
 

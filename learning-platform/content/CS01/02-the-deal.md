@@ -1,3 +1,19 @@
+---
+title: "Module 2: The Deal - Deconstructing the Term Sheet"
+description: "A detailed breakdown of a sample term sheet, explaining key components like valuation, IP licensing, and investor rights."
+learning_concepts:
+  - "Term sheet components: valuation, anti-dilution, liquidation preference (implied), IP licensing vs. assignment."
+  - "Equity financing and its dilutive effects."
+  - "Key license terms: exclusivity, field of use, term, royalties/milestones."
+  - "Investor rights: pro-rata rights, information rights, board seats/observer rights."
+learning_objectives:
+  - "Define and analyze the key financial and control terms within a venture financing term sheet."
+  - "Calculate the impact of anti-dilution provisions on the company's capitalization structure."
+  - "Differentiate between an IP license and an IP assignment and articulate the strategic advantages of each for both parties."
+  - "Evaluate how investor diligence and control terms (e.g., board observation, reporting) affect a startup's operations."
+author: "Jeffrey M Glazer"
+date: "2025-10-18"
+---
 # Module 2: The Deal - Deconstructing the Term Sheet
 {:.no_toc}
 

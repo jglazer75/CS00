@@ -1,3 +1,17 @@
+---
+title: "Module 5: Pitch Competition"
+description: "A capstone exercise where students create a pitch deck, P&L summary, and a sources and uses of funds statement, culminating in a mock pitch competition."
+learning_concepts:
+  - "Financial document creation"
+  - "Investor pitch development"
+  - "Startup accelerators"
+learning_objectives:
+  - "Create a P&L summary and a sources and uses of funds statement."
+  - "Develop a compelling investor pitch deck and presentation."
+  - "Understand the role and function of startup accelerators in the ecosystem."
+author: "Jeffrey M Glazer"
+date: "2025-10-18"
+---
 # Module 5: Pitch Competition
 {:.no_toc}
 

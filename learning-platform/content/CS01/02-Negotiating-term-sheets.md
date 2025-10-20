@@ -1,3 +1,19 @@
+---
+title: "Module 2: Negotiating Term Sheets"
+description: "A guide to negotiating term sheets, focusing on the key concepts of economics and control, and understanding leverage."
+learning_concepts:
+  - "Economics vs. Control"
+  - "Leverage in Negotiation"
+  - "Early Stage Investors"
+  - "Investment Instruments"
+learning_objectives:
+  - "Understand the two primary components of any term sheet: economics and control."
+  - "Identify sources of leverage in a negotiation, such as competition and traction."
+  - "Differentiate between different types of early-stage investors."
+  - "Explain the difference between priced and un-priced investment rounds."
+author: "Jeffrey M Glazer"
+date: "2025-10-18"
+---
 # Module 2:Negotiating Term Sheets
 {:.no_toc}
 
@@ -10,7 +26,7 @@ A presentation by Jeffrey M. Glazer
 
 This is the start of a multi-year relationship. An overly aggressive negotiation can poison the well before you even start.
 
-**Fair Deal \!= Winning Deal** Your investors are your partners. Their success is tied to yours. The goal is to find a "fair" deal, not a "winning" deal. A fair deal aligns incentives for everyone.
+**Fair Deal != Winning Deal** Your investors are your partners. Their success is tied to yours. The goal is to find a "fair" deal, not a "winning" deal. A fair deal aligns incentives for everyone.
 
 ### Key Concept: Economics + Control
 {:.keyconcept}
@@ -32,7 +48,7 @@ Show progress. Tell stories of actual customer discovery (customers are people w
 
 A quick note on *customers* v *users*: Customers are people who pay you. Users are people that use the product or service. They are not always the same person. For example, in social media you are not the customer, you are the *user* (or, more cynically, the product); the companies that pay for ads are the *customers*.
 
-**Narrative \+ Source/Use of Funds**
+**Narrative + Source/Use of Funds**
 Know your pitch, but, more importantly, know your finances. How much do you need? What are you going to do with it? When and how much is the next round? How does this relate to your story and growth narrative? A detailed, credible use-of-funds plan builds confidence.
 
 **Golden Rule**
@@ -79,7 +95,7 @@ S/He who has the gold makes the rules. Unless you have something they can't get 
 
 ---
 
-## SAFE \+ Convertible Note
+## SAFE + Convertible Note
 
 What's the difference?  
 
@@ -101,19 +117,19 @@ Terms specific to convertible notes:
 
 * *Example:* $1M SAFE with a $10M cap. If the next round is at $20M, the SAFE holder converts at the $10M price, effectively doubling their ownership stake compared to new investors.
 
-**Discount Rate:** A discount the investor gets on the price of the next round. Typically 15-20%.
+**Discount Rate:** A discount the investor gets on the price of the next round. Typically 15-20%. 
 
 * *Example:* Next round is priced at $1.00/share. A 20% discount means the SAFE holder converts at $0.80/share.
 
 **Other Concepts:**
 
-**Pre/Post-Money:** Are you using a "Pre-Money" or "Post-Money" SAFE? Post-money SAFEs are investor-friendly and have become more common. They can be significantly more dilutive to founders. Understand the math\!  
+**Pre/Post-Money:** Are you using a "Pre-Money" or "Post-Money" SAFE? Post-money SAFEs are investor-friendly and have become more common. They can be significantly more dilutive to founders. Understand the math!  
 
 **MFN:** The holder of an MFN instrument always gets the most favorable negotiated deal in the round.
 
 * *Example:* Investor A has MFN; Investor B negotiates a 5% discount rate; Investor C negotiates a 20% discount rate. Investor A (all other things equal) will get Investor C's 20% discount rate.
 
-**Convertible Note:** is debt\!\!  
+**Convertible Note:** is debt!!  
 
 * **Interest Rate:** A small interest rate (2-8%) that accrues and is added to the principal that converts to equity.
 * **Maturity Date:** A date (typically 18-24 months) by which, if a priced round hasn't occurred, the note is due.
@@ -128,7 +144,7 @@ Even if you raise on a SAFE or other convertible interest for the purpose of pun
 
 ### Economics
 
-* Pre-Money Valuation \+ Amount Raised in Round = Post-Money Valuation
+* Pre-Money Valuation + Amount Raised in Round = Post-Money Valuation
 * Option Pool: The option pool (for future employees) is almost always created before the first major investment, reducing the founder's effective valuation. *Example:* An investor agrees to a $10M "pre-money" valuation but requires a 20% option pool. The pool is created from the existing equity, so the true pre-money valuation of the company is now $8M. You can do the mental gymnastics to figure out why this is true.
 * Liquidation Preferences  
   * *Modern Standard:* 1x, Non-Participating. Investor gets the first money out in a sale—either their investment back OR their ownership percentage, whichever is greater.  
@@ -140,18 +156,18 @@ Even if you raise on a SAFE or other convertible interest for the purpose of pun
 
 **Anti-dilution** is a surprisingly difficult concept to implement. Let's break down what's really going on when an investor asks for "anti-dilution" provisions. First, what the investor is really asking is that as you are raising money their ownership percentage won't change. So, if the investor owns 10% of the company (for sake of easy math, let's just assume Investor A owns 10,000 shares of 100,000 total outstanding shares), when more money comes in, Investor A will continue to own 10% of the company. But, what does this really mean?
 
-**Example**. Founder puts $90,000 in to ABC, Co. for \$1/share. The next day Investor A puts in $10,000 for \$1/share \+ "anti-dilution" protection. Quick-review: Pre-Money Valuation (\$90,000) \+ Amount Raised in Round (\$10,000) = Post-Money Valuation (\$100,000). Therefore, *Investor's A ownership percentage = 10% (\$10,000/\$100,000)*. The next week, Investor B comes along and wants to put in \$20,000 for \$1/share. So, again, post-money valuation will equal \$120,000.
+**Example**. Founder puts $90,000 in to ABC, Co. for $1/share. The next day Investor A puts in $10,000 for $1/share + "anti-dilution" protection. Quick-review: Pre-Money Valuation ($90,000) + Amount Raised in Round ($10,000) = Post-Money Valuation ($100,000). Therefore, *Investor's A ownership percentage = 10% ($10,000/$100,000)*. The next week, Investor B comes along and wants to put in $20,000 for $1/share. So, again, post-money valuation will equal $120,000.
 
 The cap-table now looks like: Founder (90k shares) = 75%; Investor A (10k shares) = 8.33%; Investor B (20k shares) = 16.67%. But Investor A has "anti-dilution" percentage and needs to be brought up to 10%, but none of the valuations change. To get Investor A up to 10% ABC Co must issue new shares. ABC Co must give Investor A another 2,204 shares to account for the anti-dilution requirement. Here's the math:
 
-120k / (1.00-(.1 - .0833)) *or* \\
-120,000 total shares / .9833 = 122,038 total shares outstanding \\
-122,038 \* 10% = 2,203.8 \\
+120k / (1.00-(.1 - .0833)) *or* \
+120,000 total shares / .9833 = 122,038 total shares outstanding \ 
+122,038 * 10% = 2,203.8 \ 
 round up to avoid fractional shares = 2,204 additional shares.
 
 New, New capt-table: Founder: 73.77%; Investor A: 10.00%; Investor B: 16.39% (this totals 100.16 because I rounded to the nearest 100th)
 
-**TAX NOTE:** ABC, Co will "grant" these 2,204 shares to Investor A; since Investor A isn't paying for these shares, the grant  *also* creates taxable income for Investor A in the amount of $2,204 (at $1/share)
+**TAX NOTE:** ABC, Co will "grant" these 2,204 shares to Investor A; since Investor A isn't paying for these shares, the grant *also* creates taxable income for Investor A in the amount of $2,204 (at $1/share)
 
 The usual ways around this are for the company NOT to grant more shares to Investor A, but rather provide rights that allow the Investor to maintain their ownership percentage such tag-along rights or rights of first refusal.
 
@@ -168,7 +184,7 @@ The usual ways around this are for the company NOT to grant more shares to Inves
 
 ## Technology-Specific Considerations
 
-**Time \+ Money:** For some technologies (e.g., pharma) startup costs can be particularly high because of high equipment/lab costs (BioTech), tooling costs (HardTech/AgTech), service costs (AI), or build-out costs (AgriTourism/Food&Bev). For others, development timelines (Pharma) or sales timelines (EdTech/GovTech) can be particularly long. The impacts of these marginal costs need to be known and accounted-for from the very beginning. For high-costs, this means rounds will be bigger to fund higher burn-rates; for long timelines this means rounds need to fund longer runways.
+**Time + Money:** For some technologies (e.g., pharma) startup costs can be particularly high because of high equipment/lab costs (BioTech), tooling costs (HardTech/AgTech), service costs (AI), or build-out costs (AgriTourism/Food&Bev). For others, development timelines (Pharma) or sales timelines (EdTech/GovTech) can be particularly long. The impacts of these marginal costs need to be known and accounted-for from the very beginning. For high-costs, this means rounds will be bigger to fund higher burn-rates; for long timelines this means rounds need to fund longer runways.
 
 **Intellectual Property:** All industries have IP. Some are strongly patent protected (pharma, hardtech), others are strongly copyright protected (software, services). In others trade secrets are incredibly important (food). All have trademark issues. Investors want to know that the company's founders understand what IP the company owns and have a coherent and comprensive strategy for acquiring and leveraging it.
 
@@ -186,9 +202,8 @@ The usual ways around this are for the company NOT to grant more shares to Inves
 
 1. Introduction/Pitch/Relationship Building: Think in *ROUNDS*, not *DEALS*
 2. Term Sheet Signed: Term sheets are mostly non-binding, but they create moral commitment. Exclusivity ("no-shop") and confidentiality clauses are usually binding.
-3. Due Diligence: The investor's lawyers and analysts will verify everything. Financials, technology, legal structure, customer contracts, etc. Be organized\!
+3. Due Diligence: The investor's lawyers and analysts will verify everything. Financials, technology, legal structure, customer contracts, etc. Be organized!  
 4. Document Drafting: The term sheet is expanded into lengthy, binding legal contracts. A lawyer should handle the heavy lifting.
 5. Closing: You sign a mountain of paperwork.
 6. ???  
-7. Profit (cash that check, yo\!)
-
+7. Profit (cash that check, yo!)

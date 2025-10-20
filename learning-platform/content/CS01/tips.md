@@ -1,3 +1,19 @@
+---
+title: "Some Tips on Negotiating"
+description: "A guide to negotiation dynamics, focusing on founder archetypes and how leverage impacts specific term sheet clauses."
+learning_concepts:
+  - "Founder Archetypes"
+  - "Negotiation Leverage"
+  - "IP Representations & Warranties"
+  - "Founder Vesting"
+  - "Exclusivity Period"
+learning_objectives:
+  - "Understand how an investor's perception of a founder's background can influence a negotiation."
+  - "Identify how leverage can be used to negotiate specific contract clauses like IP warranties and vesting."
+  - "Analyze the strategic importance of the 'no-shop' or exclusivity period in a term sheet."
+author: "Jeffrey M Glazer"
+date: "2025-10-18"
+---
 # Some Tips on Negotiating
 
 *\* This material was developed by Google Gemini Pro 2.5 on June 19, 2025*

@@ -1,3 +1,19 @@
+---
+title: "Module 1: Foundations – The Setup & The Stakes"
+description: "An introduction to the key parties, concepts, and legal stakes involved in a corporate spin-off and the formation of a new technology company."
+learning_concepts:
+  - "Corporate Spin-offs and Technology Transfer"
+  - "IP assignment in employment"
+  - "Founder motivations and entity formation"
+  - "Intial capitalization and sweat equity"
+learning_objectives:
+  - "Explain the business and university policy justifications for internal project commercialization"
+  - "Identify the different ways in which employers have rights over employee-created IP"
+  - "Identify personal and professional factors that motivate founders when working from within"
+  - "Analyze an initial capitalization table, the implications of equity splits, vesting schedules, and impact of later investment on founder equity"
+author: "Jeffrey M Glazer"
+date: "2025-10-18"
+---
 # Module 1: Foundations – The Setup & The Stakes
 {:.no_toc}
 
