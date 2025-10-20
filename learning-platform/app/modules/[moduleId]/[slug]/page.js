@@ -1,6 +1,7 @@
 import { getAllModuleIds, getPageData, getSortedPagesData } from '@/lib/content';
 import ModuleNav from '@/app/components/ModuleNav';
-import { Box, Container, Typography, Card, CardContent, CardHeader } from '@mui/material';
+import ModulePageContent from '@/app/components/ModulePageContent';
+import { Box } from '@mui/material';
 
 export async function generateStaticParams() {
   const moduleIds = await getAllModuleIds();
@@ -33,58 +34,11 @@ export default async function Page({ params }) {
   return (
     <Box sx={{ display: 'flex' }}>
       <ModuleNav moduleId={moduleId} activeSlug={slug} pages={navData} />
-      <Box
-        component="main"
-        sx={{
-          flexGrow: 1,
-          py: 4,
-          px: 3,
-          bgcolor: 'background.default',
-        }}
-      >
-        <Container maxWidth="lg">
-          <Typography variant="h1" component="h1" gutterBottom>
-            {pageData.title}
-          </Typography>
-          {pageData.contentChunks.map((chunk, index) => (
-            <Card key={index} component="article" sx={{ mb: 3 }}>
-              <CardHeader title={chunk.title} component="h2" />
-              <CardContent>
-                <div
-                  className="prose lg:prose-xl"
-                  dangerouslySetInnerHTML={{ __html: chunk.contentHtml }}
-                />
-              </CardContent>
-            </Card>
-          ))}
-
-          {pageData.instructorNoteHtml && (
-            <Card
-              component="aside"
-              sx={{
-                mb: 3,
-                border: 2,
-                borderColor: 'secondary.main',
-                bgcolor: 'secondary.light',
-              }}
-            >
-              <CardHeader
-                title="Instructor Notes"
-                component="h3"
-                sx={{ color: 'secondary.contrastText' }}
-              />
-              <CardContent>
-                <div
-                  className="prose lg:prose-xl"
-                  dangerouslySetInnerHTML={{
-                    __html: pageData.instructorNoteHtml,
-                  }}
-                />
-              </CardContent>
-            </Card>
-          )}
-        </Container>
-      </Box>
+      <ModulePageContent
+        title={pageData.title || slug}
+        contentChunks={pageData.contentChunks}
+        instructorNoteHtml={pageData.instructorNoteHtml}
+      />
     </Box>
   );
 }

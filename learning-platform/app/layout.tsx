@@ -4,6 +4,7 @@ import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import theme from './theme';
 import Header from "./components/Header";
+import { InstructorModeProvider } from "./context/InstructorModeContext";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -22,8 +23,10 @@ export default function RootLayout({
         <AppRouterCacheProvider>
           <ThemeProvider theme={theme}>
             <CssBaseline />
-            <Header />
-            {children}
+            <InstructorModeProvider>
+              <Header />
+              {children}
+            </InstructorModeProvider>
           </ThemeProvider>
         </AppRouterCacheProvider>
       </body>
