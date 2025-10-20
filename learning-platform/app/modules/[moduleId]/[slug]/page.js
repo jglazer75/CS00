@@ -1,6 +1,6 @@
 import { getAllModuleIds, getPageData, getSortedPagesData } from '@/lib/content';
 import ModuleNav from '@/app/components/ModuleNav';
-import { Box, Container, Paper, Typography, Card, CardContent, CardHeader } from '@mui/material';
+import { Box, Container, Typography, Card, CardContent, CardHeader } from '@mui/material';
 
 export async function generateStaticParams() {
   const moduleIds = await getAllModuleIds();
@@ -43,6 +43,9 @@ export default async function Page({ params }) {
         }}
       >
         <Container maxWidth="lg">
+          <Typography variant="h1" component="h1" gutterBottom>
+            {pageData.title}
+          </Typography>
           {pageData.contentChunks.map((chunk, index) => (
             <Card key={index} component="article" sx={{ mb: 3 }}>
               <CardHeader title={chunk.title} component="h2" />

@@ -3,7 +3,6 @@ import path from 'path';
 import matter from 'gray-matter';
 import { remark } from 'remark';
 import html from 'remark-html';
-import toc from 'remark-toc';
 
 const contentDirectory = path.join(process.cwd(), 'content');
 
