@@ -15,12 +15,6 @@ author: "Jeffrey M Glazer"
 date: "2025-10-18"
 ---
 # Module 2:Negotiating Term Sheets
-{:.no_toc}
-
-* this unordered seed list will be replaced by toc as unordered list
-{:toc}
-
-A presentation by Jeffrey M. Glazer
 
 ## Think Marriage, Not War
 

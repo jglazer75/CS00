@@ -72,25 +72,6 @@ Each group should take 40 minutes to discuss the Term Sheet and, in your role fo
 
 You should reference [the term sheet found in Module 2](./02-the-deal.md) and you may find the [capitalization table in Module 1](./01-foundations.md) helpful.
 
-## AI Term Sheet Analysis
-
-Upload your redlined term sheet (.docx or .pdf) to receive an AI-powered analysis and negotiation suggestions.
-
-<div id="term-sheet-analyzer">
-  <form id="upload-form">
-    <input type="file" id="term-sheet-file" accept=".docx,.pdf">
-    <button type="submit">Submit for Analysis</button>
-  </form>
-  <div id="analysis-result" style="display:none;">
-    <h3>Analysis Results:</h3>
-    <div id="loading-indicator">Analyzing...</div>
-    <div id="error-message" style="color:red;"></div>
-    <pre id="analysis-output"></pre>
-  </div>
-</div>
-
-<script src="{{ '/assets/js/term-sheet-analyzer.js' | relative_url }}"></script>
-
 ## Part 2 - Face Off {#pt2-face-off}
 
 Once you have marked up the Term Sheet, it is sent to BigTech and their lawyers. Their lawyers have responded and would like to set up a time to talk through your suggestions. 
@@ -110,54 +91,6 @@ _< 45 mins_ - Each team should just speak directly to each other and note areas 
 _1 hr - 2 hr_ - This is enough time that teams typically present and discuss alternatives face to face, but may take time away from "the table" to discuss strategy in between rounds of negotiating. This is enough time that most teams will get through all major issues in the redline, but may not reach definite numbers or fully understand the consequences of their agreements.
 
 _3 - 7 days_ - In this scenario, the parties negotiate outside of class on their own time. This is enough time to fully negotiate the term sheet. Results should be detailed and often the parties may exchange a few redlines before occasionally coming together (either in-person or remotely) to discuss major points.
-
-## Part 2 - AI Negotiation (DealCraft MVP)
-
-Engage in a simulated negotiation with an AI opponent. Paste your term sheet, choose your role, and try to negotiate the best deal for your side.
-
-<style>
-  #dealcraft-container { border: 1px solid #ccc; padding: 15px; border-radius: 5px; margin-top: 20px; }
-  #dealcraft-setup textarea { width: 100%; min-height: 150px; margin-bottom: 10px; }
-  #dealcraft-setup .roles { margin-bottom: 15px; }
-  #chat-history { height: 400px; border: 1px solid #eee; overflow-y: auto; padding: 10px; margin-bottom: 10px; background-color: #f9f9f9; }
-  .chat-message { margin-bottom: 10px; }
-  .user-message strong { color: #007bff; }
-  .ai-message strong { color: #28a745; }
-  .system-message { font-style: italic; color: #6c757d; }
-  #chat-input-area { display: flex; }
-  #chat-input-area input { flex-grow: 1; margin-right: 10px; }
-  #status-display { margin-top: 10px; color: #888; }
-</style>
-
-<div id="dealcraft-container">
-  <!-- Setup View -->
-  <div id="dealcraft-setup">
-    <h3>1. Upload Your Redlined Term Sheet</h3>
-    <input type="file" id="dealcraft-term-sheet-file" name="termSheetFile" accept=".docx,.pdf">
-    
-    <h3>2. Choose Your Role</h3>
-    <div class="roles">
-      <label><input type="radio" name="userRole" value="NewCo" checked> Represent NewCo</label><br>
-      <label><input type="radio" name="userRole" value="BigTech"> Represent BigTech</label>
-    </div>
-
-    <h3>3. Start Negotiating</h3>
-    <button id="start-negotiation-btn" class="btn">Start Negotiation</button>
-  </div>
-
-  <!-- Chat View (Initially Hidden) -->
-  <div id="dealcraft-chat" style="display: none;">
-    <h3>Negotiation</h3>
-    <div id="chat-history"></div>
-    <div id="status-display" style="display: none;"></div>
-    <div id="chat-input-area">
-      <input type="text" id="message-input" placeholder="Type your message...">
-      <button id="send-message-btn" class="btn">Send</button>
-    </div>
-  </div>
-</div>
-
-<script src="{{ '/assets/js/dealcraft.js' | relative_url }}"></script>
 
 ## Part 3 - Review {#pt3-review}
 

@@ -15,17 +15,6 @@ author: "Jeffrey M Glazer"
 date: "2025-10-18"
 ---
 # Module 4: Startup Finances
-{:.no_toc}
-
-* this unordered seed list will be replaced by toc as unordered list
-{:toc}
-
-| Learning Concepts | Learning Objectives |
-| ------ | -------- |
-| Pro Forma Financial Statements | Explain the purpose and use of pro forma financial statements |
-| Projected Financial Statements | Produce and Analyze projected financials for a 6 month, 1 year, and 3 year time horizon.|
-| Competitive Analysis | Explain the benefits and general processes for performing a robust market competition analysis|
-| Pitch Decks | Explain the purpose of a pitch deck and its synthesis of business models, market analyses, and financial projections.|
 
 In the facts in Module 1, we are told that NewCo will need to hire 3-5 engineers for research and 1 marketing officer to start doing customer validation. Together these 6 positions will each cost at least $100,000 per year plus equity incentives.
 

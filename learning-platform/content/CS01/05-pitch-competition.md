@@ -13,10 +13,6 @@ author: "Jeffrey M Glazer"
 date: "2025-10-18"
 ---
 # Module 5: Pitch Competition
-{:.no_toc}
-
-* this unordered seed list will be replaced by toc as unordered list
-{:toc}
 
 ## Additional Facts
 

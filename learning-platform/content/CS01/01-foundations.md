@@ -15,17 +15,6 @@ author: "Jeffrey M Glazer"
 date: "2025-10-18"
 ---
 # Module 1: Foundations – The Setup & The Stakes
-{:.no_toc}
-
-* this unordered seed list will be replaced by toc as unordered list
-{:toc}
-
-| Learning Concepts | Learning Objectives |
-| ------ | -------- |
-|Corporate Spin-offs and Technology Transfer | Explain the business and university policy justifications for internal project commercialization |
-| IP assignment in employment | Identify the different ways in which employers have rights over employee-created IP|
-| Founder motivations and entity formation | Identify personal and professional factors that motivate founders when working from within|
-| Intial capitalization and sweat equity | Analyze an initial capitalization table, the implications of equity splits, vesting schedules, and impact of later investment on founder equity|
 
 *[IP]: Intellectual Property
 

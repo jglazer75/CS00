@@ -19,5 +19,3 @@ Since this is the first startup by Baker and Carter, the position of BigTech is 
 BigTech is concerned about the inexperience of NewCo’s founders in running their own enterprise. While they were wonderful R&D managers for such a large company, they have no experience running a company. BigTech would like to require NewCo that bring someone on with more experience in the startup environment.
 
 BigTech themselves might be interested in putting more money into NewCo if development continues on its promising track. In any event, the executives at BigTech have contacts at a variety of Venture Capital firms that might be able to provide larger funding rounds to NewCo rather than NewCo’s proposed piecemeal angel investments.
-
-**[<-- Back to Module 3: The Exercise](./03-the-exercise.md)**
