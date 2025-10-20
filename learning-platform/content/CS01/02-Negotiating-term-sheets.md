@@ -14,8 +14,6 @@ learning_objectives:
 author: "Jeffrey M Glazer"
 date: "2025-10-18"
 ---
-# Module 2:Negotiating Term Sheets
-
 ## Think Marriage, Not War
 
 This is the start of a multi-year relationship. An overly aggressive negotiation can poison the well before you even start.

@@ -14,8 +14,6 @@ learning_objectives:
 author: "Jeffrey M Glazer"
 date: "2025-10-18"
 ---
-# Some Tips on Negotiating
-
 *\* This material was developed by Google Gemini Pro 2.5 on June 19, 2025*
 
 ## On the Sociology of the Founding Team (Founder Archetypes)

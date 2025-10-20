@@ -14,8 +14,6 @@ learning_objectives:
 author: "Jeffrey M Glazer"
 date: "2025-10-18"
 ---
-# Module 2: The Deal - Deconstructing the Term Sheet
-
 *[IP]: Intellectual Property
 
 ## Resources

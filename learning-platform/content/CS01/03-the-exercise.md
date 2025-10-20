@@ -14,18 +14,6 @@ learning_objectives:
 author: "Jeffrey M Glazer"
 date: "2025-10-18"
 ---
-# The Negotiation
-{:.no_toc}
-
-* this unordered seed list will be replaced by toc as unordered list
-{:toc}
-
-| Learning Concepts | Learning Objectives |
-| ------ | -------- |
-|Negotiation Theory: BATNA, reservation points, creating and claiming value | Formulate counter-offers and draft redlined revision to a legal term sheet|
-| Client counseling and issue spotting | Develop a comprehensive negotiation strategy based on a client's stated goals and confidential information|
-| Strategic communication and persuasion| Synthesize competing interests to reach a mutually acceptable (or strategically abandoned) agreement|
-| Role-playing and perspective-taking | Engage in simulated negotiation, effectively articulating their position and responding to the other party's proposals|
 
 ## Part 1 - Markup the Term Sheet {#pt1-mup-term-sheet}
 

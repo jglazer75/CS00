@@ -12,8 +12,6 @@ learning_objectives:
 author: "Jeffrey M Glazer"
 date: "2025-10-18"
 ---
-# Module 5: Pitch Competition
-
 ## Additional Facts
 
 After securing the IP and other concessions from BigTech in exchange for equity in NewCo, Baker and Carter interviewed and hired Delia to be the CEO of NewCo. Delia was given 20% equity as part of her compensation package. Each of the three of them need to make at least $60,000 per year for the forseeable future for their services (luckily they each have spouses with health insurance, so the company will not need to sponsor a health insurance package); they have agreed to forego cash compensation until the first funding round is closed. Each of them have also been moved to a vesting schedule; they will vest over the next four years with a 1-year cliff. NewCo has also established a qualified employee stock option pool comprising 15% of fully diluted equity.

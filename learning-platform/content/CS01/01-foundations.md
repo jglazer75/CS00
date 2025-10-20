@@ -14,8 +14,6 @@ learning_objectives:
 author: "Jeffrey M Glazer"
 date: "2025-10-18"
 ---
-# Module 1: Foundations – The Setup & The Stakes
-
 *[IP]: Intellectual Property
 
 ## PARTIES
