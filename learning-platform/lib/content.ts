@@ -366,23 +366,19 @@ function extractHeadingInfo(node: Heading) {
 }
 
 function getNodeText(node: MarkdownNode): string {
-  if (isLiteral(node)) {
-    return typeof node.value === 'string' ? node.value : '';
+  const literalCandidate = node as Literal;
+  if (typeof literalCandidate.value === 'string') {
+    return literalCandidate.value;
   }
 
-  if (isParentNode(node)) {
-    return node.children.map((child) => getNodeText(child as MarkdownNode)).join('');
+  const parentCandidate = node as Parent;
+  if (Array.isArray(parentCandidate.children)) {
+    return (parentCandidate.children as MarkdownNode[])
+      .map((child) => getNodeText(child))
+      .join('');
   }
 
   return '';
-}
-
-function isLiteral(node: MarkdownNode): node is Literal {
-  return typeof (node as Literal).value !== 'undefined';
-}
-
-function isParentNode(node: MarkdownNode): node is Parent {
-  return Array.isArray((node as Parent).children);
 }
 
 function slugify(value: string): string {
