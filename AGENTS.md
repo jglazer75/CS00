@@ -4,6 +4,10 @@
 @./.gemini/uiux.md
 @./.gemini/contentengine.md
 @./.gemini/frontmatter.md
+@./.gemini/CS01-ai/term-sheet-analysis-plan.ai.md
+@./.gemini/CS01-ai/term-sheet-dealcraft-implmentation.ai.md
+@./.gemini/CS01-ai/term-sheet-dealcraft.ai.md
+@./.gemini/CS01-ai/term-sheet-dealcraft-sql.ai.md
 
 # AGENTS BRIEFING
 
