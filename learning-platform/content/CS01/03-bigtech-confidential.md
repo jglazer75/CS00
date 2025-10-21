@@ -9,6 +9,8 @@ learning_objectives:
   - "Understand the strategic reasons an incumbent company would license IP to a spin-off."
   - "Identify common investor concerns about founding teams."
   - "Analyze the perspective of the corporate investor in a spin-off venture."
+keywords:
+  - "IP: Intellectual Property"
 author: "Jeffrey M Glazer"
 date: "2025-10-18"
 ---

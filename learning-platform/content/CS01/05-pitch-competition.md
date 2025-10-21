@@ -9,6 +9,8 @@ learning_objectives:
   - "Create a P&L summary and a sources and uses of funds statement."
   - "Develop a compelling investor pitch deck and presentation."
   - "Understand the role and function of startup accelerators in the ecosystem."
+keywords:
+  - "P&L: Profit & Loss Statement"
 author: "Jeffrey M Glazer"
 date: "2025-10-18"
 ---

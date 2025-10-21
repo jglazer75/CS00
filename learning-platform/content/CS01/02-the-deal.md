@@ -11,11 +11,11 @@ learning_objectives:
   - "Calculate the impact of anti-dilution provisions on the company's capitalization structure."
   - "Differentiate between an IP license and an IP assignment and articulate the strategic advantages of each for both parties."
   - "Evaluate how investor diligence and control terms (e.g., board observation, reporting) affect a startup's operations."
+keywords:
+  - "IP: Intellectual Property"
 author: "Jeffrey M Glazer"
 date: "2025-10-18"
 ---
-*[IP]: Intellectual Property
-
 ## Resources
 {:.keyconcept}
 

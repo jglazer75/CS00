@@ -11,6 +11,8 @@ learning_objectives:
   - "Produce and Analyze projected financials for a 6 month, 1 year, and 3 year time horizon."
   - "Explain the benefits and general processes for performing a robust market competition analysis"
   - "Explain the purpose of a pitch deck and its synthesis of business models, market analyses, and financial projections."
+keywords:
+  - "P&L: Profit & Loss Statement"
 author: "Jeffrey M Glazer"
 date: "2025-10-18"
 ---
@@ -68,5 +70,3 @@ There are a lot of great resources about competitive analysis. In addition to th
 * [Asana: How to Create a Competitive Analysis](https://asana.com/resources/competitive-analysis-example)
 * [Carnegie Mellon Schwartz Center for Entrepreneurship (pdf)](https://www.cmu.edu/swartz-center-for-entrepreneurship/assets/Olympus%20pdfs/Competitive%20Analysis.pdf)
 * [Cambridge University Decision Support Tools](https://www.ifm.eng.cam.ac.uk/research/dstools/porters-generic-competitive-strategies/)
-
-*[P&L]: Profit & Loss Statement

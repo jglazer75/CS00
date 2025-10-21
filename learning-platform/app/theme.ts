@@ -16,6 +16,10 @@ const theme = createTheme({
     secondary: {
       main: '#2A5A2A', // Forest Green
     },
+    warning: {
+      main: '#FDB813', // Harvest Gold
+      contrastText: '#212121',
+    },
     background: {
       default: '#F7F7F7', // Light Gray
       paper: '#FFFFFF',

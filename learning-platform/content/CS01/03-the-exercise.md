@@ -11,6 +11,8 @@ learning_objectives:
   - "Develop a comprehensive negotiation strategy based on a client's stated goals and confidential information"
   - "Synthesize competing interests to reach a mutually acceptable (or strategically abandoned) agreement"
   - "Engage in simulated negotiation, effectively articulating their position and responding to the other party's proposals"
+keywords:
+  - "BATNA: Best Alternative to a Negotiated Agreement"
 author: "Jeffrey M Glazer"
 date: "2025-10-18"
 ---
@@ -43,7 +45,6 @@ A key part of negotiating is understanding your leverage and the leverage of the
 
 Every negotiation has two potential results:  it works, or it doesn't. Of course, the final negotiated result may look very different from where the parties started, but sometimes there is no common ground to be found. In this case, both parties go home without a deal and need to then turn to their Best Alternative to a Negotiated Agreement ("BATNA").
 
-*[BATNA]: Best Alternative to a Negotiated Agreement
 
 ### Resources
 {:.keyconcept}

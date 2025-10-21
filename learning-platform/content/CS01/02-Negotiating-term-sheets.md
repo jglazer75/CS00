@@ -11,6 +11,13 @@ learning_objectives:
   - "Identify sources of leverage in a negotiation, such as competition and traction."
   - "Differentiate between different types of early-stage investors."
   - "Explain the difference between priced and un-priced investment rounds."
+keywords:
+  - "MFN: Most Favored Nation"
+  - "tag-along: may participate in future round on same terms as the round"
+  - "rights of first refusal: get first right to participate in the next round on same terms as the round"
+  - "burn-rate: Cash In - Cash Out per month"
+  - "runway: how long a given round of cash will last"
+  - "IP: Intellectual Property"
 author: "Jeffrey M Glazer"
 date: "2025-10-18"
 ---
@@ -126,7 +133,6 @@ Terms specific to convertible notes:
 * **Interest Rate:** A small interest rate (2-8%) that accrues and is added to the principal that converts to equity.
 * **Maturity Date:** A date (typically 18-24 months) by which, if a priced round hasn't occurred, the note is due.
 
-*[MFN]: Most Favored Nation
 
 ---
 
@@ -163,8 +169,6 @@ New, New capt-table: Founder: 73.77%; Investor A: 10.00%; Investor B: 16.39% (th
 
 The usual ways around this are for the company NOT to grant more shares to Investor A, but rather provide rights that allow the Investor to maintain their ownership percentage such tag-along rights or rights of first refusal.
 
-*[tag-along]: may participate in future round on same terms as the round
-*[rights of first refusal]: get first right to participate in the next round on same terms as the round
 
 ### Control
 
@@ -184,9 +188,6 @@ The usual ways around this are for the company NOT to grant more shares to Inves
 
 **Mission-Aligned:** The "impact" investor universe can be challenging. The good news is that the right investor is often looking for the right solution for reasons that are not strictly financial. The bad news is finding that fit can be hard and very time consuming. Seek out investors who understand the problem *and* the technology *and* share your long-term vision. While these investors can be more patient and provide more relevant strategic value, there are far fewer of them and they get a lot of deals to look at.
 
-*[burn-rate]: Cash In - Cash Out per month
-*[runway]: how long a given round of cash will last
-*[IP]: Intellectual Property
 
 ---
 

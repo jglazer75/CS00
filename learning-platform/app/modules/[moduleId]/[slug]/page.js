@@ -35,9 +35,10 @@ export default async function Page({ params }) {
     <Box sx={{ display: 'flex' }}>
       <ModuleNav moduleId={moduleId} activeSlug={slug} pages={navData} />
       <ModulePageContent
-        title={pageData.title || slug}
-        contentChunks={pageData.contentChunks}
-        instructorNoteHtml={pageData.instructorNoteHtml}
+        metadata={pageData.metadata}
+        chunks={pageData.chunks}
+        instructorNote={pageData.instructorNote}
+        tableOfContents={pageData.tableOfContents}
       />
     </Box>
   );

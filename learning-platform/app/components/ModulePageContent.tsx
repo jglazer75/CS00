@@ -1,34 +1,27 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import {
-  Box,
-  Card,
-  CardContent,
-  CardHeader,
-  Container,
-  IconButton,
-  Tooltip,
-  Typography,
-} from '@mui/material';
+import { useEffect, useMemo, useState } from 'react';
+import { Box, Container, IconButton, Stack, Tooltip, Typography } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { useInstructorMode } from '../context/InstructorModeContext';
-
-type ContentChunk = {
-  title: string;
-  contentHtml: string;
-};
+import MetadataCard from './cards/MetadataCard';
+import ContentCard from './cards/ContentCard';
+import InstructorNoteCard from './cards/InstructorNoteCard';
+import TableOfContents from './TableOfContents';
+import type { ContentChunk, InstructorNote, PageMetadata, TableOfContentsItem } from '@/lib/content';
 
 type ModulePageContentProps = {
-  title: string;
-  contentChunks: ContentChunk[];
-  instructorNoteHtml: string | null;
+  metadata: PageMetadata;
+  chunks: ContentChunk[];
+  instructorNote?: InstructorNote;
+  tableOfContents: TableOfContentsItem[];
 };
 
 export default function ModulePageContent({
-  title,
-  contentChunks,
-  instructorNoteHtml,
+  metadata,
+  chunks,
+  instructorNote,
+  tableOfContents,
 }: ModulePageContentProps) {
   const { isInstructorMode } = useInstructorMode();
   const [showInstructorCard, setShowInstructorCard] = useState(false);
@@ -39,11 +32,30 @@ export default function ModulePageContent({
     }
   }, [isInstructorMode]);
 
-  const hasInstructorNotes = Boolean(instructorNoteHtml);
+  const hasInstructorNotes = Boolean(instructorNote?.html);
 
   const handleInfoToggle = () => {
     setShowInstructorCard((prev) => !prev);
   };
+
+  const publishedAt = useMemo(() => {
+    if (!metadata.date) {
+      return undefined;
+    }
+
+    const parsed = new Date(metadata.date);
+    if (Number.isNaN(parsed.getTime())) {
+      return metadata.date;
+    }
+
+    return parsed.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+  }, [metadata.date]);
+
+  const authorAndDate = [metadata.author, publishedAt].filter(Boolean).join(' • ');
 
   return (
     <Box
@@ -55,69 +67,59 @@ export default function ModulePageContent({
         bgcolor: 'background.default',
       }}
     >
-      <Container maxWidth="lg">
+      <Container maxWidth="lg" sx={{ pb: 6 }}>
         <Box
           sx={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            mb: 3,
-            gap: 1,
+            display: { xs: 'block', md: 'grid' },
+            gridTemplateColumns: { md: 'minmax(0, 1fr)', lg: 'minmax(0, 1fr) 280px' },
+            gap: { md: 4, lg: 6 },
           }}
         >
-          <Typography variant="h1" component="h1" gutterBottom sx={{ mb: 0 }}>
-            {title}
-          </Typography>
-          {isInstructorMode && hasInstructorNotes && (
-            <Tooltip title={showInstructorCard ? 'Hide instructor notes' : 'Show instructor notes'}>
-              <IconButton
-                color={showInstructorCard ? 'secondary' : 'default'}
-                onClick={handleInfoToggle}
-                aria-label={showInstructorCard ? 'Hide instructor notes' : 'Show instructor notes'}
-              >
-                <InfoOutlinedIcon />
-              </IconButton>
-            </Tooltip>
-          )}
+          <Stack spacing={3}>
+            <Box
+              sx={{
+                display: 'flex',
+                alignItems: { xs: 'flex-start', sm: 'center' },
+                justifyContent: 'space-between',
+                gap: 2,
+                flexWrap: 'wrap',
+              }}
+            >
+              <Box>
+                <Typography variant="h1" component="h1" sx={{ mb: 1 }}>
+                  {metadata.title}
+                </Typography>
+                {authorAndDate && (
+                  <Typography variant="body2" color="text.secondary">
+                    {authorAndDate}
+                  </Typography>
+                )}
+              </Box>
+              {isInstructorMode && hasInstructorNotes && (
+                <Tooltip title={showInstructorCard ? 'Hide instructor notes' : 'Show instructor notes'}>
+                  <IconButton
+                    color={showInstructorCard ? 'secondary' : 'default'}
+                    onClick={handleInfoToggle}
+                    aria-label={showInstructorCard ? 'Hide instructor notes' : 'Show instructor notes'}
+                  >
+                    <InfoOutlinedIcon />
+                  </IconButton>
+                </Tooltip>
+              )}
+            </Box>
+
+            <MetadataCard metadata={metadata} />
+
+            {chunks.map((chunk) => (
+              <ContentCard key={chunk.id} chunk={chunk} />
+            ))}
+
+            {isInstructorMode && hasInstructorNotes && showInstructorCard && instructorNote && (
+              <InstructorNoteCard title={instructorNote.title} html={instructorNote.html} />
+            )}
+          </Stack>
+          <TableOfContents items={tableOfContents} />
         </Box>
-
-        {contentChunks.map((chunk, index) => (
-          <Card key={index} component="article" sx={{ mb: 3 }}>
-            <CardHeader title={chunk.title} component="h2" />
-            <CardContent>
-              <div
-                className="prose lg:prose-xl"
-                dangerouslySetInnerHTML={{ __html: chunk.contentHtml }}
-              />
-            </CardContent>
-          </Card>
-        ))}
-
-        {isInstructorMode && hasInstructorNotes && showInstructorCard && (
-          <Card
-            component="aside"
-            sx={{
-              mb: 3,
-              border: 2,
-              borderColor: 'secondary.main',
-              bgcolor: 'secondary.light',
-            }}
-          >
-            <CardHeader
-              title="Instructor Notes"
-              component="h3"
-              sx={{ color: 'secondary.contrastText' }}
-            />
-            <CardContent>
-              <div
-                className="prose lg:prose-xl"
-                dangerouslySetInnerHTML={{
-                  __html: instructorNoteHtml || '',
-                }}
-              />
-            </CardContent>
-          </Card>
-        )}
       </Container>
     </Box>
   );
