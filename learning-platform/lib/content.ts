@@ -366,25 +366,23 @@ function extractHeadingInfo(node: Heading) {
 }
 
 function getNodeText(node: MarkdownNode): string {
-  if (isLiteral(node) && typeof node.value === 'string') {
-    return node.value;
+  if (isLiteral(node)) {
+    return typeof node.value === 'string' ? node.value : '';
   }
 
   if (isParentNode(node)) {
-    return node.children
-      .map((child) => getNodeText(child as MarkdownNode))
-      .join('');
+    return node.children.map((child) => getNodeText(child as MarkdownNode)).join('');
   }
 
   return '';
 }
 
 function isLiteral(node: MarkdownNode): node is Literal {
-  return typeof (node as Literal).value === 'string';
+  return typeof (node as Literal).value !== 'undefined';
 }
 
 function isParentNode(node: MarkdownNode): node is Parent {
-  return 'children' in node && Array.isArray((node as Parent).children);
+  return Array.isArray((node as Parent).children);
 }
 
 function slugify(value: string): string {
