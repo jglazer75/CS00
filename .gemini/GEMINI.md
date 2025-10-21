@@ -1,5 +1,8 @@
-@design.md
-@systemdesign.md
+@./design.md
+@./systemdesign.md
+@./uiux.md
+@./contentengine.md
+@./frontmatter.md
 
 Let's break this down into the three parts you requested.
 

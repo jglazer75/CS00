@@ -1,3 +1,10 @@
+@./.gemini/GEMINI.md
+@./.gemini/design.md
+@./.gemini/systemdesign.md
+@./.gemini/uiux.md
+@./.gemini/contentengine.md
+@./.gemini/frontmatter.md
+
 # AGENTS BRIEFING
 
 ## App Overview
@@ -6,12 +13,6 @@
 - UI shell: global Material theme (`app/theme.ts`), `Header`, `ModuleNav`, and card layouts render dashboard and module views while maintaining consistent navigation.
 - Platform roadmap pairs Supabase (auth, database, storage, realtime) with Vercel serverless functions to mediate AI interactions and secure deployments on Vercel.
 - Visual tone stays professional-yet-grounded using the mandated palette, typography, and Wisconsin-themed imagery.
-
-## Commands
-- `npm run dev` — start the development server with Turbopack.
-- `npm run build` — create a production build.
-- `npm run start` — serve the production build.
-- `npm run lint` — run ESLint checks.
 
 ## Design Mandates
 - **User-Centered Learning**: Design for defined personas (law students, MBAs, lawyers, entrepreneurs), enforce WCAG accessibility, and iterate through continuous learner testing.
