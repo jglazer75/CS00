@@ -1,14 +1,12 @@
-import type { MarkdownNode } from '../markdown';
+import type { Plugin } from 'unified';
+import type { Root, Content, Paragraph, Heading } from 'mdast';
+import type { Data } from 'unist';
 
 const KEY_CONCEPT_MARKER_REGEX = /^\{\s*:\s*\.keyconcept\s*\}$/i;
 
-export default function remarkKeyConcept() {
-  return (tree: { children?: MarkdownNode[] }) => {
-    if (!tree.children) {
-      return;
-    }
-
-    const children = tree.children;
+const remarkKeyConcept: Plugin<[], Root> = () => {
+  return (tree) => {
+    const children = tree.children ?? [];
 
     for (let index = 0; index < children.length; index += 1) {
       const node = children[index];
@@ -23,7 +21,7 @@ export default function remarkKeyConcept() {
         annotateNode(previous);
       }
 
-      if (next && next.type !== 'heading') {
+      if (next && !isHeading(next)) {
         annotateNode(next);
       }
 
@@ -31,10 +29,16 @@ export default function remarkKeyConcept() {
       index -= 1;
     }
   };
-}
+};
 
-function isKeyConceptMarker(node: MarkdownNode) {
-  if (node.type !== 'paragraph' || !node.children || node.children.length !== 1) {
+export default remarkKeyConcept;
+
+function isKeyConceptMarker(node: Content): node is Paragraph {
+  if (node.type !== 'paragraph') {
+    return false;
+  }
+
+  if (!node.children || node.children.length !== 1) {
     return false;
   }
 
@@ -42,21 +46,26 @@ function isKeyConceptMarker(node: MarkdownNode) {
   return child.type === 'text' && KEY_CONCEPT_MARKER_REGEX.test(String(child.value || '').trim());
 }
 
-function annotateNode(node: MarkdownNode) {
-  const data = (node.data = node.data || {});
-  (data as Record<string, unknown>).keyConcept = true;
+function annotateNode(node: Content) {
+  const data = (node.data ??= {}) as Data & Record<string, unknown>;
 
-  let hProperties = (data as Record<string, unknown>).hProperties;
-  if (typeof hProperties !== 'object' || hProperties === null) {
+  data.keyConcept = true;
+
+  let hProperties = data.hProperties as Record<string, unknown> | undefined;
+  if (!hProperties || typeof hProperties !== 'object') {
     hProperties = {};
-    (data as Record<string, unknown>).hProperties = hProperties;
+    data.hProperties = hProperties;
   }
 
-  const existing = (hProperties as Record<string, unknown>).className;
+  const existing = hProperties.className;
   const classList = Array.isArray(existing)
     ? new Set(existing.map((value) => String(value)))
     : new Set<string>(existing ? [String(existing)] : []);
 
   classList.add('key-concept');
-  (hProperties as Record<string, unknown>).className = Array.from(classList);
+  hProperties.className = Array.from(classList);
+}
+
+function isHeading(node: Content): node is Heading {
+  return node.type === 'heading';
 }

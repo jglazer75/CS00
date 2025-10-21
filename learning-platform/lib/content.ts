@@ -3,6 +3,8 @@ import path from 'path';
 import matter from 'gray-matter';
 import { remark } from 'remark';
 import remarkKeyConcept from './remark/keyConcept';
+import type { Root, Heading } from 'mdast';
+import type { Literal, Parent } from 'unist';
 import { MarkdownNode, renderMarkdown, renderMarkdownFromNodes } from './markdown';
 
 const contentDirectory = path.join(process.cwd(), 'content');
@@ -123,8 +125,8 @@ export async function getPageData(moduleId: string, slug: string): Promise<Modul
   const metadata = buildPageMetadata(data, slugToTitle(slug));
 
   const processor = remark().use(remarkKeyConcept);
-  const parsedTree = processor.parse(content) as { type: string; children?: MarkdownNode[] };
-  const transformedTree = (await processor.run(parsedTree)) as { type: string; children?: MarkdownNode[] };
+  const parsedTree = processor.parse(content) as Root;
+  const transformedTree = (await processor.run(parsedTree)) as Root;
   const { rawChunks, tableOfContents } = splitIntoChunks(transformedTree.children ?? [], metadata.title);
 
   const chunks = await Promise.all(
@@ -341,11 +343,11 @@ function isKeyConceptNode(node: MarkdownNode): boolean {
   return Boolean(node.data && (node.data as { keyConcept?: unknown }).keyConcept);
 }
 
-function isHeading(node: MarkdownNode): boolean {
+function isHeading(node: MarkdownNode): node is Heading {
   return node.type === 'heading';
 }
 
-function extractHeadingInfo(node: MarkdownNode) {
+function extractHeadingInfo(node: Heading) {
   const text = getNodeText(node).trim();
   const anchorMatch = text.match(/\s*\{#([a-z0-9\-_]+)\}\s*$/i);
 
@@ -364,15 +366,25 @@ function extractHeadingInfo(node: MarkdownNode) {
 }
 
 function getNodeText(node: MarkdownNode): string {
-  if (typeof node.value === 'string') {
+  if (isLiteral(node) && typeof node.value === 'string') {
     return node.value;
   }
 
-  if (node.children && node.children.length > 0) {
-    return node.children.map((child) => getNodeText(child)).join('');
+  if (isParentNode(node)) {
+    return node.children
+      .map((child) => getNodeText(child as MarkdownNode))
+      .join('');
   }
 
   return '';
+}
+
+function isLiteral(node: MarkdownNode): node is Literal {
+  return 'value' in node;
+}
+
+function isParentNode(node: MarkdownNode): node is Parent {
+  return 'children' in node && Array.isArray((node as Parent).children);
 }
 
 function slugify(value: string): string {

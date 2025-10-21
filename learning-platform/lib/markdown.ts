@@ -1,19 +1,11 @@
 import { remark } from 'remark';
 import html from 'remark-html';
 import remarkKeyConcept from './remark/keyConcept';
+import type { Root, Content } from 'mdast';
 
-export type MarkdownNode = {
-  type: string;
-  depth?: number;
-  value?: string;
-  children?: MarkdownNode[];
-  data?: Record<string, unknown>;
-};
+export type MarkdownNode = Content;
 
-type MarkdownRoot = {
-  type: 'root';
-  children: MarkdownNode[];
-};
+type MarkdownRoot = Root;
 
 export async function renderMarkdown(markdown: string): Promise<string> {
   const processor = createProcessor();
@@ -32,8 +24,8 @@ export async function renderMarkdownFromNodes(nodes: MarkdownNode[]): Promise<st
     children: nodes,
   };
 
-  const transformed = (await processor.run(tree as unknown)) as MarkdownRoot;
-  return processor.stringify(transformed as unknown);
+  const transformed = (await processor.run(tree)) as MarkdownRoot;
+  return processor.stringify(transformed);
 }
 
 function createProcessor() {
