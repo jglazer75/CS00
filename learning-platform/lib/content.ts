@@ -380,7 +380,7 @@ function getNodeText(node: MarkdownNode): string {
 }
 
 function isLiteral(node: MarkdownNode): node is Literal {
-  return 'value' in node;
+  return typeof (node as Literal).value === 'string';
 }
 
 function isParentNode(node: MarkdownNode): node is Parent {
