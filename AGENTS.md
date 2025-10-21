@@ -30,11 +30,10 @@ Goal: Launch a polished single-user module (Venture Capital Term Sheet Negotiati
 1. **Project Setup**: Initialize Next.js with MUI, configure Supabase project services, and link deployment to Vercel.
 2. **Pilot Module Import**: Move `CS01/docs` and `CS01/source-documents` into `/content`; keep numbered file ordering and handle `*.ai.md` special cases.
 3. **UI/UX Foundation (Phase 1.3)**:
-   - Expand `lib/content.js` to return learning metadata, demographic fields, and the future `team` flag.
-   - Split Markdown into card chunks by `<h2>` headings and return structured arrays per page.
-   - Auto-associate instructor notes from `/instructor`.
-   - Build reusable cards (`MetadataCard`, `ContentCard`), a sticky three-column layout with `ModuleNav`, and a `TableOfContents` sidebar.
-   - Craft a remark extension for `{:.keyconcept}` styling and surface an instructor-mode toggle via React context.
+   - ✅ Expanded `lib/content.ts` to return structured metadata (learning objectives, keywords, demographics, `team`) plus anchored content chunks and instructor notes. Added remark plugin for `{:.keyconcept}` markers.
+   - ✅ Built reusable cards (`MetadataCard`, `ContentCard`, `InstructorNoteCard`) and markdown renderer styling. Added sticky three-column module layout with `ModuleNav` and new `TableOfContents`.
+   - ✅ Updated content markdown files to pull glossary keywords from inline designators into frontmatter.
+   - **Next:** Integrate Supabase-authored progress indicators once auth layer is ready; document component APIs (Storybook or MDX) for team onboarding.
 4. **Authentication & Progress**: Integrate Supabase Auth and store per-user page completion in `user_module_progress`.
 5. **Exercise Workflow & AI Bridge**: Enable file uploads into `user_documents` and route submissions through Vercel serverless functions to the AI provider.
 
