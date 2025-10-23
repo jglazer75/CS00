@@ -42,9 +42,11 @@ Goal: Launch a polished single-user module (Venture Capital Term Sheet Negotiati
    - ✅ Expanded `lib/content.ts` to return structured metadata (learning objectives, keywords, demographics, `team`) plus anchored content chunks and instructor notes. Added remark plugin for `{:.keyconcept}` markers.
    - ✅ Built reusable cards (`MetadataCard`, `ContentCard`, `InstructorNoteCard`) and markdown renderer styling. Added sticky three-column module layout with `ModuleNav` and new `TableOfContents`.
    - ✅ Updated content markdown files to pull glossary keywords from inline designators into frontmatter.
-   - **Next:** Integrate Supabase-authored progress indicators once auth layer is ready; document component APIs (Storybook or MDX) for team onboarding.
+   - ✅ Wired Supabase progress tracking (schema, sync tooling, client/server helpers, module/dashboard UI).
+   - ✅ Implemented Supabase Auth UI (login/logout) with shared session context in the header.
+   - **Next:** Document component APIs (Storybook or MDX) for team onboarding.
    - **Cleanup:** process markdown tables to display correctly
-4. **Authentication & Progress**: Integrate Supabase Auth and store per-user page completion in `user_module_progress`.
+4. **Authentication & Progress**: Polish Supabase Auth flows (invite/reset UX) and finish connecting per-user progress persistence in `user_module_progress`.
 5. **Exercise Workflow & AI Bridge**: Enable file uploads into `user_documents` and route submissions through Vercel serverless functions to the AI provider.
 
 ### Phase 2 — Collaboration & Community

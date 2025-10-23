@@ -158,6 +158,15 @@ export function useModuleProgress(moduleId: string, slugs: string[]): HookResult
       }
     }
 
+    if (!supabase) {
+      setStatus('unauthenticated');
+      setState(INITIAL_STATE);
+      setUserId(null);
+      return () => {
+        cancelled = true;
+      };
+    }
+
     initialize(supabase).catch((err: Error | PostgrestError) => {
       if (!cancelled) {
         setStatus('error');
@@ -171,8 +180,8 @@ export function useModuleProgress(moduleId: string, slugs: string[]): HookResult
   }, [moduleId, refreshNonce, slugsKey, supabase, totalPages]);
 
   const updateModuleState = useCallback(
-    async (client: SupabaseClient, modulePageId: string, completedCount: number) => {
-      if (!userId) {
+    async (client: SupabaseClient | null, modulePageId: string, completedCount: number) => {
+      if (!userId || !client) {
         return;
       }
 
@@ -205,7 +214,7 @@ export function useModuleProgress(moduleId: string, slugs: string[]): HookResult
 
   const markPageVisited = useCallback(
     async (slug: string) => {
-      if (!userId) {
+      if (!userId || !supabase) {
         return;
       }
 
@@ -253,7 +262,7 @@ export function useModuleProgress(moduleId: string, slugs: string[]): HookResult
 
   const markPageCompleted = useCallback(
     async (slug: string) => {
-      if (!userId) {
+      if (!userId || !supabase) {
         return;
       }
 

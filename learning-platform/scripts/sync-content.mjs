@@ -127,7 +127,6 @@ async function main() {
     .sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
 
   for (const moduleId of moduleDirs) {
-    // eslint-disable-next-line no-await-in-loop
     await syncModule(moduleId);
   }
 }

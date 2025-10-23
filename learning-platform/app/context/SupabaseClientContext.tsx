@@ -22,11 +22,5 @@ export function SupabaseClientProvider({ children }: { children: ReactNode }) {
 }
 
 export function useSupabaseClient() {
-  const client = useContext(SupabaseClientContext);
-
-  if (!client) {
-    throw new Error('useSupabaseClient must be used within a SupabaseClientProvider.');
-  }
-
-  return client;
+  return useContext(SupabaseClientContext);
 }

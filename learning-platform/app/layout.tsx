@@ -4,8 +4,9 @@ import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import theme from './theme';
 import Header from "./components/Header";
-import { InstructorModeProvider } from "./context/InstructorModeContext";
 import { SupabaseClientProvider } from "./context/SupabaseClientContext";
+import { InstructorModeProvider } from "./context/InstructorModeContext";
+import { AuthProvider } from "./context/AuthContext";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -25,10 +26,12 @@ export default function RootLayout({
           <ThemeProvider theme={theme}>
             <CssBaseline />
             <SupabaseClientProvider>
-              <InstructorModeProvider>
-                <Header />
-                {children}
-              </InstructorModeProvider>
+              <AuthProvider>
+                <InstructorModeProvider>
+                  <Header />
+                  {children}
+                </InstructorModeProvider>
+              </AuthProvider>
             </SupabaseClientProvider>
           </ThemeProvider>
         </AppRouterCacheProvider>

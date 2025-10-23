@@ -33,6 +33,12 @@ export default function DashboardClient({ moduleLinks }: { moduleLinks: ModuleLi
       setStatus('loading');
       setError(undefined);
 
+      if (!supabase) {
+        setStatus('unauthenticated');
+        setProgressByModule({});
+        return;
+      }
+
       const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
       if (sessionError) {
         if (!cancelled) {

@@ -37,3 +37,9 @@ Initial content for the pilot module can be loaded via `supabase/seed_cs01.sql`.
 Re-run the seed when content metadata changes; the statements use `ON CONFLICT` to perform idempotent updates.
 
 For larger updates, prefer the automation script: `npm run sync:content` reads the markdown frontmatter and upserts module/page metadata via the Supabase service key. It is safe to re-run anytime you add or rename content files.
+
+## Authentication
+
+- The end-user sign-in page lives at `/login` and performs Supabase email/password authentication via `supabase.auth.signInWithPassword`.
+- The global header exposes a sign-in link when no session is detected and a sign-out button (calling `supabase.auth.signOut`) when a user is logged in.
+- Sessions are managed client-side in `AuthContext` (`app/context/AuthContext.tsx`) which listens for Supabase auth state changes and shares the current user throughout the app.
