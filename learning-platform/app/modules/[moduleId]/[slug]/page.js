@@ -1,7 +1,5 @@
 import { getAllModuleIds, getPageData, getSortedPagesData } from '@/lib/content';
-import ModuleNav from '@/app/components/ModuleNav';
-import ModulePageContent from '@/app/components/ModulePageContent';
-import { Box } from '@mui/material';
+import ModulePageClient from '@/app/components/ModulePageClient';
 
 export async function generateStaticParams() {
   const moduleIds = await getAllModuleIds();
@@ -31,15 +29,5 @@ export default async function Page({ params }) {
   const pageData = await getPageContent(moduleId, slug);
   const navData = await getSortedPagesData(moduleId); // Fetch navigation data here
 
-  return (
-    <Box sx={{ display: 'flex' }}>
-      <ModuleNav moduleId={moduleId} activeSlug={slug} pages={navData} />
-      <ModulePageContent
-        metadata={pageData.metadata}
-        chunks={pageData.chunks}
-        instructorNote={pageData.instructorNote}
-        tableOfContents={pageData.tableOfContents}
-      />
-    </Box>
-  );
+  return <ModulePageClient moduleId={moduleId} slug={slug} navData={navData} pageData={pageData} />;
 }
