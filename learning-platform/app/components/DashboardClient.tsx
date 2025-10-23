@@ -84,7 +84,7 @@ export default function DashboardClient({ moduleLinks }: { moduleLinks: ModuleLi
     return () => {
       cancelled = true;
     };
-  }, [moduleIdsKey, supabase]);
+  }, [moduleIds, moduleIdsKey, supabase]);
 
   return (
     <Box component="main" sx={{ py: 4 }}>
