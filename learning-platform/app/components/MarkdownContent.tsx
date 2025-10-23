@@ -46,13 +46,37 @@ export default function MarkdownContent({ html }: MarkdownContentProps) {
         '& table': {
           width: '100%',
           borderCollapse: 'collapse',
-          marginBottom: 2,
-        },
-        '& th, & td': {
+          marginBottom: 3,
+          display: 'block',
+          overflowX: 'auto',
           border: '1px solid',
           borderColor: 'divider',
-          padding: 1,
+          borderRadius: 1,
+        },
+        '& table thead, & table tbody': {
+          display: 'table',
+          width: '100%',
+          tableLayout: 'fixed',
+        },
+        '& table thead': {
+          backgroundColor: 'rgba(0, 45, 90, 0.08)',
+        },
+        '& table tbody tr:nth-of-type(odd)': {
+          backgroundColor: 'rgba(33, 33, 33, 0.04)',
+        },
+        '& table tr': {
+          borderBottom: '1px solid',
+          borderColor: 'divider',
+        },
+        '& table th, & table td': {
+          padding: '12px 16px',
           textAlign: 'left',
+          borderRight: '1px solid',
+          borderColor: 'divider',
+          minWidth: '140px',
+        },
+        '& table th:last-of-type, & table td:last-of-type': {
+          borderRight: 'none',
         },
         '& code': {
           fontSize: '0.9rem',
