@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { Suspense, useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
   Alert,
@@ -16,7 +16,7 @@ import NextLink from 'next/link';
 import { useSupabaseClient } from '@/app/context/SupabaseClientContext';
 import { useAuth } from '@/app/context/AuthContext';
 
-export default function LoginPage() {
+function LoginFormContents() {
   const supabase = useSupabaseClient();
   const { session, loading } = useAuth();
   const router = useRouter();
@@ -59,10 +59,6 @@ export default function LoginPage() {
 
     setStatus('success');
     router.replace(redirectTo);
-  }
-
-  if (loading) {
-    return null;
   }
 
   return (
@@ -124,5 +120,13 @@ export default function LoginPage() {
         </Box>
       </Stack>
     </Container>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginFormContents />
+    </Suspense>
   );
 }
