@@ -7,7 +7,16 @@ import { getSupabaseBrowserClient } from '@/lib/supabase';
 const SupabaseClientContext = createContext<SupabaseClient | null>(null);
 
 export function SupabaseClientProvider({ children }: { children: ReactNode }) {
-  const client = useMemo(() => getSupabaseBrowserClient(), []);
+  const client = useMemo(() => {
+    try {
+      return getSupabaseBrowserClient();
+    } catch (error) {
+      if (process.env.NODE_ENV !== 'production') {
+        console.warn('Supabase client unavailable:', error);
+      }
+      return null;
+    }
+  }, []);
 
   return <SupabaseClientContext.Provider value={client}>{children}</SupabaseClientContext.Provider>;
 }

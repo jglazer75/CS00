@@ -8,6 +8,10 @@
 @./.gemini/CS01-ai/term-sheet-dealcraft-implmentation.ai.md
 @./.gemini/CS01-ai/term-sheet-dealcraft.ai.md
 @./.gemini/CS01-ai/term-sheet-dealcraft-sql.ai.md
+@./.gemini/coding-rules/database.md
+@./.gemini/coding-rules/react.md
+@./.gemini/coding-rules/tailwind.md
+@./.gemini/coding-rules/typescript.md
 
 # AGENTS BRIEFING
 
