@@ -1,12 +1,12 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { Suspense, useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Alert, Box, Button, Container, Stack, TextField, Typography } from '@mui/material';
 import { useSupabaseClient } from '@/app/context/SupabaseClientContext';
 import { useAuth } from '@/app/context/AuthContext';
 
-export default function ResetPasswordPage() {
+function ResetPasswordContent() {
   const supabase = useSupabaseClient();
   const { refreshSession } = useAuth();
   const searchParams = useSearchParams();
@@ -174,5 +174,13 @@ export default function ResetPasswordPage() {
         )}
       </Stack>
     </Container>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={null}>
+      <ResetPasswordContent />
+    </Suspense>
   );
 }
