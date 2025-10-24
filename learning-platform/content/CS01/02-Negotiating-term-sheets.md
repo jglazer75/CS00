@@ -149,6 +149,12 @@ Even if you raise on a SAFE or other convertible interest for the purpose of pun
   * *No Longer Standard:* Participating Preferred. The investor gets their money back AND their ownership percentage. This is a form of double-dipping and is no longer market standard for early rounds.  
 * Anti-Dilution (fully-diluted/tag along/drag along/ROFR)  
 
+### Control
+
+* **Board Seats**: Control often starts here. A typical 3-person seed stage board: 1 Founder Seat, 1 Investor Seat, 1 Independent Seat (mutually agreed upon). In many cases, the company might have 2 founders instead of an independent seat until the Board is expanded to 5 a little later in the company's corporate existence. A *Board Observer* is someone that is permitted to attend Board meetings and receives Board updates and documents, but does not have a formal vote on Board decisions.
+* **Veto Rights**: Investors may demand a list of major corporate actions that require investor approval (a "veto right"). These might include major corporate decisions such as: selling the company, changing the articles of incorporation, issuing senior stock, and taking on significant debt. It would be unusual (and thus scrutinized heavily before agreeing) for vetoes over operational decisions like hiring or firing executives, annual budgets, or pivoting the business.
+* **Voting Rights**: Can take many forms, but most frequently might look like *Super-voting Rights* (each share is worth more than 1 vote) or *Non-voting Rights* (shares do not carry voting rights)
+
 ### KeyConcept: Anti-Dilution
 {:.keyconcept}
 
@@ -168,14 +174,6 @@ New, New capt-table: Founder: 73.77%; Investor A: 10.00%; Investor B: 16.39% (th
 **TAX NOTE:** ABC, Co will "grant" these 2,204 shares to Investor A; since Investor A isn't paying for these shares, the grant *also* creates taxable income for Investor A in the amount of $2,204 (at $1/share)
 
 The usual ways around this are for the company NOT to grant more shares to Investor A, but rather provide rights that allow the Investor to maintain their ownership percentage such tag-along rights or rights of first refusal.
-
-
-### Control
-
-* **Board Seats**: Control often starts here. A typical 3-person seed stage board: 1 Founder Seat, 1 Investor Seat, 1 Independent Seat (mutually agreed upon). In many cases, the company might have 2 founders instead of an independent seat until the Board is expanded to 5 a little later in the company's corporate existence. A *Board Observer* is someone that is permitted to attend Board meetings and receives Board updates and documents, but does not have a formal vote on Board decisions.
-* **Veto Rights**: Investors may demand a list of major corporate actions that require investor approval (a "veto right"). These might include major corporate decisions such as: selling the company, changing the articles of incorporation, issuing senior stock, and taking on significant debt. It would be unusual (and thus scrutinized heavily before agreeing) for vetoes over operational decisions like hiring or firing executives, annual budgets, or pivoting the business.
-* **Voting Rights**: Can take many forms, but most frequently might look like *Super-voting Rights* (each share is worth more than 1 vote) or *Non-voting Rights* (shares do not carry voting rights)
-
 ---
 
 ## Technology-Specific Considerations

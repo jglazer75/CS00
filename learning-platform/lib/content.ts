@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
 import { remark } from 'remark';
+import remarkGfm from 'remark-gfm';
 import remarkKeyConcept from './remark/keyConcept';
 import type { Root, Heading } from 'mdast';
 import type { Literal, Parent } from 'unist';
@@ -124,7 +125,7 @@ export async function getPageData(moduleId: string, slug: string): Promise<Modul
   const { data, content } = matter(fileContents);
   const metadata = buildPageMetadata(data, slugToTitle(slug));
 
-  const processor = remark().use(remarkKeyConcept);
+  const processor = remark().use(remarkGfm).use(remarkKeyConcept);
   const parsedTree = processor.parse(content) as Root;
   const transformedTree = (await processor.run(parsedTree)) as Root;
   const { rawChunks, tableOfContents } = splitIntoChunks(transformedTree.children ?? [], metadata.title);
