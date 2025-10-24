@@ -1,5 +1,5 @@
 ---
-title: "The Negotiation"
+title: "Module 3: The Negotiation"
 description: "An interactive exercise where students analyze a term sheet, develop a negotiation strategy, and engage in a simulated negotiation."
 learning_concepts:
   - "Negotiation Theory: BATNA, reservation points, creating and claiming value"

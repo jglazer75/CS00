@@ -44,8 +44,9 @@ Goal: Launch a polished single-user module (Venture Capital Term Sheet Negotiati
    - ✅ Updated content markdown files to pull glossary keywords from inline designators into frontmatter.
    - ✅ Wired Supabase progress tracking (schema, sync tooling, client/server helpers, module/dashboard UI).
    - ✅ Implemented Supabase Auth UI (login/logout) with shared session context in the header.
+   - ✅ Polished markdown table rendering using GFM support and responsive styling.
+   - ✅ Key concept blocks nested under subheadings now break into standalone cards without promoting the parent heading.
    - **Next:** Document component APIs (Storybook or MDX) for team onboarding.
-   - **Cleanup:** process markdown tables to display correctly
 4. **Authentication & Progress**: Polish Supabase Auth flows (invite/reset UX) and finish connecting per-user progress persistence in `user_module_progress`.
 5. **Exercise Workflow & AI Bridge**: Enable file uploads into `user_documents` and route submissions through Vercel serverless functions to the AI provider.
 

@@ -1,5 +1,6 @@
 import { remark } from 'remark';
 import html from 'remark-html';
+import remarkGfm from 'remark-gfm';
 import remarkKeyConcept from './remark/keyConcept';
 import type { Root, Content } from 'mdast';
 
@@ -29,5 +30,5 @@ export async function renderMarkdownFromNodes(nodes: MarkdownNode[]): Promise<st
 }
 
 function createProcessor() {
-  return remark().use(remarkKeyConcept).use(html);
+  return remark().use(remarkGfm).use(remarkKeyConcept).use(html);
 }

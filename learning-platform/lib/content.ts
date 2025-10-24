@@ -219,8 +219,25 @@ function splitIntoChunks(nodes: MarkdownNode[], defaultTitle: string) {
         pendingHeading = headingText;
         pendingId = uniqueId;
         pendingKeyConcept = isKeyConceptNode(node);
+
+        continue;
       }
 
+      if (isKeyConceptNode(node)) {
+        pushPending();
+
+        const { text, id } = extractHeadingInfo(node as Heading);
+        const headingText = text || 'Key Concept';
+        const uniqueId = ensureUniqueSlug(id ?? slugify(headingText), slugCounts);
+
+        pendingHeading = headingText;
+        pendingId = uniqueId;
+        pendingKeyConcept = true;
+
+        continue;
+      }
+
+      pendingNodes.push(node);
       continue;
     }
 
