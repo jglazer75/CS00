@@ -43,3 +43,29 @@ For larger updates, prefer the automation script: `npm run sync:content` reads t
 - The end-user sign-in page lives at `/login` and performs Supabase email/password authentication via `supabase.auth.signInWithPassword`.
 - The global header exposes a sign-in link when no session is detected and a sign-out button (calling `supabase.auth.signOut`) when a user is logged in.
 - Sessions are managed client-side in `AuthContext` (`app/context/AuthContext.tsx`) which listens for Supabase auth state changes and shares the current user throughout the app.
+
+## Authentication Admin Flows
+
+### Environment Variables
+
+```
+ADMIN_EMAILS=jmglazer@wisc.edu,second.admin@example.com
+NEXT_PUBLIC_ADMIN_EMAILS=jmglazer@wisc.edu,second.admin@example.com
+NEXT_PUBLIC_SITE_URL=https://cs-00.vercel.app/
+```
+
+- `ADMIN_EMAILS` (server only) controls which accounts can access the invite API.
+- `NEXT_PUBLIC_ADMIN_EMAILS` enables the client UI to surface admin-only links.
+- `NEXT_PUBLIC_SITE_URL` is used when sending password reset and invitation links so Supabase can redirect back to the correct domain.
+
+### Inviting Users
+
+1. Sign in with an email listed in `ADMIN_EMAILS` / `NEXT_PUBLIC_ADMIN_EMAILS`.
+2. Navigate to `/admin/invite` and submit the invite form.
+3. The UI requests a Supabase access token, calls `/api/admin/invite`, and the API uses the service role key to send an email invite via `auth.admin.inviteUserByEmail`.
+
+### Password Reset Flow
+
+1. From the login page, click “Forgot your password?” to request a reset email.
+2. Supabase sends a recovery link that redirects users to `/reset-password` with access and refresh tokens in the URL.
+3. The reset page restores the session (`supabase.auth.setSession`) and lets the user choose a new password via `supabase.auth.updateUser`.

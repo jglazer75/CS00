@@ -11,6 +11,9 @@ import Box from '@mui/material/Box';
 import Link from 'next/link';
 import { useInstructorMode } from '../context/InstructorModeContext';
 import { useAuth } from '../context/AuthContext';
+import { getAdminEmails, isAdminEmail } from '@/lib/auth';
+
+const PUBLIC_ADMIN_EMAILS = getAdminEmails('public');
 
 export default function Header() {
   const { isInstructorMode, setIsInstructorMode } = useInstructorMode();
@@ -57,6 +60,17 @@ export default function Header() {
         >
           Docs
         </Button>
+        {!loading && user?.email && PUBLIC_ADMIN_EMAILS.length > 0 && isAdminEmail(user.email, 'public') && (
+          <Button
+            component={Link}
+            href="/admin/invite"
+            variant="outlined"
+            color="inherit"
+            sx={{ mr: { xs: 0, sm: 1 } }}
+          >
+            Invite users
+          </Button>
+        )}
         {!loading && (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             {user ? (

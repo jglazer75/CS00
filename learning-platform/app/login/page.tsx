@@ -7,6 +7,11 @@ import {
   Box,
   Button,
   Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   Link as MuiLink,
   Stack,
   TextField,
@@ -27,6 +32,11 @@ function LoginFormContents() {
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success'>('idle');
+  const [resetOpen, setResetOpen] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const [resetStatus, setResetStatus] = useState<'idle' | 'submitting' | 'success'>('idle');
+  const [resetMessage, setResetMessage] = useState<string | null>(null);
+  const [resetError, setResetError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!loading && session) {
@@ -35,6 +45,7 @@ function LoginFormContents() {
   }, [loading, redirectTo, router, session]);
 
   const formDisabled = useMemo(() => status === 'submitting', [status]);
+  const resetDisabled = resetStatus === 'submitting';
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -59,6 +70,44 @@ function LoginFormContents() {
 
     setStatus('success');
     router.replace(redirectTo);
+  }
+
+  async function handleResetSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setResetError(null);
+    setResetMessage(null);
+
+    if (!supabase) {
+      setResetError('Supabase client is not available.');
+      return;
+    }
+
+    const emailToReset = (resetEmail || email).trim();
+    if (!emailToReset) {
+      setResetError('Enter an email address to receive a reset link.');
+      return;
+    }
+
+    setResetStatus('submitting');
+
+    const redirectOrigin =
+      typeof window !== 'undefined' ? window.location.origin : process.env.NEXT_PUBLIC_SITE_URL;
+    const redirectTo = redirectOrigin
+      ? `${redirectOrigin.replace(/\/$/, '')}/reset-password`
+      : undefined;
+
+    const { error } = await supabase.auth.resetPasswordForEmail(emailToReset, {
+      redirectTo,
+    });
+
+    if (error) {
+      setResetError(error.message);
+      setResetStatus('idle');
+      return;
+    }
+
+    setResetStatus('success');
+    setResetMessage('Password reset email sent. Check your inbox for further instructions.');
   }
 
   return (
@@ -106,9 +155,16 @@ function LoginFormContents() {
             >
               {status === 'submitting' ? 'Signing in…' : 'Sign in'}
             </Button>
-            <Typography variant="body2" color="text.secondary">
-              Forgot your password? Use the Supabase dashboard to send a password reset or contact support.
-            </Typography>
+            <Button
+              type="button"
+              variant="text"
+              onClick={() => {
+                setResetOpen(true);
+                setResetEmail(email);
+              }}
+            >
+              Forgot your password?
+            </Button>
             {redirectTo !== '/' && (
               <Typography variant="body2">
                 <MuiLink component={NextLink} href="/">
@@ -119,6 +175,65 @@ function LoginFormContents() {
           </Stack>
         </Box>
       </Stack>
+      <Dialog
+        open={resetOpen}
+        onClose={() => {
+          if (resetStatus !== 'submitting') {
+            setResetOpen(false);
+            setResetStatus('idle');
+            setResetError(null);
+            setResetMessage(null);
+          }
+        }}
+      >
+        <Box component="form" onSubmit={handleResetSubmit} noValidate>
+          <DialogTitle>Reset password</DialogTitle>
+          <DialogContent>
+            <DialogContentText sx={{ mb: 2 }}>
+              Enter the email address associated with your account. We&apos;ll send a link to choose a new password.
+            </DialogContentText>
+            {resetError && (
+              <Alert severity="error" sx={{ mb: 2 }} onClose={() => setResetError(null)}>
+                {resetError}
+              </Alert>
+            )}
+            {resetMessage && (
+              <Alert severity="success" sx={{ mb: 2 }} onClose={() => setResetMessage(null)}>
+                {resetMessage}
+              </Alert>
+            )}
+            <TextField
+              autoFocus
+              margin="dense"
+              label="Email address"
+              type="email"
+              fullWidth
+              value={resetEmail}
+              onChange={(event) => setResetEmail(event.target.value)}
+              disabled={resetDisabled}
+              required
+            />
+          </DialogContent>
+          <DialogActions sx={{ px: 3, pb: 2 }}>
+            <Button
+              type="button"
+              onClick={() => {
+                if (resetStatus !== 'submitting') {
+                  setResetOpen(false);
+                  setResetStatus('idle');
+                  setResetError(null);
+                  setResetMessage(null);
+                }
+              }}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" variant="contained" disabled={resetDisabled}>
+              {resetDisabled ? 'Sending…' : 'Send reset link'}
+            </Button>
+          </DialogActions>
+        </Box>
+      </Dialog>
     </Container>
   );
 }
