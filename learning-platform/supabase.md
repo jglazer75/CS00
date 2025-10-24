@@ -19,13 +19,15 @@ Additional environment variables will be documented here as new Supabase-backed 
 
 ## Database Schema
 
-The schema for Phase 1.3 progress tracking lives in `supabase/schema.sql` and creates:
+The schema SQL lives in `supabase/schema.sql` and now covers both the learning progress core and the AI gateway foundations:
 
-- `modules` and `module_pages` to mirror the content folder structure with stable IDs and ordering for joins.
-- `user_module_progress` to record per-page completion/status with RLS limiting access to the owning user.
-- `user_module_state` to track the last page visited and aggregate completion percentage per module.
+- `modules` and `module_pages` mirror the content folder structure with stable IDs and ordering for joins.
+- `user_module_progress` stores per-page completion/status with RLS limiting access to the owning user.
+- `user_module_state` tracks the last page visited and aggregate completion percentage per module.
+- `user_ai_providers` lets each learner store their preferred AI provider credentials (encrypted API key + optional model preferences). RLS restricts all reads/writes to the owning user.
+- `ai_request_cache` persists normalized AI responses keyed by the prompt/model hash. Only the service role may access this table, keeping cached payloads server-side.
 
-Apply the script through the Supabase SQL editor or CLI to bootstrap the tables, triggers, and policies.
+Apply the script through the Supabase SQL editor or CLI to bootstrap the tables, triggers, policies, and indexes. The cache table includes an `expires_at` column—configure a Supabase cron job (example in `ai-implementation.md`) to purge stale rows on a schedule once the environment supports background jobs.
 
 ## Seed Data
 

@@ -53,11 +53,11 @@ Goal: Launch the VC Term Sheet module with an end-to-end AI gateway for individu
    - Shipped invite + password reset UX and consolidated session handling.
    - Stored per-user progress, resume CTAs, and module state sync.
 5. 🔄 **1.5 AI Gateway Foundation** (current):
-   - Lock in the AI task schema (prompt structure, difficulty/persona toggles, data capture) and update specs accordingly.
-   - Author blueprint specs for Document Analyzer, Negotiation Simulator, and Guided Annotation that align with the gateway contract.
-   - Add Supabase tables `user_ai_providers` (+RLS) and `ai_request_cache` (with eviction cron).
-   - Scaffold `app/api/ai/route.ts` with provider selection, caching checks, and a stub `GeminiAdapter` wired to Vercel secrets.
-   - Produce `/docs/module-author-guide` once the gateway contract is stable to capture the validated author workflow.
+   - ✅ Lock in the AI task schema (prompt structure, difficulty/persona toggles, data capture) and document the contract.
+   - ✅ Author blueprint specs for Document Analyzer, Negotiation Simulator, and Guided Annotation that align with the gateway contract.
+   - ✅ Add Supabase tables `user_ai_providers` (+RLS) and `ai_request_cache` (with eviction cron guidance).
+   - ☐ Scaffold `app/api/ai/route.ts` with provider selection, caching checks, and a stub `GeminiAdapter` wired to Vercel secrets.
+   - ☐ Produce `/docs/module-author-guide` once the gateway contract is stable to capture the validated author workflow.
 6. ☐ **1.6 AI Authoring Integration**:
    - Extend `lib/content.ts` to surface `aiTasks` metadata and anchor markers from `content/**/ai-tasks/*.json`.
    - Build `app/components/ai/` registry, including `DocumentAnalyzer` scaffold and `/settings/ai-providers` management screen.

@@ -60,6 +60,28 @@ create table if not exists public.user_module_state (
   unique (user_id, module_id)
 );
 
+create table if not exists public.user_ai_providers (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references auth.users(id) on delete cascade,
+  provider_name text not null,
+  encrypted_api_key text not null,
+  model_preferences jsonb,
+  created_at timestamptz not null default timezone('utc', now()),
+  updated_at timestamptz not null default timezone('utc', now()),
+  unique (user_id, provider_name)
+);
+
+create table if not exists public.ai_request_cache (
+  id uuid primary key default gen_random_uuid(),
+  cache_key text not null unique,
+  provider_name text,
+  model_name text,
+  task_id text,
+  response_data jsonb not null,
+  created_at timestamptz not null default timezone('utc', now()),
+  expires_at timestamptz not null default timezone('utc', now()) + interval '30 day'
+);
+
 drop trigger if exists modules_set_updated_at on public.modules;
 create trigger modules_set_updated_at
 before update on public.modules
@@ -84,10 +106,18 @@ before update on public.user_module_state
 for each row
 execute procedure public.set_updated_at_timestamp();
 
+drop trigger if exists user_ai_providers_set_updated_at on public.user_ai_providers;
+create trigger user_ai_providers_set_updated_at
+before update on public.user_ai_providers
+for each row
+execute procedure public.set_updated_at_timestamp();
+
 alter table if exists public.modules enable row level security;
 alter table if exists public.module_pages enable row level security;
 alter table if exists public.user_module_progress enable row level security;
 alter table if exists public.user_module_state enable row level security;
+alter table if exists public.user_ai_providers enable row level security;
+alter table if exists public.ai_request_cache enable row level security;
 
 do $$
 begin
@@ -148,8 +178,39 @@ begin
       using (auth.uid() = user_id)
       with check (auth.uid() = user_id);
   end if;
+
+  if not exists (
+    select 1
+    from pg_policies
+    where schemaname = 'public'
+      and tablename = 'user_ai_providers'
+      and policyname = 'Users manage their AI providers'
+  ) then
+    create policy "Users manage their AI providers"
+      on public.user_ai_providers
+      for all
+      to authenticated
+      using (auth.uid() = user_id)
+      with check (auth.uid() = user_id);
+  end if;
+
+  if not exists (
+    select 1
+    from pg_policies
+    where schemaname = 'public'
+      and tablename = 'ai_request_cache'
+      and policyname = 'Service role manages AI cache'
+  ) then
+    create policy "Service role manages AI cache"
+      on public.ai_request_cache
+      for all
+      using (auth.role() = 'service_role')
+      with check (auth.role() = 'service_role');
+  end if;
 end $$;
 
 create index if not exists module_pages_module_id_idx on public.module_pages (module_id, sort_order);
 create index if not exists user_module_progress_user_idx on public.user_module_progress (user_id, module_id);
 create index if not exists user_module_state_user_idx on public.user_module_state (user_id, module_id);
+create index if not exists user_ai_providers_user_idx on public.user_ai_providers (user_id, provider_name);
+create index if not exists ai_request_cache_expires_idx on public.ai_request_cache (expires_at);

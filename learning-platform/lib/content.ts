@@ -7,6 +7,8 @@ import remarkKeyConcept from './remark/keyConcept';
 import type { Root, Heading } from 'mdast';
 import type { Literal, Parent } from 'unist';
 import { MarkdownNode, renderMarkdown, renderMarkdownFromNodes } from './markdown';
+import type { AiTaskDefinition } from './ai/schema';
+import { validateAiTaskDefinition, AiTaskValidationError } from './ai/validation';
 
 const contentDirectory = path.join(process.cwd(), 'content');
 
@@ -62,6 +64,7 @@ export type ModulePage = {
   chunks: ContentChunk[];
   tableOfContents: TableOfContentsItem[];
   instructorNote?: InstructorNote;
+  aiTasks: AiTaskDefinition[];
 };
 
 type RawChunk = {
@@ -141,6 +144,7 @@ export async function getPageData(moduleId: string, slug: string): Promise<Modul
   );
 
   const instructorNote = await loadInstructorNote(moduleDirectory, slug);
+  const aiTasks = loadAiTasksForPage(moduleDirectory, moduleId, slug);
 
   return {
     slug,
@@ -148,6 +152,7 @@ export async function getPageData(moduleId: string, slug: string): Promise<Modul
     chunks,
     tableOfContents,
     instructorNote,
+    aiTasks,
   };
 }
 
@@ -164,6 +169,64 @@ async function loadInstructorNote(moduleDirectory: string, slug: string): Promis
     title: typeof data.title === 'string' ? data.title : 'Instructor Notes',
     html: await renderMarkdown(content),
   };
+}
+
+function loadAiTasksForPage(moduleDirectory: string, moduleId: string, slug: string): AiTaskDefinition[] {
+  const tasksDirectory = path.join(moduleDirectory, 'ai-tasks');
+  if (!fs.existsSync(tasksDirectory)) {
+    return [];
+  }
+
+  const entries = fs.readdirSync(tasksDirectory, { withFileTypes: true });
+  const tasks: AiTaskDefinition[] = [];
+
+  for (const entry of entries) {
+    if (!entry.isFile() || !entry.name.toLowerCase().endsWith('.json')) {
+      continue;
+    }
+
+    const filePath = path.join(tasksDirectory, entry.name);
+    let parsed: unknown;
+
+    try {
+      const rawContents = fs.readFileSync(filePath, 'utf8');
+      parsed = JSON.parse(rawContents);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown parsing error';
+      throw new Error(`Failed to parse AI task JSON at ${filePath}: ${message}`);
+    }
+
+    try {
+      const task = validateAiTaskDefinition(parsed, {
+        source: filePath,
+        expectedModuleId: moduleId,
+      });
+
+      if (task.status === 'deprecated') {
+        continue;
+      }
+
+      if (task.placement.pageSlug === slug) {
+        tasks.push(task);
+      }
+    } catch (error) {
+      if (error instanceof AiTaskValidationError) {
+        throw error;
+      }
+      const message = error instanceof Error ? error.message : 'Unknown validation error';
+      throw new Error(`Failed to validate AI task at ${filePath}: ${message}`);
+    }
+  }
+
+  const orderValue = (task: AiTaskDefinition) => task.placement.order ?? Number.MAX_SAFE_INTEGER;
+
+  return tasks.sort((a, b) => {
+    const orderDiff = orderValue(a) - orderValue(b);
+    if (orderDiff !== 0) {
+      return orderDiff;
+    }
+    return a.id.localeCompare(b.id);
+  });
 }
 
 function splitIntoChunks(nodes: MarkdownNode[], defaultTitle: string) {

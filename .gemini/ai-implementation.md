@@ -61,48 +61,232 @@ CREATE TABLE public.team_ai_settings (
 
 This is the core of the authoring experience. For each AI task in a module (e.g., `CS01`), a corresponding file is created at `content/CS01/ai-tasks/[task-name].json`.
 
-**Structure of `[task-name].json`:**
+**Schema Overview**
+
+The canonical TypeScript definitions live at `lib/ai/schema.ts`. Each task JSON file must align with the `AiTaskDefinition` interface to pass validation. At a glance:
+
+| Field | Description |
+| --- | --- |
+| `version` | Semver string bumped on breaking schema updates (e.g. `"1.0.0"`). |
+| `id` | Task identifier unique within the module (`"term-sheet-analysis"`). |
+| `moduleId` | Owning module (`"CS01"`). Useful for auditing and Supabase storage. |
+| `status` | `"draft" \| "active" \| "deprecated"` to control visibility. |
+| `metadata` | Title, summary, tags, estimated minutes, rubric reference. |
+| `placement` | Target `pageSlug`, `anchorId`, and optional `order`. |
+| `ui` | Component name and strongly typed `props` injected into the React registry. |
+| `toggles` | Optional `difficulty`, `persona`, or additional toggle groups that influence the prompt and/or UI. |
+| `inputs` | Rendered controls describing the learner payload (files, text, enums, confirmations). |
+| `context` | Optional content/document datasets pulled into the prompt (markdown excerpts, static rubrics, Supabase queries). |
+| `prompt` | Ordered template segments (system/user/assistant) with conditional injections. |
+| `dataCapture` | Post-run Supabase operations and storage directives, including raw response retention. |
+| `cache` | Strategy configuration (`prompt-hash`) plus TTL to govern reuse. |
+| `telemetry` | Analytics surface (`eventName`, custom payload hints). |
+
+**Difficulty & Persona Toggles**
+
+Toggles live inside `toggles.difficulty`, `toggles.persona`, or `toggles.additional[]`. Every toggle option includes optional `promptInjections` to append contextually scoped instructions only when that option is active. Setting `exposeAsInput: true` on a toggle surfaces it in the generated form; otherwise it can remain hidden but still influence prompt construction through default selections.
+
+**Prompt Composition**
+
+`prompt.segments` is an ordered array of `{ role, template, when? }` objects. Templates are rendered with moustache-style placeholders: `{{inputs.difficulty}}`, `{{toggles.persona.label}}`, `{{context.foundationNotes}}`. Conditional segments (`when.toggleId`) only fire when the learner selects an eligible toggle option. The response format block advertises what the adapter should request from the provider (markdown, JSON schema, or richer structured payloads).
+
+**Data Capture Contract**
+
+`dataCapture.operations` enumerates the Supabase writes the gateway may perform after a successful completion. Each operation defines a `table`, supported `operation` (`insert` or `upsert`), optional `conflictTarget`, and an array of `fields` mapping column names to template expressions. The gateway enforces these contracts; unlisted writes are rejected.
+
+**Template Variables**
+
+The templating engine exposes a constrained namespace for authoring:
+
+* `{{task.id}}`, `{{task.moduleId}}`, `{{task.metadata.title}}`
+* `{{auth.userId}}`, `{{auth.email}}`
+* `{{inputs.<inputId>}}` for text values, `{{inputs.<fileId>.content}}` for extracted file bodies, and `{{inputs.json}}` for the entire input payload.
+* `{{toggles.<toggleId>.id}}`, `{{toggles.<toggleId>.label}}`
+* `{{context.<contextId>}}` referencing items declared in the `context` array.
+* `{{datasets.<datasetId>}}` or `{{datasets.<datasetId>.<column>}}` for structured records fetched via `context` entries that declare `"type": "dataset"`.
+* `{{response.json}}` and `{{response.markdown}}` in the `dataCapture` block when storing provider output.
+
+Unsupported variables throw validation errors during task ingestion to keep prompts deterministic.
+
+**Authoring Example**
+
 ```json
 {
-  "description": "A brief explanation of what this task does.",
+  "version": "1.0.0",
+  "id": "term-sheet-analysis",
+  "moduleId": "CS01",
+  "status": "active",
+  "metadata": {
+    "title": "Term Sheet Analysis",
+    "summary": "Upload a redlined term sheet and receive targeted coaching aligned with CS01 goals.",
+    "tags": ["document", "analysis"],
+    "estimatedDurationMinutes": 15,
+    "rubricId": "cs01-term-sheet-v1"
+  },
   "placement": {
-    "page_slug": "03-the-exercise",
-    "anchor_id": "unique-anchor-for-this-task"
+    "pageSlug": "03-the-exercise",
+    "anchorId": "ai-term-sheet-analysis"
   },
   "ui": {
     "component": "DocumentAnalyzer",
     "props": {
-      "title": "AI-Powered Term Sheet Analysis",
-      "description": "Upload your redlined term sheet (.docx or .pdf) to receive an instant analysis based on the case study's objectives.",
-      "submitButtonText": "Analyze My Document"
+      "title": "AI-Powered Term Sheet Review",
+      "description": "Attach your draft to get immediate feedback tied to the module rubrics.",
+      "submitLabel": "Analyze My Draft"
+    }
+  },
+  "toggles": {
+    "difficulty": {
+      "id": "difficulty",
+      "label": "Difficulty",
+      "type": "single",
+      "defaultValue": "standard",
+      "options": [
+        {
+          "id": "standard",
+          "label": "Standard",
+          "promptInjections": {
+            "system": ["Provide coaching calibrated for a learner in the middle of a JD-MBA program."]
+          }
+        },
+        {
+          "id": "advanced",
+          "label": "Advanced",
+          "promptInjections": {
+            "system": ["Assume the learner is a practicing associate preparing for partner review; dive deeper on edge-case tradeoffs."]
+          }
+        }
+      ]
+    },
+    "persona": {
+      "id": "persona",
+      "label": "Learner Persona",
+      "type": "single",
+      "defaultValue": "mba",
+      "options": [
+        {
+          "id": "mba",
+          "label": "MBA",
+          "promptInjections": {
+            "user": ["Highlight business impacts, investor relationships, and financial implications."]
+          }
+        },
+        {
+          "id": "founder",
+          "label": "Founder",
+          "promptInjections": {
+            "user": ["Emphasize control provisions, dilution, and long-term operating flexibility."]
+          }
+        }
+      ],
+      "exposeAsInput": true,
+      "ui": {
+        "control": "pill",
+        "order": 1
+      }
     }
   },
   "inputs": [
     {
-      "type": "file",
-      "name": "document_to_analyze",
-      "accept": [".docx", ".pdf"]
+      "id": "termSheet",
+      "name": "termSheet",
+      "label": "Upload your redlined term sheet",
+      "kind": "file",
+      "accept": [".pdf", ".docx"],
+      "maxSizeMB": 15,
+      "required": true,
+      "description": "We store submissions securely in Supabase object storage."
+    },
+    {
+      "id": "focusAreas",
+      "name": "focusAreas",
+      "label": "Tell us what to prioritize",
+      "kind": "textarea",
+      "placeholder": "E.g. liquidation preferences, board control…",
+      "maxLength": 500
     }
   ],
-  "outputs": {
-    "format": "markdown"
-  },
-  "system_prompt_template": [
-    "You are an expert legal AI specializing in venture capital deals.",
-    "Your analysis should be based on the context provided in the following documents: {{content:CS01/01-foundations.md}} and {{content:CS01/02-the-deal.md}}.",
-    "The user has submitted a document named {{inputs:document_to_analyze:fileName}}. Its content is: {{inputs:document_to_analyze:fileContent}}.",
-    "Return your response as a markdown-formatted string."
-  ],
-  "allowed_database_operations": [
+  "context": [
     {
-      "action": "insert",
-      "table": "user_document_analysis",
+      "id": "foundationsOverview",
+      "type": "markdown",
+      "path": "CS01/01-foundations.md",
+      "includeHeadings": ["Foundations Overview", "Key Definitions"]
+    },
+    {
+      "type": "static",
+      "id": "rubric",
+      "value": "### Evaluation Rubric\n- Highlight critical red flags\n- Map comments to CS01 objectives\n- Recommend next steps"
+    }
+  ],
+  "prompt": {
+    "version": "prompt-v1",
+    "segments": [
+      {
+        "role": "system",
+        "template": "You are an expert venture attorney coaching learners through CS01."
+      },
+      {
+        "role": "system",
+        "template": "{{context.rubric}}"
+      },
+      {
+        "role": "user",
+        "template": "Learner persona: {{toggles.persona.label}}."
+      },
+      {
+        "role": "user",
+        "template": "Submitted term sheet contents:\n{{inputs.termSheet.content}}"
+      },
+      {
+        "role": "user",
+        "template": "Learner focus areas: {{inputs.focusAreas}}",
+        "when": {
+          "toggleId": "difficulty",
+          "optionIds": ["advanced"]
+        }
+      }
+    ],
+    "responseFormat": {
+      "type": "structured",
       "schema": {
-        "user_document_id": "uuid",
-        "analysis_summary": "text"
+        "type": "object",
+        "properties": {
+          "summary": { "type": "string" },
+          "strengths": { "type": "array", "items": { "type": "string" } },
+          "risks": { "type": "array", "items": { "type": "string" } },
+          "nextSteps": { "type": "array", "items": { "type": "string" } }
+        },
+        "required": ["summary", "risks", "nextSteps"]
       }
     }
-  ]
+  },
+  "dataCapture": {
+    "storeRawResponse": true,
+    "operations": [
+      {
+        "table": "ai_task_runs",
+        "operation": "insert",
+        "fields": [
+          { "column": "task_id", "value": "{{task.id}}" },
+          { "column": "module_id", "value": "{{task.moduleId}}" },
+          { "column": "user_id", "value": "{{auth.userId}}" },
+          { "column": "difficulty", "value": "{{toggles.difficulty.id}}" },
+          { "column": "persona", "value": "{{toggles.persona.id}}" },
+          { "column": "inputs", "value": "{{inputs.json}}" },
+          { "column": "response", "value": "{{response.json}}" }
+        ]
+      }
+    ]
+  },
+  "cache": {
+    "enabled": true,
+    "strategy": "prompt-hash",
+    "ttlSeconds": 2592000
+  },
+  "telemetry": {
+    "eventName": "ai.task.submitted"
+  }
 }
 ```
 
@@ -111,7 +295,7 @@ This is the core of the authoring experience. For each AI task in a module (e.g.
 A single serverless function at `app/api/ai/route.ts` will handle all AI requests.
 
 **Logic:**
-1.  Receives a request: `{ "moduleId": "CS01", "taskName": "term-sheet-analysis", "data": { ... } }`.
+1.  Receives a request: `{ "moduleId": "CS01", "taskId": "term-sheet-analysis", "payload": { ... } }`.
 2.  Authenticates the user via Supabase.
 3.  **Provider Selection:**
     *   Checks `team_ai_settings` for the user's team.
@@ -119,7 +303,7 @@ A single serverless function at `app/api/ai/route.ts` will handle all AI request
     *   If not found, falls back to the system default Gemini provider (credentials in Vercel env vars).
 4.  **Task Orchestration:**
     *   Reads the corresponding `[task-name].json` file.
-    *   Constructs the final prompt, replacing template variables like `{{inputs:...}}` and `{{content:...}}` with the actual data.
+    *   Constructs the final prompt, replacing template variables like `{{inputs.termSheet.content}}` or `{{context.rubric}}` with hydrated values.
 5.  **Execution:**
     *   Instantiates the correct Provider Adapter (e.g., `GeminiAdapter`).
     *   Passes the constructed prompt to the adapter.
@@ -133,7 +317,7 @@ A single serverless function at `app/api/ai/route.ts` will handle all AI request
 
 The frontend will be responsible for discovering and rendering the AI tasks.
 
-1.  **Content Parsing (`lib/content.ts`):** The `getPage-data` function will be updated to scan the module's `/ai-tasks` directory. If it finds a task whose `placement.page_slug` matches the current page, it will parse the JSON and inject it into an `aiTasks` array in the page data object.
+1.  **Content Parsing (`lib/content.ts`):** The `getPage-data` function will be updated to scan the module's `/ai-tasks` directory. If it finds a task whose `placement.pageSlug` matches the current page, it will parse the JSON and inject it into an `aiTasks` array in the page data object. Task files are validated against `lib/ai/validation.ts`; any structural errors surface during the build to keep authored tasks trustworthy.
 
 2.  **Component Rendering (`ModulePageContent.tsx`):**
     *   The component will receive the `aiTasks` array.
