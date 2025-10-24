@@ -16,6 +16,7 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 const resolvedSupabaseUrl = supabaseUrl as string;
 const resolvedSupabaseAnonKey = supabaseAnonKey as string;
+const resolvedServiceKey = supabaseServiceKey as string;
 
 if (!supabaseServiceKey) {
   throw new Error('SUPABASE_SERVICE_ROLE_KEY must be set to use the invite API.');
@@ -74,7 +75,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
   }
 
-  const serviceClient = createClient(resolvedSupabaseUrl, supabaseServiceKey, {
+  const serviceClient = createClient(resolvedSupabaseUrl, resolvedServiceKey, {
     auth: {
       persistSession: false,
     },
