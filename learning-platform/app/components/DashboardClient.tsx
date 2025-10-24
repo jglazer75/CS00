@@ -12,11 +12,16 @@ type ModuleLink = {
   description: string;
 };
 
+type ModuleProgressInfo = {
+  percent: number;
+  lastSlug?: string;
+};
+
 export default function DashboardClient({ moduleLinks }: { moduleLinks: ModuleLink[] }) {
   const supabase = useSupabaseClient();
   const moduleIds = useMemo(() => moduleLinks.map((link) => link.id), [moduleLinks]);
   const moduleIdsKey = moduleIds.join('|');
-  const [progressByModule, setProgressByModule] = useState<Record<string, number>>({});
+  const [progressByModule, setProgressByModule] = useState<Record<string, ModuleProgressInfo>>({});
   const [status, setStatus] = useState<'loading' | 'unauthenticated' | 'ready' | 'error'>('loading');
   const [error, setError] = useState<string>();
 
@@ -59,7 +64,7 @@ export default function DashboardClient({ moduleLinks }: { moduleLinks: ModuleLi
 
       const { data, error: stateError } = await supabase
         .from('user_module_state')
-        .select('module_id, percent_complete')
+        .select('module_id, percent_complete, last_module_page_id')
         .in('module_id', moduleIds);
 
       if (stateError) {
@@ -70,8 +75,41 @@ export default function DashboardClient({ moduleLinks }: { moduleLinks: ModuleLi
         return;
       }
 
+      const lastPageIds = (data ?? [])
+        .map((row) => row.last_module_page_id)
+        .filter((value): value is string => typeof value === 'string' && value.length > 0);
+
+      const slugMap = new Map<string, string>();
+
+      if (lastPageIds.length > 0) {
+        const { data: pageRows, error: pageError } = await supabase
+          .from('module_pages')
+          .select('id, slug')
+          .in('id', Array.from(new Set(lastPageIds)));
+
+        if (pageError) {
+          if (!cancelled) {
+            setStatus('error');
+            setError(pageError.message);
+          }
+          return;
+        }
+
+        pageRows?.forEach((row) => {
+          if (row.id && row.slug) {
+            slugMap.set(row.id, row.slug);
+          }
+        });
+      }
+
       const nextProgress = Object.fromEntries(
-        (data ?? []).map((row) => [row.module_id, typeof row.percent_complete === 'number' ? row.percent_complete : 0])
+        (data ?? []).map((row) => [
+          row.module_id,
+          {
+            percent: typeof row.percent_complete === 'number' ? row.percent_complete : 0,
+            lastSlug: row.last_module_page_id ? slugMap.get(row.last_module_page_id) : undefined,
+          },
+        ])
       );
 
       if (!cancelled) {
@@ -111,7 +149,13 @@ export default function DashboardClient({ moduleLinks }: { moduleLinks: ModuleLi
           }}
         >
           {moduleLinks.map(({ id, href, title, description }) => {
-            const progress = Math.min(100, Math.max(0, progressByModule[id] ?? 0));
+            const moduleProgress = progressByModule[id];
+            const progress = Math.min(100, Math.max(0, moduleProgress?.percent ?? 0));
+            const resumeSlug = moduleProgress?.lastSlug;
+            const baseHref = href === '#' ? undefined : href;
+            const targetHref = resumeSlug && baseHref ? `/modules/${id}/${resumeSlug}` : baseHref;
+            const ctaLabel = status === 'ready' && progress > 0 ? 'Resume module' : 'Start module';
+            const isDisabled = !targetHref;
 
             return (
             <Box
@@ -153,8 +197,14 @@ export default function DashboardClient({ moduleLinks }: { moduleLinks: ModuleLi
                   </Box>
                 </CardContent>
                 <CardActions>
-                  <Button component={Link} href={href} size="small" variant="contained">
-                    Start Module
+                  <Button
+                    component={targetHref ? Link : 'button'}
+                    href={targetHref || undefined}
+                    size="small"
+                    variant="contained"
+                    disabled={isDisabled}
+                  >
+                    {ctaLabel}
                   </Button>
                 </CardActions>
               </Card>

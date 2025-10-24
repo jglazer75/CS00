@@ -49,7 +49,7 @@ Goal: Launch a polished single-user module (Venture Capital Term Sheet Negotiati
    - ✅ Added `/docs/components` reference page documenting shared component APIs.
 4. **Authentication & Progress**:
    - ✅ Supabase invite + password reset UX (admin API, login improvements, reset handler).
-   - **Next:** Finish connecting per-user progress persistence in `user_module_progress`.
+   - ✅ Per-user progress persistence (module resume routing, dashboard resume CTA, module state storage).
 5. **Exercise Workflow & AI Bridge**: Enable file uploads into `user_documents` and route submissions through Vercel serverless functions to the AI provider.
 
 ### Phase 2 — Collaboration & Community

@@ -8,11 +8,10 @@ export default async function Home() {
     moduleIds.map(async ({ params }) => {
       const { moduleId } = params;
       const pages = await getSortedPagesData(moduleId);
-      const firstPageSlug = pages.length > 0 ? pages[0].slug : '';
-      
+      const hasPages = pages.length > 0;
       return {
         id: moduleId,
-        href: `/modules/${moduleId}/${firstPageSlug}`,
+        href: hasPages ? `/modules/${moduleId}` : '#',
         title: `Venture Capital Term Sheet`, 
         description: `An interactive case study on negotiating a venture capital term sheet.`
       };
