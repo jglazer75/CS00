@@ -174,6 +174,7 @@ New, New capt-table: Founder: 73.77%; Investor A: 10.00%; Investor B: 16.39% (th
 **TAX NOTE:** ABC, Co will "grant" these 2,204 shares to Investor A; since Investor A isn't paying for these shares, the grant *also* creates taxable income for Investor A in the amount of $2,204 (at $1/share)
 
 The usual ways around this are for the company NOT to grant more shares to Investor A, but rather provide rights that allow the Investor to maintain their ownership percentage such tag-along rights or rights of first refusal.
+
 ---
 
 ## Technology-Specific Considerations

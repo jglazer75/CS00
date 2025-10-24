@@ -48,6 +48,15 @@ export default function Header() {
             Wisconsin Rural Entrepreneurship Legal Hub
           </Link>
         </Typography>
+        <Button
+          component={Link}
+          href="/docs/components"
+          variant="outlined"
+          color="inherit"
+          sx={{ mr: { xs: 0, sm: 1 } }}
+        >
+          Docs
+        </Button>
         {!loading && (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             {user ? (

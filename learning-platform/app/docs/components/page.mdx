@@ -1,0 +1,124 @@
+export const metadata = {
+  title: 'Component API Reference',
+  description: 'Documentation for the reusable UI components in the learning platform.',
+};
+
+# Component API Reference
+
+This guide outlines the primary reusable components in the learning platform and the props each one expects. Use it as a quick reference when composing new views or extending existing pages.
+
+## MetadataCard
+
+**Source:** `app/components/cards/MetadataCard.tsx`
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `metadata` | `PageMetadata` | Content metadata including title, description, learning objectives, keywords, author, date, pageId, and team. |
+
+Usage:
+
+```tsx
+import MetadataCard from '@/app/components/cards/MetadataCard';
+
+<MetadataCard
+  metadata={{
+    title: 'Module 1: Foundations',
+    description: 'Introductory context for the case study.',
+    learningObjectives: ['Understand key stakeholders'],
+    coreConcepts: ['Economics vs Control'],
+    keywords: [{ term: 'IP', definition: 'Intellectual Property' }],
+    author: 'Course Author',
+    date: '2025-10-18',
+  }}
+/>
+```
+
+## ContentCard
+
+**Source:** `app/components/cards/ContentCard.tsx`
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `chunk` | `ContentChunk` | Structured content chunk containing `id`, `heading`, `html`, `order`, and `isKeyConcept`. |
+
+- Key concept chunks render with a warning accent, chip, and border.
+- The card uses `MarkdownContent` to render the supplied HTML.
+
+```tsx
+import ContentCard from '@/app/components/cards/ContentCard';
+
+<ContentCard
+  chunk={{
+    id: 'economics-control',
+    heading: 'Economics vs Control',
+    order: 1,
+    isKeyConcept: true,
+    html: '<p>Founders must balance valuation and governance.</p>',
+  }}
+/>
+```
+
+## InstructorNoteCard
+
+**Source:** `app/components/cards/InstructorNoteCard.tsx`
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `title` | `string` | Heading displayed at the top of the card. |
+| `html` | `string` | Rendered instructor note markup. |
+
+Instructor notes are only visible when instructor mode is enabled via `InstructorModeContext`.
+
+```tsx
+import InstructorNoteCard from '@/app/components/cards/InstructorNoteCard';
+
+<InstructorNoteCard
+  title="Facilitator Notes"
+  html="<p>Prompt the class to identify leverage points.</p>"
+/>
+```
+
+## ModuleNav
+
+**Source:** `app/components/ModuleNav.tsx`
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `moduleId` | `string` | Identifier for the module (used to build URLs). |
+| `activeSlug` | `string` | Current page slug; applied to highlight the active list item. |
+| `pages` | `ModulePageSummary[]` | Ordered list of pages used for navigation labels. |
+| `completedSlugs` | `string[]` (optional) | Slugs the user has completed; shows check icons. |
+| `percentComplete` | `number` (optional) | Completion percentage for the module progress bar. |
+| `lastVisitedSlug` | `string` (optional) | Most recent slug visited; displays a caption marker. |
+
+## ModulePageContent
+
+**Source:** `app/components/ModulePageContent.tsx`
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `metadata` | `PageMetadata` | Page metadata displayed in the header and metadata card. |
+| `chunks` | `ContentChunk[]` | Ordered content chunks for the body of the module page. |
+| `instructorNote` | `InstructorNote` (optional) | HTML notes shown when instructor mode is active. |
+| `tableOfContents` | `TableOfContentsItem[]` | Section anchors shown in the sticky TOC column. |
+| `progressStatus` | `'idle' \| 'loading' \| 'unauthenticated' \| 'ready' \| 'error'` | Current progress hook state. |
+| `progressError` | `string` (optional) | Error message surfaced by the progress hook. |
+| `isCompleted` | `boolean` | Indicates whether the current page is marked complete. |
+| `isProcessingProgress` | `boolean` | True while a progress mutation is in flight. |
+| `onMarkComplete` | `() => void \| Promise<void>` | Handler invoked when the user clicks “Mark as complete.” |
+
+The component consumes `InstructorModeContext` to control visibility of instructor content and exposes a “Mark as complete” action connected to Supabase progress tracking.
+
+## MarkdownContent
+
+**Source:** `app/components/MarkdownContent.tsx`
+
+| Prop | Type | Description |
+| --- | --- | --- |
+| `html` | `string` | Sanitized HTML produced by the markdown pipeline. |
+
+The component applies typography, table, blockquote, key concept, and code styling across rendered markdown. Tables are responsive with zebra striping and overflow scrolling for smaller screens.
+
+---
+
+For additional integration notes, see the inline comments within each component and the Supabase integration guide in `supabase.md`.
