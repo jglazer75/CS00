@@ -14,6 +14,9 @@ if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Supabase URL or anon key is not configured.');
 }
 
+const resolvedSupabaseUrl = supabaseUrl as string;
+const resolvedSupabaseAnonKey = supabaseAnonKey as string;
+
 if (!supabaseServiceKey) {
   throw new Error('SUPABASE_SERVICE_ROLE_KEY must be set to use the invite API.');
 }
@@ -50,7 +53,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 });
   }
 
-  const userClient = createClient(supabaseUrl, supabaseAnonKey, {
+  const userClient = createClient(resolvedSupabaseUrl, resolvedSupabaseAnonKey, {
     auth: {
       persistSession: false,
       detectSessionInUrl: false,
@@ -71,7 +74,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
   }
 
-  const serviceClient = createClient(supabaseUrl, supabaseServiceKey, {
+  const serviceClient = createClient(resolvedSupabaseUrl, supabaseServiceKey, {
     auth: {
       persistSession: false,
     },
