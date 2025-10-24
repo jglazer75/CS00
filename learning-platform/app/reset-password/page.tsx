@@ -98,6 +98,7 @@ export default function ResetPasswordPage() {
   }
 
   const heading = status === 'success' ? 'Password updated' : 'Set a new password';
+  const isSubmitting = status === 'submitting';
 
   return (
     <Container maxWidth="sm" sx={{ py: 8 }}>
@@ -124,7 +125,7 @@ export default function ResetPasswordPage() {
           )}
         </Box>
 
-        {status === 'ready' && (
+        {(status === 'ready' || status === 'submitting') && (
           <>
             {errorMessage && (
               <Alert severity="error" onClose={() => setErrorMessage(null)}>
@@ -137,7 +138,7 @@ export default function ResetPasswordPage() {
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               required
-              disabled={status !== 'ready'}
+              disabled={isSubmitting}
             />
             <TextField
               label="Confirm password"
@@ -145,10 +146,10 @@ export default function ResetPasswordPage() {
               value={confirmPassword}
               onChange={(event) => setConfirmPassword(event.target.value)}
               required
-              disabled={status !== 'ready'}
+              disabled={isSubmitting}
             />
-            <Button type="submit" variant="contained" disabled={!canSubmit}>
-              {status === 'submitting' ? 'Saving…' : 'Update password'}
+            <Button type="submit" variant="contained" disabled={!canSubmit || isSubmitting}>
+              {isSubmitting ? 'Saving…' : 'Update password'}
             </Button>
           </>
         )}
@@ -165,7 +166,7 @@ export default function ResetPasswordPage() {
               type="button"
               variant="text"
               onClick={() => router.replace('/login')}
-              disabled={status === 'submitting'}
+              disabled={isSubmitting}
             >
               Return to sign-in
             </Button>
