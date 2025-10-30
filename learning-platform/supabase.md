@@ -17,6 +17,19 @@ SUPABASE_SERVICE_ROLE_URL=https://mousqbknairepmemqicd.supabase.co # optional ov
 
 Additional environment variables will be documented here as new Supabase-backed features are implemented.
 
+### AI Gateway Environment
+
+Set the following variables before exercising the `/api/ai` gateway scaffold:
+
+```
+GEMINI_API_KEY=your-google-ai-key
+GEMINI_MODEL=gemini-1.5-pro-latest # optional override; defaults to gemini-pro
+```
+
+- `GEMINI_API_KEY` powers the system fallback provider when a user has not configured their own credentials.
+- `GEMINI_MODEL` is optional and lets you pin the default Gemini model; the adapter currently falls back to `gemini-pro`.
+- Future provider integrations will introduce additional variables (`OPENAI_API_KEY`, etc.); keep them server-side only.
+
 ## Database Schema
 
 The schema SQL lives in `supabase/schema.sql` and now covers both the learning progress core and the AI gateway foundations:
@@ -39,6 +52,13 @@ Initial content for the pilot module can be loaded via `supabase/seed_cs01.sql`.
 Re-run the seed when content metadata changes; the statements use `ON CONFLICT` to perform idempotent updates.
 
 For larger updates, prefer the automation script: `npm run sync:content` reads the markdown frontmatter and upserts module/page metadata via the Supabase service key. It is safe to re-run anytime you add or rename content files.
+
+## AI Gateway TODOs
+
+- Replace the stubbed `GeminiAdapter` implementation with the real Google client and structured response handling.
+- Implement the templating engine that hydrates prompt placeholders (`{{inputs.*}}`, `{{context.*}}`, etc.) before dispatching to the provider.
+- Persist and replay task `dataCapture` operations once the execution contract is finalized.
+- Extend provider resolution to honor team-level settings and decrypt user-supplied API keys.
 
 ## Authentication
 
