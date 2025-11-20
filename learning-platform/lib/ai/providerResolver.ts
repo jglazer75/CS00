@@ -71,11 +71,11 @@ async function lookupUserProvider(userId: string, providerName: ProviderIdentifi
   const supabase = getSupabaseServerClient();
 
   const { data, error } = await supabase
-    .from<UserProviderRecord>('user_ai_providers')
+    .from('user_ai_providers')
     .select('id, provider_name, encrypted_api_key, model_preferences')
     .eq('user_id', userId)
     .eq('provider_name', providerName)
-    .maybeSingle();
+    .maybeSingle<UserProviderRecord>();
 
   if (error) {
     console.warn('Failed to lookup user AI provider', error);
@@ -94,10 +94,10 @@ async function lookupTeamProvider(teamId: string): Promise<TeamProviderLookupRes
   const supabase = getSupabaseServerClient();
 
   const { data, error } = await supabase
-    .from<TeamProviderSettingsRecord>('team_ai_settings')
+    .from('team_ai_settings')
     .select('selected_user_provider_id, allow_system_fallback')
     .eq('team_id', teamId)
-    .maybeSingle();
+    .maybeSingle<TeamProviderSettingsRecord>();
 
   if (error) {
     if (error?.code === '42P01') {
@@ -146,10 +146,10 @@ async function fetchProviderRecordById(providerId: string): Promise<UserProvider
   const supabase = getSupabaseServerClient();
 
   const { data, error } = await supabase
-    .from<UserProviderRecord>('user_ai_providers')
+    .from('user_ai_providers')
     .select('id, provider_name, encrypted_api_key, model_preferences')
     .eq('id', providerId)
-    .maybeSingle();
+    .maybeSingle<UserProviderRecord>();
 
   if (error) {
     console.warn('Failed to fetch provider record by id', error);
