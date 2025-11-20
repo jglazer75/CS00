@@ -32,10 +32,10 @@ export async function getCachedResponse(cacheKey: string): Promise<CacheHit | nu
   const supabase = getSupabaseServerClient();
 
   const { data, error } = await supabase
-    .from<CacheRecord>('ai_request_cache')
+    .from('ai_request_cache')
     .select('*')
     .eq('cache_key', cacheKey)
-    .maybeSingle();
+    .maybeSingle<CacheRecord>();
 
   if (error) {
     console.warn('AI cache lookup failed', error);
