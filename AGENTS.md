@@ -15,6 +15,85 @@
 @./.gemini/coding-rules/typescript.md
 
 # AGENTS BRIEFING
+You are an expert Senior Full-Stack TypeScript Developer. When generating code, refactoring, or explaining concepts, you must strictly adhere to the following architectural and stylistic guidelines.
+
+## 1. TypeScript General Rules
+
+* **Strict Typing:** Never use `any`. If the type is truly dynamic, use `unknown` and perform type narrowing.
+* **Explicit Returns:** Always define return types for functions, even if they are void. This aids in readability and type inference.
+* **Interfaces vs. Types:**
+    * Use `interface` for defining object shapes and public API contracts (allows extending).
+    * Use `type` for unions, intersections, primitives, and complex utility types.
+* **No Non-Null Assertions:** Avoid the `!` operator. Use optional chaining (`?.`) and nullish coalescing (`??`) or proper type guards.
+* **Enums:** Avoid TypeScript `enum`. Use `const` assertions or string literal unions instead.
+
+## 2. Code Style & Formatting
+
+* **Functional Paradigm:** Prefer functional programming patterns. Use `map`, `filter`, `reduce` over imperative loops where cleaner.
+* **Immutability:** Treat data as immutable. Use spread syntax `...` or libraries like `immer` only when necessary.
+* **Naming Conventions:**
+    * **Variables/Functions:** `camelCase`
+    * **Components/Classes:** `PascalCase`
+    * **Constants:** `UPPER_SNAKE_CASE` (global constants only)
+    * **Files:** `kebab-case.ts` (utilities) or `PascalCase.tsx` (components).
+* **Exports:** Use **Named Exports** solely. Avoid default exports (except for Next.js pages/layouts where required by framework).
+
+## 3. Component Architecture (React/Next.js Context)
+
+* **Functional Components:** Use React Functional Components exclusively.
+* **Props Interface:** Define a `Props` interface for every component, exported alongside the component.
+* **Destructuring:** Destructure props in the function signature.
+* **Colocation:** Keep related files together.
+    ```text
+    /Component
+      ├── Component.tsx
+      ├── Component.test.tsx
+      ├── Component.module.css
+      └── types.ts
+    ```
+* **Logic Separation:** Move complex logic out of the JSX and into custom hooks (`useComponentNameLogic`) or utility functions.
+
+## 4. State Management & Data Fetching
+
+* **Server State:** Use **TanStack Query (React Query)** for all async server state. Never use `useEffect` for data fetching.
+* **Client State:** Use **Zustand** or **Context API** for global client-side state. Avoid Redux unless strictly legacy.
+* **Url State:** Prioritize URL parameters (search params) for state that should persist on reload (filters, pagination, tabs).
+* **Zod Validation:** All API responses must be validated using **Zod** schemas before being used in the application. Trust nothing from the network.
+
+## 5. Error Handling
+
+* **Try/Catch:** Handle errors at the boundaries.
+* **Error Boundaries:** Use React Error Boundaries for UI crash prevention.
+* **Toast/Notifications:** Display user-friendly errors via the toast system, but log the full technical error to the console/monitoring service.
+
+## 6. Testing Guidelines
+
+* **Unit Tests:** Use **Vitest/Jest**. Focus on testing logic and edge cases, not implementation details.
+* **Integration:** Use **React Testing Library**. Test user interactions (clicks, typing) rather than internal state.
+* **E2E:** Use **Playwright**. Write tests for critical user flows only.
+* **Mocks:** Mock external dependencies and API calls using `msw` (Mock Service Worker) where possible.
+
+## 7. Example Patterns
+
+**✅ PREFERRED (Zod + React Query + Named Exports):**
+
+```typescript
+// user-api.ts
+import { z } from 'zod';
+
+export const UserSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string().min(2),
+  email: z.string().email(),
+});
+
+export type User = z.infer<typeof UserSchema>;
+
+export const fetchUser = async (id: string): Promise<User> => {
+  const res = await fetch(\`/api/users/\${id}\`);
+  const data = await res.json();
+  return UserSchema.parse(data); // Runtime validation
+};
 
 ## App Overview
 - Next.js 15 + MUI (Material Design) platform delivering interactive case-study modules for the Wisconsin Rural Entrepreneurship Legal Hub.
