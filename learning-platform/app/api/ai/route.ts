@@ -45,6 +45,10 @@ type AiGatewayResponse = {
   capturedData?: Record<string, unknown>;
 };
 
+type AuthResult =
+  | { status: 200; userId: string; email: string | null }
+  | { status: number; error: string };
+
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
@@ -270,7 +274,7 @@ export async function POST(request: NextRequest) {
 
 async function authenticateRequest(
   request: NextRequest
-): Promise<{ status: number; error?: string; userId?: string; email?: string | null }> {
+): Promise<AuthResult> {
   const authHeader = request.headers.get('authorization') ?? '';
   if (!authHeader.toLowerCase().startsWith('bearer ')) {
     return { status: 401, error: 'Unauthorized.' };
