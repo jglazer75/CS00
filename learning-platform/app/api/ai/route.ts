@@ -45,9 +45,9 @@ type AiGatewayResponse = {
   capturedData?: Record<string, unknown>;
 };
 
-type AuthResult =
-  | { status: 200; userId: string; email: string | null }
-  | { status: number; error: string };
+type AuthSuccessResult = { status: 200; userId: string; email: string | null };
+type AuthErrorResult = { status: number; error: string };
+type AuthResult = AuthSuccessResult | AuthErrorResult;
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
   }
 
   const userAuth = await authenticateRequest(request);
-  if (userAuth.status !== 200) {
+  if (!isAuthSuccess(userAuth)) {
     const errorMessage = 'error' in userAuth ? userAuth.error : 'Unauthorized.';
     return NextResponse.json({ error: errorMessage, requestId }, { status: userAuth.status });
   }
@@ -271,6 +271,10 @@ export async function POST(request: NextRequest) {
   }
 
   return NextResponse.json(response);
+}
+
+function isAuthSuccess(result: AuthResult): result is AuthSuccessResult {
+  return result.status === 200 && 'userId' in result;
 }
 
 async function authenticateRequest(
