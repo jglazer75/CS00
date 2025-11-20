@@ -82,7 +82,8 @@ export async function POST(request: NextRequest) {
 
   const userAuth = await authenticateRequest(request);
   if (userAuth.status !== 200) {
-    return NextResponse.json({ error: userAuth.error, requestId }, { status: userAuth.status });
+    const errorMessage = 'error' in userAuth ? userAuth.error : 'Unauthorized.';
+    return NextResponse.json({ error: errorMessage, requestId }, { status: userAuth.status });
   }
 
   const { userId, email } = userAuth;
