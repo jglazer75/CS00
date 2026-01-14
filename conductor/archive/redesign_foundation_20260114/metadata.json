@@ -1,0 +1,8 @@
+{
+  "track_id": "redesign_foundation_20260114",
+  "type": "architectural_change",
+  "status": "new",
+  "created_at": "2026-01-14T12:00:00Z",
+  "updated_at": "2026-01-14T12:00:00Z",
+  "description": "Establish the Database as the Source of Truth and decouple content structure from filenames."
+}
