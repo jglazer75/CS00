@@ -1,0 +1,8 @@
+{
+  "track_id": "runtime_migration_20260114",
+  "type": "architectural_change",
+  "status": "new",
+  "created_at": "2026-01-14T13:00:00Z",
+  "updated_at": "2026-01-14T13:00:00Z",
+  "description": "Switch the application's routing and data fetching logic from filesystem scanning to database queries."
+}

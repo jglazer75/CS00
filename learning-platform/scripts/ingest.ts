@@ -3,6 +3,10 @@ import yaml from 'js-yaml';
 import { ModuleManifestSchema, type ModuleManifest, type ModuleNode } from '../lib/schema/manifest';
 import { createClient } from '@supabase/supabase-js';
 import path from 'path';
+import dotenv from 'dotenv';
+
+// Load environment variables from .env.local
+dotenv.config({ path: path.join(process.cwd(), '.env.local') });
 
 /**
  * Loads a YAML manifest from the given file path.

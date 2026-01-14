@@ -1,0 +1,24 @@
+# Implementation Plan: Runtime Migration (DB-First Routing)
+
+## Phase 1: Data Layer Refactor
+- [ ] Task: Create DB-backed `getAllModuleIds`
+    - [ ] Update `lib/content.ts` to fetch modules from Supabase.
+    - [ ] Add caching/memoization if necessary.
+- [ ] Task: Create DB-backed `getModuleStructure`
+    - [ ] Implement `getModuleStructure(moduleId)` in `lib/content.ts`.
+    - [ ] Query `module_nodes` and reconstruct the tree structure (sections -> children).
+- [ ] Task: Refactor `getPageData`
+    - [ ] Update to fetch node metadata from DB.
+    - [ ] Keep file reading logic for content body only, using `content_source` from DB.
+- [ ] Task: Conductor - User Manual Verification 'Phase 1: Data Layer Refactor' (Protocol in workflow.md)
+
+## Phase 2: Frontend Integration
+- [ ] Task: Update `generateStaticParams`
+    - [ ] Modify `app/modules/[moduleId]/[slug]/page.js` (or `.tsx`) to use the new DB functions.
+    - [ ] Ensure nested routes are handled if necessary (currently flat `[slug]` might need adjustment or mapping).
+- [ ] Task: Refactor `ModuleNav` Component
+    - [ ] Update component to render the hierarchical structure returned by `getModuleStructure`.
+    - [ ] Implement collapsible sections if not present.
+- [ ] Task: Verify Metadata Flow
+    - [ ] Ensure page titles, descriptions, and learning objectives are correctly passed from DB to the UI components.
+- [ ] Task: Conductor - User Manual Verification 'Phase 2: Frontend Integration' (Protocol in workflow.md)
