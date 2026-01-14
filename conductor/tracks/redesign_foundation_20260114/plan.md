@@ -1,15 +1,15 @@
 # Implementation Plan: Redesign Foundation
 
-## Phase 1: Database & Schema Definition
+## Phase 1: Database & Schema Definition [checkpoint: e9e4f49]
 - [x] Task: Create `module_nodes` migration [commit: 7c2fe67]
-    - [ ] Create Supabase migration file `supabase/migrations/<timestamp>_create_module_nodes.sql`.
-    - [ ] Define table schema with RLS policies.
-    - [ ] Apply migration locally and verify.
+    - [x] Create Supabase migration file `supabase/migrations/<timestamp>_create_module_nodes.sql`.
+    - [x] Define table schema with RLS policies.
+    - [x] Apply migration locally and verify.
 - [x] Task: Define Manifest Zod Schema [commit: 882258c]
-    - [ ] Create `lib/schema/manifest.ts`.
-    - [ ] Define types for `ModuleManifest`, `ModuleNode`, `VisibilityRule`.
-    - [ ] Write unit tests for schema validation (valid/invalid yamls).
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Database & Schema Definition' (Protocol in workflow.md)
+    - [x] Create `lib/schema/manifest.ts`.
+    - [x] Define types for `ModuleManifest`, `ModuleNode`, `VisibilityRule`.
+    - [x] Write unit tests for schema validation (valid/invalid yamls).
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Database & Schema Definition' (Protocol in workflow.md)
 
 ## Phase 2: Ingestion Service
 - [ ] Task: Scaffold Ingestion Script
