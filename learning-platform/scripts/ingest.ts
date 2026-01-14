@@ -7,7 +7,7 @@ import path from 'path';
 /**
  * Loads a YAML manifest from the given file path.
  */
-export function loadManifest(filePath: string): any {
+export function loadManifest(filePath: string): unknown {
   const content = fs.readFileSync(filePath, 'utf8');
   return yaml.load(content);
 }
@@ -15,7 +15,7 @@ export function loadManifest(filePath: string): any {
 /**
  * Validates the manifest data against the Zod schema.
  */
-export function validateManifest(data: any): ModuleManifest {
+export function validateManifest(data: unknown): ModuleManifest {
   return ModuleManifestSchema.parse(data);
 }
 
@@ -64,14 +64,14 @@ export async function syncModule(manifest: ModuleManifest) {
   if (moduleError) throw moduleError;
 
   // 2. Prepare nodes for recursive flattening
-  const nodesToUpsert: any[] = [];
+  const nodesToUpsert: Record<string, unknown>[] = [];
   const nodeIdsInManifest: string[] = [];
 
   function flattenNodes(nodes: ModuleNode[], parentId: string | null = null) {
     nodes.forEach((node, index) => {
       nodeIdsInManifest.push(node.id);
       
-      const flattenedNode: any = {
+      const flattenedNode: Record<string, unknown> = {
         module_id: manifest.id,
         node_id: node.id,
         parent_node_id: parentId,
