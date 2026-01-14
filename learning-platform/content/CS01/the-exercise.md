@@ -1,22 +1,3 @@
----
-title: "Module 3: The Negotiation"
-description: "An interactive exercise where students analyze a term sheet, develop a negotiation strategy, and engage in a simulated negotiation."
-learning_concepts:
-  - "Negotiation Theory: BATNA, reservation points, creating and claiming value"
-  - "Client counseling and issue spotting"
-  - "Strategic communication and persuasion"
-  - "Role-playing and perspective-taking"
-learning_objectives:
-  - "Formulate counter-offers and draft redlined revision to a legal term sheet"
-  - "Develop a comprehensive negotiation strategy based on a client's stated goals and confidential information"
-  - "Synthesize competing interests to reach a mutually acceptable (or strategically abandoned) agreement"
-  - "Engage in simulated negotiation, effectively articulating their position and responding to the other party's proposals"
-keywords:
-  - "BATNA: Best Alternative to a Negotiated Agreement"
-author: "Jeffrey M Glazer"
-date: "2025-10-18"
----
-
 ## Part 1 - Markup the Term Sheet {#pt1-mup-term-sheet}
 
 ### BigTechCo, Inc

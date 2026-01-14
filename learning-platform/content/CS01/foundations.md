@@ -1,26 +1,3 @@
----
-title: "Module 1: Foundations – The Setup & The Stakes"
-description: "An introduction to the key parties, concepts, and legal stakes involved in a corporate spin-off and the formation of a new technology company."
-learning_concepts:
-  - "Corporate Spin-offs and Technology Transfer"
-  - "IP assignment in employment"
-  - "Founder motivations and entity formation"
-  - "Intial capitalization and sweat equity"
-learning_objectives:
-  - "Explain the business and university policy justifications for internal project commercialization"
-  - "Identify the different ways in which employers have rights over employee-created IP"
-  - "Identify personal and professional factors that motivate founders when working from within"
-  - "Analyze an initial capitalization table, the implications of equity splits, vesting schedules, and impact of later investment on founder equity"
-keywords:
-  - "IP: Intellectual Property"
-  - "CVC: Corporate Venture Capital"
-  - "PI: Principal Investigators - usually Professors or specialized researchers at a University"
-  - "license: a contractual right to use something, in this case intellectual property; it is _not_ a transfer of ownership."
-  - "assignment: a contractual change of ownership, in this case of intellectual property"
-  - "NDA: Non-Disclosure Agreement, sometimes called Confidentiality Agreement"
-author: "Jeffrey M Glazer"
-date: "2025-10-18"
----
 ## PARTIES
 
 **BigTechCo, Inc. ("BigTech")** is a very large, Silicon Valley-based, publicly traded, Fortune 100, hardware technology company with a considerable in-house research and development group. BigTech's primary business is the manufacturing of central processing units for desktop computers and mobile devices. Like many large companies, BigTech frequently expands through acquisition of related technologies. It also develops its own technologies in-house and even has a special program that encourages and rewards employee entrepreneurial endeavors. Where the in-house developments are speculative or merely tangentially related to BigTech's central line of business, BigTech will spin-off the technology into its own company to live or die on its own. Executives at BigTech believe this lets the technology compete in a free market as any other startup which can accelerate the technology and could create a nice return on investment for BigTech. As the technology develops, BigTech will sometimes buy-out the startup once the technology is proven thus bringing it back in-house, but frequently it will simply maintain its equity position in this new company and hold it as it would any other stock in its investment portfolio.

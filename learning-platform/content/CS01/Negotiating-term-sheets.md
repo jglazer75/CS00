@@ -1,26 +1,3 @@
----
-title: "Module 2: Negotiating Term Sheets"
-description: "A guide to negotiating term sheets, focusing on the key concepts of economics and control, and understanding leverage."
-learning_concepts:
-  - "Economics vs. Control"
-  - "Leverage in Negotiation"
-  - "Early Stage Investors"
-  - "Investment Instruments"
-learning_objectives:
-  - "Understand the two primary components of any term sheet: economics and control."
-  - "Identify sources of leverage in a negotiation, such as competition and traction."
-  - "Differentiate between different types of early-stage investors."
-  - "Explain the difference between priced and un-priced investment rounds."
-keywords:
-  - "MFN: Most Favored Nation"
-  - "tag-along: may participate in future round on same terms as the round"
-  - "rights of first refusal: get first right to participate in the next round on same terms as the round"
-  - "burn-rate: Cash In - Cash Out per month"
-  - "runway: how long a given round of cash will last"
-  - "IP: Intellectual Property"
-author: "Jeffrey M Glazer"
-date: "2025-10-18"
----
 ## Think Marriage, Not War
 
 This is the start of a multi-year relationship. An overly aggressive negotiation can poison the well before you even start.

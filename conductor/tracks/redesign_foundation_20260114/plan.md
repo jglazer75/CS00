@@ -28,7 +28,7 @@
 - [x] Task: Create Module Manifest [commit: 6cd7384]
     - [ ] Analyze `content/CS01` structure.
     - [ ] Author `content/CS01/module.yaml` mapping all existing pages.
-- [ ] Task: Clean Content Files
+- [~] Task: Clean Content Files
     - [ ] Rename markdown files (remove prefixes).
     - [ ] Strip YAML frontmatter from all CS01 markdown files.
 - [ ] Task: Run Ingestion & Verify

@@ -8,7 +8,7 @@ navigation:
   - id: "foundations"
     title: "Foundations"
     type: "page"
-    content_source: "01-foundations.md"
+    content_source: "foundations.md"
     layout: "reader"
     
   - id: "the-basics"
@@ -19,7 +19,7 @@ navigation:
       - id: "negotiating-basics"
         title: "Negotiating Term Sheets"
         type: "page"
-        content_source: "02-Negotiating-term-sheets.md"
+        content_source: "Negotiating-term-sheets.md"
       - id: "negotiation-tips"
         title: "Negotiation Tips"
         type: "page"
@@ -33,18 +33,18 @@ navigation:
       - id: "term-sheet-breakdown"
         title: "Deconstructing the Term Sheet"
         type: "page"
-        content_source: "02-the-deal.md"
+        content_source: "the-deal.md"
       - id: "confidential-bigtech"
         title: "BigTech Confidential Briefing"
         type: "page"
-        content_source: "03-bigtech-confidential.md"
+        content_source: "bigtech-confidential.md"
         visibility: 
           role: ["BigTech", "Instructor"]
 
   - id: "the-exercise"
     title: "Negotiation Exercise"
     type: "page"
-    content_source: "03-the-exercise.md"
+    content_source: "the-exercise.md"
     layout: "workbench"
 
   - id: "finances-and-pitch"
@@ -55,11 +55,11 @@ navigation:
       - id: "startup-finances"
         title: "Startup Finances"
         type: "page"
-        content_source: "04-financials.md"
+        content_source: "financials.md"
       - id: "pitch-competition"
         title: "Pitch Competition"
         type: "page"
-        content_source: "05-pitch-competition.md"
+        content_source: "pitch-competition.md"
 
   - id: "instructor-resources"
     title: "Instructor Resources"
