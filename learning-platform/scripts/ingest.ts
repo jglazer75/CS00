@@ -51,6 +51,11 @@ export function verifyFiles(manifest: ModuleManifest, moduleDirectory: string) {
 export async function syncModule(manifest: ModuleManifest) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
   const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+  
+  if (!supabaseUrl || !supabaseKey) {
+      throw new Error('Missing Supabase credentials (NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)');
+  }
+
   const supabase = createClient(supabaseUrl, supabaseKey);
 
   // 1. Upsert the module itself
@@ -114,4 +119,40 @@ export async function syncModule(manifest: ModuleManifest) {
     .not('node_id', 'in', `(${nodeIdsInManifest.join(',')})`);
 
   if (deleteError) throw deleteError;
+}
+
+async function main() {
+  const contentDir = path.join(process.cwd(), 'content');
+  const moduleDirs = fs
+    .readdirSync(contentDir, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory() && !entry.name.startsWith('.'))
+    .map((entry) => entry.name);
+
+  for (const moduleId of moduleDirs) {
+    const moduleDir = path.join(contentDir, moduleId);
+    const manifestPath = path.join(moduleDir, 'module.yaml');
+
+    if (fs.existsSync(manifestPath)) {
+      console.log(`Processing module: ${moduleId}`);
+      try {
+        const raw = loadManifest(manifestPath);
+        const manifest = validateManifest(raw);
+        verifyFiles(manifest, moduleDir);
+        await syncModule(manifest);
+        console.log(`Successfully synced module: ${moduleId}`);
+      } catch (error) {
+        console.error(`Failed to sync module ${moduleId}:`, error);
+      }
+    } else {
+      console.log(`No module.yaml found for ${moduleId}, skipping.`);
+    }
+  }
+}
+
+// Check if we are running as a script
+if (process.argv[1] && (process.argv[1].endsWith('ingest.ts') || process.argv[1].endsWith('ingest'))) {
+    main().catch((err) => {
+        console.error(err);
+        process.exit(1);
+    });
 }
