@@ -1,7 +1,7 @@
 # Implementation Plan: Redesign Foundation
 
 ## Phase 1: Database & Schema Definition
-- [ ] Task: Create `module_nodes` migration
+- [x] Task: Create `module_nodes` migration [commit: 7c2fe67]
     - [ ] Create Supabase migration file `supabase/migrations/<timestamp>_create_module_nodes.sql`.
     - [ ] Define table schema with RLS policies.
     - [ ] Apply migration locally and verify.
