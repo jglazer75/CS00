@@ -5,7 +5,7 @@
     - [ ] Create Supabase migration file `supabase/migrations/<timestamp>_create_module_nodes.sql`.
     - [ ] Define table schema with RLS policies.
     - [ ] Apply migration locally and verify.
-- [ ] Task: Define Manifest Zod Schema
+- [x] Task: Define Manifest Zod Schema [commit: 882258c]
     - [ ] Create `lib/schema/manifest.ts`.
     - [ ] Define types for `ModuleManifest`, `ModuleNode`, `VisibilityRule`.
     - [ ] Write unit tests for schema validation (valid/invalid yamls).
