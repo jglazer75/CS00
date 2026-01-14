@@ -16,7 +16,7 @@
     - [ ] Create `scripts/ingest.ts`.
     - [ ] Implement `loadManifest(path)` function.
     - [ ] Implement `validateManifest(manifest)` function.
-- [ ] Task: Implement DB Sync Logic
+- [x] Task: Implement DB Sync Logic [commit: 0d2bb83]
     - [ ] Implement `syncModule(module)` function.
     - [ ] Implement recursive node upsert logic.
     - [ ] Implement deletion logic for removed nodes.
