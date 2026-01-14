@@ -11,18 +11,18 @@
     - [x] Write unit tests for schema validation (valid/invalid yamls).
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Database & Schema Definition' (Protocol in workflow.md)
 
-## Phase 2: Ingestion Service
+## Phase 2: Ingestion Service [checkpoint: 2f857c7]
 - [x] Task: Scaffold Ingestion Script [commit: ebfd7b3]
-    - [ ] Create `scripts/ingest.ts`.
-    - [ ] Implement `loadManifest(path)` function.
-    - [ ] Implement `validateManifest(manifest)` function.
+    - [x] Create `scripts/ingest.ts`.
+    - [x] Implement `loadManifest(path)` function.
+    - [x] Implement `validateManifest(manifest)` function.
 - [x] Task: Implement DB Sync Logic [commit: 0d2bb83]
-    - [ ] Implement `syncModule(module)` function.
-    - [ ] Implement recursive node upsert logic.
-    - [ ] Implement deletion logic for removed nodes.
+    - [x] Implement `syncModule(module)` function.
+    - [x] Implement recursive node upsert logic.
+    - [x] Implement deletion logic for removed nodes.
 - [x] Task: Implement File Verification [commit: 16b1fc4]
-    - [ ] Add check to ensure `content_source` paths exist on disk.
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Ingestion Service' (Protocol in workflow.md)
+    - [x] Add check to ensure `content_source` paths exist on disk.
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Ingestion Service' (Protocol in workflow.md)
 
 ## Phase 3: Content Migration (CS01)
 - [ ] Task: Create Module Manifest
