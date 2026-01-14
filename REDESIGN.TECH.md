@@ -216,3 +216,44 @@ create table public.module_nodes (
 1.  Define the `dealcraft-negotiator-v1` Task Definition.
 2.  Update `module.yaml` to include the AI node.
 3.  Deploy and verify role-based access logic.
+
+---
+
+## 7. Frontend Architecture: The Hybrid Layout Engine
+
+To support the "Hybrid Dojo" experience, the frontend must become layout-aware.
+
+### 7.1 Schema Extensions
+The `module_nodes` table and `module.yaml` will support a `layout` configuration property.
+
+```yaml
+# module.yaml
+- id: "the-exercise"
+  type: "section"
+  # New layout property
+  layout: "workbench" 
+  
+  # Layout-specific configuration
+  layout_config:
+    secondary_component: "PDFViewer"
+    secondary_source: "./assets/term-sheet.pdf"
+```
+
+### 7.2 The LayoutResolver Component
+We will introduce a `LayoutResolver` at the top level of the Module Page (`app/modules/[moduleId]/[slug]/page.tsx`).
+
+**Logic:**
+1.  Fetch the current node's data from Supabase.
+2.  Read the `layout` property (defaulting to "reader" if undefined).
+3.  Render the appropriate shell component:
+    *   `ReaderLayout`: Standard centered column, sticky TOC.
+    *   `WorkbenchLayout`: Resizable split-pane. Passes `content_source` to Left Pane and `layout_config` to Right Pane.
+    *   `ImmersiveLayout`: Fullscreen, no sidebar. Used for "Journey" steps.
+
+### 7.3 State Synchronization (The Workbench)
+For the Split-Screen "Workbench" mode, the Left Pane (Guide) and Right Pane (Artifact) must communicate.
+
+*   **Shared Context:** A `WorkbenchContext` will act as the bus.
+*   **Action:** When a user clicks a "Hotspot" in the Markdown guide (e.g., `[See Liquidation Clause]`), it dispatches an event: `{ type: 'FOCUS_ARTIFACT', target: 'clause-4.2' }`.
+*   **Reaction:** The Right Pane (PDF Viewer) listens for this event and scrolls/zooms to the relevant section.
+*   **Reverse Flow:** Clicking an element in the Right Pane can highlight the explanation in the Left Pane guide.

@@ -115,3 +115,23 @@ This architecture is critical for the **DealCraft** negotiation simulator:
 2.  **Conversion:** Write a script to convert the existing `content/CS01` folder into a `module.yaml` and clean markdown files.
 3.  **Update UI:** Refactor `ModuleNav` and `ModulePage` to consume the new DB-first data structure.
 4.  **Verify:** Run the ingestion locally and verify the app renders correctly.
+
+## 7. Frontend Experience Strategy: The Hybrid "Dojo"
+
+The Schema-First Architecture enables the frontend to dynamically switch layouts based on the content type, creating a "Hybrid Dojo" experience.
+
+### 7.1 The Concept
+Instead of a one-size-fits-all reading interface, we define the layout mode in the `module.yaml` for each node.
+
+*   **Mode A: The Reader (Foundational)**  
+    *   *Usage:* Standard reading assignments, introductions.
+    *   *Experience:* Enhanced version of the current card-based scroll. Low friction, high scannability.
+*   **Mode B: The Workbench (Active)**  
+    *   *Usage:* Analysis, drafting, technical review.
+    *   *Experience:* Split-screen layout. Left pane contains the guide/instruction; Right pane contains the "Active Artifact" (e.g., a PDF viewer, a Code Editor, a Form). The two panes are synchronized (clicking a PDF clause scrolls the guide).
+*   **Mode C: The Journey (Immersive)**  
+    *   *Usage:* Simulations (DealCraft), quizzes, branching narratives.
+    *   *Experience:* Full-screen, step-by-step linear flow. Focus is on interaction and decision-making rather than consumption.
+
+### 7.2 Strategic Value
+This hybrid approach balances the need for efficient information consumption (The Reader) with the need for deep, active engagement (The Workbench/Journey). It prevents "feature fatigue" by only deploying complex UI when the learning objective demands it.
