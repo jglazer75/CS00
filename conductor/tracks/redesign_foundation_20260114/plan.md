@@ -24,14 +24,14 @@
     - [x] Add check to ensure `content_source` paths exist on disk.
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Ingestion Service' (Protocol in workflow.md)
 
-## Phase 3: Content Migration (CS01)
+## Phase 3: Content Migration (CS01) [checkpoint: 4559efe]
 - [x] Task: Create Module Manifest [commit: 6cd7384]
-    - [ ] Analyze `content/CS01` structure.
-    - [ ] Author `content/CS01/module.yaml` mapping all existing pages.
+    - [x] Analyze `content/CS01` structure.
+    - [x] Author `content/CS01/module.yaml` mapping all existing pages.
 - [x] Task: Clean Content Files [commit: 0f91c50]
-    - [ ] Rename markdown files (remove prefixes).
-    - [ ] Strip YAML frontmatter from all CS01 markdown files.
+    - [x] Rename markdown files (remove prefixes).
+    - [x] Strip YAML frontmatter from all CS01 markdown files.
 - [x] Task: Run Ingestion & Verify [commit: b94768d]
-    - [ ] Execute `npm run ingest`.
-    - [ ] Verify Supabase table data matches `module.yaml`.
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Content Migration (CS01)' (Protocol in workflow.md)
+    - [x] Execute `npm run ingest`.
+    - [x] Verify Supabase table data matches `module.yaml`.
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Content Migration (CS01)' (Protocol in workflow.md)
