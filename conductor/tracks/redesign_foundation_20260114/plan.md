@@ -12,7 +12,7 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Database & Schema Definition' (Protocol in workflow.md)
 
 ## Phase 2: Ingestion Service
-- [ ] Task: Scaffold Ingestion Script
+- [x] Task: Scaffold Ingestion Script [commit: ebfd7b3]
     - [ ] Create `scripts/ingest.ts`.
     - [ ] Implement `loadManifest(path)` function.
     - [ ] Implement `validateManifest(manifest)` function.
