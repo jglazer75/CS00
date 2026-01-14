@@ -31,7 +31,7 @@
 - [x] Task: Clean Content Files [commit: 0f91c50]
     - [ ] Rename markdown files (remove prefixes).
     - [ ] Strip YAML frontmatter from all CS01 markdown files.
-- [~] Task: Run Ingestion & Verify
+- [x] Task: Run Ingestion & Verify [commit: b94768d]
     - [ ] Execute `npm run ingest`.
     - [ ] Verify Supabase table data matches `module.yaml`.
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Content Migration (CS01)' (Protocol in workflow.md)
