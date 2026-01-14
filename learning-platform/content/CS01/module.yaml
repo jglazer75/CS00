@@ -1,0 +1,82 @@
+id: "CS01"
+title: "Venture Capital Term Sheet Negotiation"
+version: "1.0.0"
+description: "An interactive case study exploring the legal and business dynamics of early-stage venture capital financing, from corporate spin-off to pitch competition."
+roles: ["NewCo", "BigTech", "Instructor"]
+
+navigation:
+  - id: "foundations"
+    title: "Foundations"
+    type: "page"
+    content_source: "01-foundations.md"
+    layout: "reader"
+    
+  - id: "the-basics"
+    title: "The Basics"
+    type: "section"
+    layout: "reader"
+    children:
+      - id: "negotiating-basics"
+        title: "Negotiating Term Sheets"
+        type: "page"
+        content_source: "02-Negotiating-term-sheets.md"
+      - id: "negotiation-tips"
+        title: "Negotiation Tips"
+        type: "page"
+        content_source: "tips.md"
+
+  - id: "the-deal"
+    title: "The Deal"
+    type: "section"
+    layout: "reader"
+    children:
+      - id: "term-sheet-breakdown"
+        title: "Deconstructing the Term Sheet"
+        type: "page"
+        content_source: "02-the-deal.md"
+      - id: "confidential-bigtech"
+        title: "BigTech Confidential Briefing"
+        type: "page"
+        content_source: "03-bigtech-confidential.md"
+        visibility: 
+          role: ["BigTech", "Instructor"]
+
+  - id: "the-exercise"
+    title: "Negotiation Exercise"
+    type: "page"
+    content_source: "03-the-exercise.md"
+    layout: "workbench"
+
+  - id: "finances-and-pitch"
+    title: "Finances & Pitching"
+    type: "section"
+    layout: "reader"
+    children:
+      - id: "startup-finances"
+        title: "Startup Finances"
+        type: "page"
+        content_source: "04-financials.md"
+      - id: "pitch-competition"
+        title: "Pitch Competition"
+        type: "page"
+        content_source: "05-pitch-competition.md"
+
+  - id: "instructor-resources"
+    title: "Instructor Resources"
+    type: "section"
+    layout: "reader"
+    visibility:
+      role: ["Instructor"]
+    children:
+      - id: "instructor-intro"
+        title: "Introduction"
+        type: "page"
+        content_source: "instructor/index.md"
+      - id: "instructor-syllabus"
+        title: "Syllabus"
+        type: "page"
+        content_source: "instructor/syllabus.md"
+      - id: "instructor-sourcedocs"
+        title: "Source Documents & Resources"
+        type: "page"
+        content_source: "instructor/sourcedocs-and-resources.md"
