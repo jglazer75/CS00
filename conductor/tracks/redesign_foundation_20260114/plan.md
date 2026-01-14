@@ -20,7 +20,7 @@
     - [ ] Implement `syncModule(module)` function.
     - [ ] Implement recursive node upsert logic.
     - [ ] Implement deletion logic for removed nodes.
-- [ ] Task: Implement File Verification
+- [x] Task: Implement File Verification [commit: 16b1fc4]
     - [ ] Add check to ensure `content_source` paths exist on disk.
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Ingestion Service' (Protocol in workflow.md)
 
