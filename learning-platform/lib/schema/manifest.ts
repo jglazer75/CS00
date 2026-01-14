@@ -9,7 +9,7 @@ const BaseNodeSchema = z.object({
   id: z.string().min(1),
   title: z.string().min(1),
   visibility: VisibilityRuleSchema.optional(),
-  metadata: z.record(z.unknown()).optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
 });
 
 type BaseNode = z.infer<typeof BaseNodeSchema>;
@@ -29,7 +29,7 @@ export const AiInteractionNodeSchema = BaseNodeSchema.extend({
     mode: z.string().optional(),
     role_required: z.boolean().optional(),
     starting_state_file: z.string().optional(),
-    completion_criteria: z.record(z.unknown()).optional(),
+    completion_criteria: z.record(z.string(), z.unknown()).optional(),
   }).strict(),
   layout: z.enum(['reader', 'workbench', 'immersive']).optional().default('immersive'),
 }).strict();
@@ -51,7 +51,7 @@ export const SectionNodeSchema: z.ZodType<SectionNode> = BaseNodeSchema.extend({
   type: z.literal('section'),
   content_source: z.string().optional(), // Sections might have intro content
   layout: z.enum(['reader', 'workbench', 'immersive']).optional().default('reader'),
-  layout_config: z.record(z.unknown()).optional(),
+  layout_config: z.record(z.string(), z.unknown()).optional(),
   children: z.lazy(() => z.array(ModuleNodeSchema)),
 }).strict();
 

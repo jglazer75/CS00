@@ -82,7 +82,7 @@ export function validateAiTaskDefinition(
     throw new AiTaskValidationError(`${prefix} is invalid`, errors);
   }
 
-  return raw as AiTaskDefinition;
+  return raw as unknown as AiTaskDefinition;
 }
 
 function validateMetadata(metadata: unknown, errors: string[]) {
