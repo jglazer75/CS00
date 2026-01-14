@@ -1,8 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { loadManifest, validateManifest, syncModule } from './ingest';
+import { loadManifest, validateManifest, syncModule, verifyFiles } from './ingest';
 import fs from 'fs';
 import yaml from 'js-yaml';
 import { createClient } from '@supabase/supabase-js';
+import path from 'path';
 
 vi.mock('fs');
 vi.mock('js-yaml');
@@ -45,6 +46,33 @@ describe('Ingestion Logic', () => {
     it('should throw error if invalid', () => {
       const invalidManifest = { id: 'CS01' };
       expect(() => validateManifest(invalidManifest)).toThrow();
+    });
+  });
+
+  describe('verifyFiles', () => {
+    it('should pass if all files exist', () => {
+      const manifest = {
+        navigation: [
+          { type: 'page', content_source: './p1.md' },
+          { type: 'section', content_source: './p2.md', children: [] }
+        ]
+      };
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      
+      expect(() => verifyFiles(manifest as any, 'module/dir')).not.toThrow();
+      expect(fs.existsSync).toHaveBeenCalledWith(path.join('module/dir', 'p1.md'));
+      expect(fs.existsSync).toHaveBeenCalledWith(path.join('module/dir', 'p2.md'));
+    });
+
+    it('should throw if a file is missing', () => {
+      const manifest = {
+        navigation: [
+          { type: 'page', content_source: './missing.md' }
+        ]
+      };
+      vi.mocked(fs.existsSync).mockReturnValue(false);
+      
+      expect(() => verifyFiles(manifest as any, 'module/dir')).toThrow('File missing at module/dir/missing.md');
     });
   });
 

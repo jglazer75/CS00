@@ -2,6 +2,7 @@ import fs from 'fs';
 import yaml from 'js-yaml';
 import { ModuleManifestSchema, type ModuleManifest, type ModuleNode } from '../lib/schema/manifest';
 import { createClient } from '@supabase/supabase-js';
+import path from 'path';
 
 /**
  * Loads a YAML manifest from the given file path.
@@ -16,6 +17,32 @@ export function loadManifest(filePath: string): any {
  */
 export function validateManifest(data: any): ModuleManifest {
   return ModuleManifestSchema.parse(data);
+}
+
+/**
+ * Verifies that all content_source files referenced in the manifest exist on disk.
+ */
+export function verifyFiles(manifest: ModuleManifest, moduleDirectory: string) {
+  function checkNodes(nodes: ModuleNode[]) {
+    nodes.forEach((node) => {
+      if (node.type === 'page' && node.content_source) {
+        const fullPath = path.join(moduleDirectory, node.content_source);
+        if (!fs.existsSync(fullPath)) {
+          throw new Error(`File missing at ${fullPath}`);
+        }
+      } else if (node.type === 'section') {
+        if (node.content_source) {
+          const fullPath = path.join(moduleDirectory, node.content_source);
+          if (!fs.existsSync(fullPath)) {
+            throw new Error(`File missing at ${fullPath}`);
+          }
+        }
+        checkNodes(node.children || []);
+      }
+    });
+  }
+
+  checkNodes(manifest.navigation);
 }
 
 /**
