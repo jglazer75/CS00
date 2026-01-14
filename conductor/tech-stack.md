@@ -12,4 +12,6 @@
 
 ## Content Management
 *   **Remark & Gray-matter:** Toolset for parsing and processing Markdown content and YAML frontmatter.
+*   **Zod:** TypeScript-first schema validation with static type inference, used for manifest and AI task validation.
 *   **Content Engine:** Custom logic (`lib/content.ts`) for dynamically rendering Markdown files from the repository.
+*   **Ingestion Service:** CLI tool (`scripts/ingest.ts`) powered by `tsx` and `js-yaml` for syncing structured module manifests to the database.
