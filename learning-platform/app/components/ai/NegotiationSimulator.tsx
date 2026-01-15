@@ -190,7 +190,7 @@ export default function NegotiationSimulator({ task }: NegotiationSimulatorProps
     <Box sx={{ my: 4 }}>
       <Grid container spacing={3}>
         {/* Chat Area */}
-        <Grid item xs={12} md={8}>
+        <Grid size={{ xs: 12, md: 8 }}>
           <Paper elevation={0} variant="outlined" sx={{ height: 600, display: 'flex', flexDirection: 'column', borderRadius: 2 }}>
             <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider', bgcolor: 'grey.50' }}>
               <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
@@ -287,7 +287,7 @@ export default function NegotiationSimulator({ task }: NegotiationSimulatorProps
         </Grid>
 
         {/* State Sidebar */}
-        <Grid item xs={12} md={4}>
+        <Grid size={{ xs: 12, md: 4 }}>
           <Paper variant="outlined" sx={{ p: 2, borderRadius: 2, height: '100%', position: 'sticky', top: 100 }}>
             <Typography variant="h6" gutterBottom>
               Deal Status
