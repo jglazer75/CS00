@@ -1,6 +1,6 @@
 # Implementation Plan: Runtime Migration (DB-First Routing)
 
-## Phase 1: Data Layer Refactor
+## Phase 1: Data Layer Refactor [checkpoint: 8beecc3]
 - [x] Task: Create DB-backed `getAllModuleIds` 42064b3
     - [ ] Update `lib/content.ts` to fetch modules from Supabase.
     - [ ] Add caching/memoization if necessary.
@@ -10,7 +10,7 @@
 - [x] Task: Refactor `getPageData` f6ed1cf
     - [ ] Update to fetch node metadata from DB.
     - [ ] Keep file reading logic for content body only, using `content_source` from DB.
-- [ ] Task: Conductor - User Manual Verification 'Phase 1: Data Layer Refactor' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 1: Data Layer Refactor' (Protocol in workflow.md)
 
 ## Phase 2: Frontend Integration
 - [ ] Task: Update `generateStaticParams`
