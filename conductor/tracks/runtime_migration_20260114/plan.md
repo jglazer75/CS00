@@ -19,6 +19,6 @@
 - [x] Task: Refactor `ModuleNav` Component a8b965c
     - [ ] Update component to render the hierarchical structure returned by `getModuleStructure`.
     - [ ] Implement collapsible sections if not present.
-- [ ] Task: Verify Metadata Flow
+- [~] Task: Verify Metadata Flow
     - [ ] Ensure page titles, descriptions, and learning objectives are correctly passed from DB to the UI components.
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Frontend Integration' (Protocol in workflow.md)
