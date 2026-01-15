@@ -16,3 +16,17 @@
 ## Role-Based Differentiation (Instructor Mode)
 *   **Visual Signaling:** When "Instructor Mode" is active, use a distinct visual indicator in the header (e.g., a specific color shift or persistent label) to ensure clear situational awareness.
 *   **Explicit Badging:** Mark every instructor-only content card or element with a clear "Instructor" or "Confidential" badge to distinguish it from student-facing material.
+
+## Content Architecture & Pedagogy
+*   **Unit of Learning:** The **Page** is the atomic unit of learning.
+    *   Every Markdown page MUST define `learning_objectives` (list of strings) in its frontmatter.
+    *   Every Markdown page MUST define `core_concepts` (list of strings) in its frontmatter.
+    *   Every Markdown page MUST define `title` in its frontmatter.
+*   **Unit of Action:** The **AI Task** is the atomic unit of application.
+    *   A page MAY contain **zero** or **one** AI Task (anchored via `AI_TASK_ANCHOR`).
+    *   Multiple tasks on a single page are prohibited to reduce cognitive load and simplify state tracking.
+    *   Tasks should generally be placed at the bottom of the page content, serving as the "Capstone" or application of the concepts read above.
+*   **The Manifest (`module.yaml`):**
+    *   Acts as the navigational router.
+    *   Titles in the manifest should be concise/navigational (e.g., "The Exercise").
+    *   Titles in Markdown frontmatter can be descriptive/pedagogical (e.g., "Negotiating Terms with BigTech").

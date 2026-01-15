@@ -9,6 +9,7 @@
     "lint": "eslint",
     "test": "vitest run",
     "sync:content": "node scripts/sync-content.mjs",
+    "validate:content": "tsx scripts/validate-content.ts",
     "ingest": "tsx scripts/ingest.ts"
   },
   "dependencies": {

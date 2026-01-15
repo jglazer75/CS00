@@ -4,5 +4,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: Document Analyzer Launch (CS01)**
-  *Link: [./tracks/document_analyzer_20260115/](./tracks/document_analyzer_20260115/)*
+- [ ] **Track: Negotiation Simulator (DealCraft)**
+  *Link: [./tracks/negotiation_simulator_20260115/](./tracks/negotiation_simulator_20260115/)*
