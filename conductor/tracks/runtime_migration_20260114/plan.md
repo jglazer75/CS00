@@ -1,7 +1,7 @@
 # Implementation Plan: Runtime Migration (DB-First Routing)
 
 ## Phase 1: Data Layer Refactor
-- [ ] Task: Create DB-backed `getAllModuleIds`
+- [x] Task: Create DB-backed `getAllModuleIds` 42064b3
     - [ ] Update `lib/content.ts` to fetch modules from Supabase.
     - [ ] Add caching/memoization if necessary.
 - [ ] Task: Create DB-backed `getModuleStructure`
