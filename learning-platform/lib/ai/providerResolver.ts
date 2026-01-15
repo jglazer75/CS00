@@ -10,6 +10,13 @@ type UserProviderRecord = {
   } | null;
 };
 
+type ModuleProviderRecord = {
+  module_id: string;
+  provider: string;
+  model: string | null;
+  encrypted_api_key: string | null;
+};
+
 type TeamProviderSettingsRecord = {
   selected_user_provider_id: string | null;
   allow_system_fallback: boolean | null;
@@ -29,21 +36,33 @@ export class ProviderResolutionError extends Error {
 
 export async function resolveProviderCredentials(params: {
   userId: string;
+  moduleId: string;
   preferredProvider?: ProviderIdentifier;
   teamId?: string;
 }): Promise<ProviderCredentials> {
-  const teamLookup = params.teamId ? await lookupTeamProvider(params.teamId) : null;
-  const providerName = params.preferredProvider ?? teamLookup?.credentials?.provider ?? 'gemini';
+  const { userId, moduleId, preferredProvider, teamId } = params;
+
+  // 1. Team Context (Phase 2+)
+  const teamLookup = teamId ? await lookupTeamProvider(teamId) : null;
+  const providerName = preferredProvider ?? teamLookup?.credentials?.provider ?? 'gemini';
 
   if (teamLookup?.credentials && teamLookup.credentials.provider === providerName) {
     return teamLookup.credentials;
   }
 
-  const userOverride = await lookupUserProvider(params.userId, providerName);
+  // 2. User Override (Personal Key)
+  const userOverride = await lookupUserProvider(userId, providerName);
   if (userOverride) {
     return userOverride;
   }
 
+  // 3. Module Config (Developer Key)
+  const moduleConfig = await lookupModuleProvider(moduleId);
+  if (moduleConfig && moduleConfig.provider === providerName) {
+    return moduleConfig;
+  }
+
+  // 4. System Fallback
   if (teamLookup && !teamLookup.allowFallback) {
     throw new ProviderResolutionError(
       `Team configuration requires a configured provider for "${providerName}". No fallback is allowed.`
@@ -87,8 +106,35 @@ async function lookupUserProvider(userId: string, providerName: ProviderIdentifi
     return null;
   }
 
-  // TODO: decrypt `encrypted_api_key` once KMS or Supabase Vault is in place.
   return toProviderCredentials(data);
+}
+
+async function lookupModuleProvider(moduleId: string): Promise<ProviderCredentials | null> {
+  const supabase = getSupabaseServerClient();
+  if (!supabase) return null;
+
+  const { data, error } = await supabase
+    .from('module_ai_settings')
+    .select('module_id, provider, model, encrypted_api_key')
+    .eq('module_id', moduleId)
+    .maybeSingle<ModuleProviderRecord>();
+
+  if (error) {
+    if (error.code === '42P01') return null; // Table not yet created
+    console.warn('Failed to lookup module AI settings', error);
+    return null;
+  }
+
+  if (!data || !data.encrypted_api_key) {
+    return null;
+  }
+
+  return {
+    provider: data.provider,
+    apiKey: data.encrypted_api_key,
+    model: data.model ?? undefined,
+    isUserSupplied: true, // Treated as supplied by developer/module
+  };
 }
 
 async function lookupTeamProvider(teamId: string): Promise<TeamProviderLookupResult | null> {
@@ -103,7 +149,6 @@ async function lookupTeamProvider(teamId: string): Promise<TeamProviderLookupRes
 
   if (error) {
     if (error?.code === '42P01') {
-      // Table not yet created in this environment; treat as no team configuration.
       console.warn('Team AI settings table not found; ignoring team provider resolution.');
       return null;
     }

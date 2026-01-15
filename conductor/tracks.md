@@ -4,5 +4,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [x] **Track: AI Gateway Foundation**
-  *Link: [./tracks/ai_gateway_foundation_20260115/](./tracks/ai_gateway_foundation_20260115/)*
+- [ ] **Track: Platform Administration (Module AI Config)**
+  *Link: [./tracks/platform_admin_20260115/](./tracks/platform_admin_20260115/)*

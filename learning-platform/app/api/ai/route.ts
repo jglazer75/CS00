@@ -73,6 +73,7 @@ export async function POST(req: Request) {
     // Note: teamId is not yet available in MVP auth context, passing undefined.
     const credentials = await resolveProviderCredentials({
       userId: user.id,
+      moduleId: moduleId,
       // teamId: ... 
     });
 

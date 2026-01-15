@@ -63,12 +63,12 @@ export default function Header() {
         {!loading && user?.email && PUBLIC_ADMIN_EMAILS.length > 0 && isAdminEmail(user.email, 'public') && (
           <Button
             component={Link}
-            href="/admin/invite"
+            href="/admin/modules"
             variant="outlined"
             color="inherit"
             sx={{ mr: { xs: 0, sm: 1 } }}
           >
-            Invite users
+            Admin
           </Button>
         )}
         {!loading && (
