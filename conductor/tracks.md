@@ -4,5 +4,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: Platform Administration (Module AI Config)**
-  *Link: [./tracks/platform_admin_20260115/](./tracks/platform_admin_20260115/)*
+- [ ] **Track: Document Analyzer Launch (CS01)**
+  *Link: [./tracks/document_analyzer_20260115/](./tracks/document_analyzer_20260115/)*

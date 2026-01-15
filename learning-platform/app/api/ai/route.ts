@@ -7,6 +7,7 @@ import { getCachedResponse, storeCachedResponse } from '@/lib/ai/cache';
 import { buildPromptCacheKey } from '@/lib/ai/hash';
 import { executeDataCapture } from '@/lib/ai/dataCapture';
 import { loadTaskContextValues } from '@/lib/ai/taskLoader';
+import { extractTextFromBuffer } from '@/lib/ai/extraction';
 import { z } from 'zod';
 
 const RequestBodySchema = z.object({
@@ -69,6 +70,48 @@ export async function POST(req: Request) {
     // 3. Load Context
     const context = loadTaskContextValues(task);
 
+    // 3.5 Process File Inputs (Extract Text)
+    // If any input is a file and matches a task input definition of kind 'file', 
+    // we need to download it from storage and extract text for the prompt.
+    const hydratedInputs = { ...inputs };
+    for (const inputDef of task.inputs) {
+      if (inputDef.kind === 'file') {
+        const filePath = inputs[inputDef.name];
+        if (typeof filePath === 'string' && filePath.trim() !== '') {
+          try {
+            // Assume filePath is the path within the bucket
+            // In a real app, bucket name might come from task config or env
+            const bucketName = 'term-sheet-submissions'; 
+            const { data: fileData, error: downloadError } = await supabase.storage
+              .from(bucketName)
+              .download(filePath);
+
+            if (downloadError) {
+              console.warn(`Failed to download file ${filePath} from ${bucketName}`, downloadError);
+              continue;
+            }
+
+            if (fileData) {
+              const buffer = Buffer.from(await fileData.arrayBuffer());
+              const extractedText = await extractTextFromBuffer(buffer, fileData.type);
+              
+              // We inject the content into the inputs so the prompt template can use {{inputs.name.content}}
+              // Actually, the taskLoader expects inputs[name] to be the value.
+              // We can make it an object if it's a file.
+              hydratedInputs[inputDef.name] = {
+                path: filePath,
+                content: extractedText,
+                mimeType: fileData.type
+              };
+            }
+          } catch (extractionError) {
+            console.error(`Error processing file input ${inputDef.name}:`, extractionError);
+            // Optionally fail the request or proceed with empty content
+          }
+        }
+      }
+    }
+
     // 4. Resolve Provider
     // Note: teamId is not yet available in MVP auth context, passing undefined.
     const credentials = await resolveProviderCredentials({
@@ -82,7 +125,7 @@ export async function POST(req: Request) {
     const promptRenderParams = {
       task,
       moduleId,
-      inputs,
+      inputs: hydratedInputs,
       toggles,
       context,
       auth: authContext,

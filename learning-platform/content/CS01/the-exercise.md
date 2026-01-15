@@ -42,6 +42,14 @@ Each group should take 40 minutes to discuss the Term Sheet and, in your role fo
 
 You should reference [the term sheet found in Module 2](./02-the-deal.md) and you may find the [capitalization table in Module 1](./01-foundations.md) helpful.
 
+### AI Coaching: Analyze Your Redline
+
+If you are working through this module independently, or if you would like immediate feedback on your proposed changes before meeting with your counterpart, you can use the AI Coach below. 
+
+Upload your redlined document and share your strategy to receive targeted feedback aligned with NewCo's goals.
+
+AI_TASK_ANCHOR: term-sheet-analysis-anchor
+
 ## Part 2 - Face Off {#pt2-face-off}
 
 Once you have marked up the Term Sheet, it is sent to BigTech and their lawyers. Their lawyers have responded and would like to set up a time to talk through your suggestions. 

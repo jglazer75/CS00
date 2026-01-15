@@ -1,0 +1,80 @@
+{
+  "version": "1.0.0",
+  "id": "term-sheet-analysis",
+  "moduleId": "CS01",
+  "status": "active",
+  "metadata": {
+    "title": "Term Sheet Redline Analysis",
+    "summary": "Upload your redlined term sheet to receive coaching on your negotiation strategy and alignment with NewCo's goals.",
+    "estimatedDurationMinutes": 15
+  },
+  "placement": {
+    "pageSlug": "the-exercise",
+    "anchorId": "term-sheet-analysis-anchor"
+  },
+  "ui": {
+    "component": "DocumentAnalyzer",
+    "props": {
+      "submitLabel": "Analyze Redline"
+    }
+  },
+  "inputs": [
+    {
+      "id": "redline",
+      "kind": "file",
+      "name": "redline",
+      "label": "Upload your redlined Term Sheet",
+      "accept": [".pdf", ".docx"],
+      "required": true,
+      "description": "Upload the document where you have made your edits or comments."
+    },
+    {
+      "id": "strategy",
+      "kind": "textarea",
+      "name": "strategy",
+      "label": "Negotiation Strategy",
+      "placeholder": "Briefly describe your primary goal for this negotiation...",
+      "description": "Explain what you were trying to achieve with your edits."
+    }
+  ],
+  "context": [
+    {
+      "id": "foundations",
+      "type": "markdown",
+      "path": "CS01/foundations.md"
+    },
+    {
+      "id": "theDeal",
+      "type": "markdown",
+      "path": "CS01/the-deal.md"
+    }
+  ],
+  "prompt": {
+    "segments": [
+      {
+        "role": "system",
+        "template": "You are a savvy venture capital attorney and negotiation coach. Your goal is to review a learner's redlined version of a term sheet for a startup spin-off called NewCo (founded by Baker and Carter) from a large corporation called BigTech.\n\nContext of the deal:\n{{context.foundations}}\n\nOriginal Terms proposed by BigTech:\n{{context.theDeal}}\n\nLearner's Strategy:\n{{inputs.strategy}}\n\nYour task is to provide constructive, professional feedback on the learner's redline. Focus on:\n1. **Economics**: How did they handle the 15% equity and anti-dilution provision?\n2. **Control**: How did they address the Board Observer and future Board Seat options?\n3. **IP & Exclusivity**: How did they handle the 'Field of Use' and diligence requirements?\n4. **Negotiation Posture**: Is their approach too aggressive, too passive, or well-balanced given the spin-off context?\n\nProvide your analysis in Markdown format with clear headings. Use a coaching tone—praise good moves and challenge questionable ones with 'Why' questions."
+      },
+      {
+        "role": "user",
+        "template": "Here is my redlined document text:\n\n{{inputs.redline.content}}"
+      }
+    ]
+  },
+  "dataCapture": {
+    "storeRawResponse": true,
+    "operations": [
+      {
+        "table": "ai_task_runs",
+        "operation": "insert",
+        "fields": [
+          { "column": "task_id", "value": "term-sheet-analysis" },
+          { "column": "module_id", "value": "CS01" },
+          { "column": "user_id", "value": "{{auth.userId}}" },
+          { "column": "inputs", "value": "{{inputs.json}}" },
+          { "column": "response", "value": "{{response.content}}" }
+        ]
+      }
+    ]
+  }
+}
