@@ -7,7 +7,7 @@
 - [x] Task: Create DB-backed `getModuleStructure` 4cc9866
     - [ ] Implement `getModuleStructure(moduleId)` in `lib/content.ts`.
     - [ ] Query `module_nodes` and reconstruct the tree structure (sections -> children).
-- [ ] Task: Refactor `getPageData`
+- [x] Task: Refactor `getPageData` f6ed1cf
     - [ ] Update to fetch node metadata from DB.
     - [ ] Keep file reading logic for content body only, using `content_source` from DB.
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Data Layer Refactor' (Protocol in workflow.md)
