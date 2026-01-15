@@ -29,7 +29,7 @@ export default function ModulePageClient({ moduleId, slug, navData, pageData }: 
     return list;
   }, [navData]);
 
-  const { metadata, chunks, instructorNote, tableOfContents } = pageData;
+  const { metadata, chunks, instructorNote, tableOfContents, aiTasks } = pageData;
 
   const {
     status,
@@ -67,6 +67,7 @@ export default function ModulePageClient({ moduleId, slug, navData, pageData }: 
         chunks={chunks}
         instructorNote={instructorNote}
         tableOfContents={tableOfContents}
+        aiTasks={aiTasks}
         progressStatus={status}
         progressError={error}
         isCompleted={isCompleted}

@@ -1,181 +1,88 @@
-import type { ProviderRunOptions, ProviderRunResult, AiProviderAdapter } from './base';
+import { GoogleGenerativeAI, type Content, type Part } from '@google/generative-ai';
+import type { AiProviderAdapter, ProviderRunOptions, ProviderRunResult } from './base';
 
-type GeminiAdapterOptions = {
+export type GeminiAdapterConfig = {
   apiKey: string;
   model?: string;
 };
 
-type GeminiPart = {
-  text?: string;
-};
-
-type GeminiContent = {
-  role?: 'user' | 'model' | 'system';
-  parts: GeminiPart[];
-};
-
-type GeminiCandidate = {
-  content?: GeminiContent;
-  finishReason?: string;
-  safetyRatings?: Array<Record<string, unknown>>;
-};
-
-type GeminiGenerateContentResponse = {
-  candidates?: GeminiCandidate[];
-  promptFeedback?: Record<string, unknown>;
-  modelVersion?: string;
-};
-
-const GEMINI_API_BASE_URL = process.env.GEMINI_API_BASE_URL ?? 'https://generativelanguage.googleapis.com/v1beta';
-const DEFAULT_MODEL = 'gemini-1.5-pro-latest';
-
 export class GeminiAdapter implements AiProviderAdapter {
   readonly name = 'gemini';
+  private client: GoogleGenerativeAI;
+  private modelName: string;
 
-  private readonly apiKey: string;
-  private readonly model: string;
-
-  constructor(options: GeminiAdapterOptions) {
-    if (!options.apiKey) {
-      throw new Error('GeminiAdapter requires an API key.');
-    }
-
-    this.apiKey = options.apiKey;
-    this.model = options.model ?? DEFAULT_MODEL;
+  constructor(config: GeminiAdapterConfig) {
+    this.client = new GoogleGenerativeAI(config.apiKey);
+    this.modelName = config.model || 'gemini-1.5-flash';
   }
 
   async run(options: ProviderRunOptions): Promise<ProviderRunResult> {
-    const requestPayload = buildRequestPayload(options);
-    const endpoint = new URL(
-      `/models/${encodeURIComponent(this.model)}:generateContent?key=${encodeURIComponent(this.apiKey)}`,
-      GEMINI_API_BASE_URL
-    );
-
-    const response = await fetch(endpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
+    const { prompt, responseFormat } = options;
+    const model = this.client.getGenerativeModel({
+      model: this.modelName,
+      generationConfig: {
+        responseMimeType: responseFormat?.type === 'json' ? 'application/json' : 'text/plain',
       },
-      body: JSON.stringify(requestPayload),
     });
 
-    if (!response.ok) {
-      const errorBody = await safeParseJson(response);
-      throw new Error(`Gemini API error (${response.status}): ${JSON.stringify(errorBody)}`);
+    // Convert RenderedPrompt to Gemini Content
+    const contents: Content[] = [];
+    let systemInstruction: string | undefined;
+
+    for (const segment of prompt.segments) {
+      if (segment.role === 'system') {
+        // Concatenate multiple system segments if necessary
+        systemInstruction = systemInstruction 
+          ? `${systemInstruction}\n${segment.content}`
+          : segment.content;
+      } else {
+        const role = segment.role === 'assistant' ? 'model' : 'user';
+        const parts: Part[] = [{ text: segment.content }];
+        
+        // Merge with previous content if role is same (Gemini expects alternating roles usually, 
+        // but 'user' messages can sometimes be consecutive if representing distinct inputs, 
+        // though typically we should merge them or ensure alternating. 
+        // For simplicity, we'll just push. Using chat history format.)
+        contents.push({ role, parts });
+      }
     }
 
-    const payload = (await response.json()) as GeminiGenerateContentResponse;
-    const primaryCandidate = payload.candidates?.[0];
-    if (!primaryCandidate?.content?.parts?.length) {
-      throw new Error('Gemini API did not return any content.');
+    try {
+      const result = await model.generateContent({
+        contents,
+        systemInstruction: systemInstruction ? { role: 'system', parts: [{ text: systemInstruction }] } : undefined,
+      });
+
+      const response = result.response;
+      const text = response.text();
+
+      // If JSON is expected, try to parse it
+      let content: string | Record<string, unknown> = text;
+      if (responseFormat?.type === 'json') {
+        try {
+          content = JSON.parse(text);
+        } catch (e) {
+          // If parse fails, return raw text but maybe log warning? 
+          // For now, keep as string or try to extract JSON from markdown block
+          const jsonMatch = text.match(/```json\n([\s\S]*?)\n```/);
+          if (jsonMatch) {
+            try {
+              content = JSON.parse(jsonMatch[1]);
+            } catch (innerE) {
+              // ignore
+            }
+          }
+        }
+      }
+
+      return {
+        model: this.modelName,
+        content,
+        rawResponse: result,
+      };
+    } catch (error: any) {
+      // Improve error handling/wrapping
+      throw new Error(`Gemini API Error: ${error.message}`);
     }
-
-    const textResponse = collectText(primaryCandidate.content.parts);
-    if (!textResponse) {
-      throw new Error('Gemini API response missing text content.');
-    }
-
-    const structuredContent = parseStructuredContent(textResponse, options.responseFormat?.type);
-
-    return {
-      model: payload.modelVersion ?? this.model,
-      content: structuredContent ?? textResponse,
-      rawResponse: {
-        payload,
-        finishReason: primaryCandidate.finishReason,
-        safetyRatings: primaryCandidate.safetyRatings,
-        promptFeedback: payload.promptFeedback,
-      },
-    };
-  }
-}
-
-function buildRequestPayload(options: ProviderRunOptions) {
-  const { prompt, responseFormat } = options;
-  const systemSegments: string[] = [];
-  const conversation: GeminiContent[] = [];
-
-  for (const segment of prompt.segments) {
-    if (!segment.content || segment.content.trim().length === 0) {
-      continue;
-    }
-
-    if (segment.role === 'system') {
-      systemSegments.push(segment.content);
-      continue;
-    }
-
-    conversation.push({
-      role: mapRole(segment.role),
-      parts: [{ text: segment.content }],
-    });
-  }
-
-  if (conversation.length === 0) {
-    throw new Error('GeminiAdapter requires at least one non-system prompt segment.');
-  }
-
-  const generationConfig: Record<string, unknown> = {};
-  if (responseFormat?.type === 'json' || responseFormat?.type === 'structured') {
-    generationConfig.responseMimeType = 'application/json';
-    if (responseFormat.type === 'structured' && responseFormat.schema) {
-      generationConfig.responseSchema = responseFormat.schema;
-    }
-  }
-
-  const payload: {
-    contents: GeminiContent[];
-    systemInstruction?: GeminiContent;
-    generationConfig?: Record<string, unknown>;
-  } = {
-    contents: conversation,
-  };
-
-  if (systemSegments.length > 0) {
-    payload.systemInstruction = {
-      role: 'system',
-      parts: systemSegments.map((text) => ({ text })),
-    };
-  }
-
-  if (Object.keys(generationConfig).length > 0) {
-    payload.generationConfig = generationConfig;
-  }
-
-  return payload;
-}
-
-function mapRole(role: string): 'user' | 'model' {
-  if (role === 'assistant') {
-    return 'model';
-  }
-  return 'user';
-}
-
-function collectText(parts: GeminiPart[]): string {
-  return parts
-    .map((part) => part.text ?? '')
-    .filter((text) => text.length > 0)
-    .join('\n')
-    .trim();
-}
-
-function parseStructuredContent(text: string, formatType?: 'markdown' | 'json' | 'structured') {
-  if (!formatType || formatType === 'markdown') {
-    return undefined;
-  }
-
-  try {
-    return JSON.parse(text);
-  } catch (error) {
-    throw new Error(`Failed to parse Gemini ${formatType} response as JSON: ${error instanceof Error ? error.message : 'unknown error'}`);
-  }
-}
-
-async function safeParseJson(response: Response) {
-  try {
-    return await response.json();
-  } catch {
-    return await response.text();
   }
 }

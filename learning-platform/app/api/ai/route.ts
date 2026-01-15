@@ -1,338 +1,181 @@
-import { randomUUID } from 'crypto';
-import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-import {
-  loadTaskDefinition,
-  renderTaskPrompt,
-  extractResponseFormat,
-  loadTaskContextValues,
-  buildTemplateContext,
-} from '@/lib/ai/taskLoader';
-import { buildPromptCacheKey } from '@/lib/ai/hash';
-import { getCachedResponse, storeCachedResponse } from '@/lib/ai/cache';
-import { resolveProviderCredentials, ProviderResolutionError } from '@/lib/ai/providerResolver';
+import { NextResponse } from 'next/server';
+import { getSupabaseServerClient } from '@/lib/supabase/server';
+import { loadTaskDefinition, renderTaskPrompt, buildTemplateContext } from '@/lib/ai/taskLoader';
+import { resolveProviderCredentials } from '@/lib/ai/providerResolver';
 import { createProviderAdapter } from '@/lib/ai/adapterFactory';
-import type { ProviderRunResult } from '@/lib/ai/providers';
-import type { ProviderCredentials } from '@/lib/ai/types';
-import { TaskNotFoundError } from '@/lib/ai/taskLoader';
-import { AiTaskValidationError } from '@/lib/ai/validation';
+import { getCachedResponse, storeCachedResponse } from '@/lib/ai/cache';
+import { buildPromptCacheKey } from '@/lib/ai/hash';
 import { executeDataCapture } from '@/lib/ai/dataCapture';
+import { loadTaskContextValues } from '@/lib/ai/taskLoader';
+import { z } from 'zod';
 
-type AiGatewayRequestBody = {
-  moduleId?: string;
-  taskId?: string;
-  provider?: string;
-  inputs?: Record<string, unknown>;
-  toggles?: Record<string, unknown>;
-  cache?: {
-    bypass?: boolean;
-  };
-  teamId?: string;
-};
+const RequestBodySchema = z.object({
+  moduleId: z.string().min(1),
+  taskId: z.string().min(1),
+  payload: z.object({
+    inputs: z.record(z.unknown()).default({}),
+    toggles: z.record(z.union([z.string(), z.array(z.string())])).optional().default({}),
+  }),
+});
 
-type AiGatewayResponse = {
-  requestId: string;
-  moduleId: string;
-  taskId: string;
-  provider: string;
-  model: string;
-  cache: {
-    hit: boolean;
-    ttlRemainingSeconds?: number;
-  };
-  content: string | Record<string, unknown>;
-  metadata: Record<string, unknown>;
-  capturedData?: Record<string, unknown>;
-};
-
-type AuthSuccessResult = { status: 200; userId: string; email: string | null };
-type AuthErrorResult = { status: number; error: string };
-type AuthResult = AuthSuccessResult | AuthErrorResult;
-
-export async function POST(request: NextRequest) {
-  const requestId = randomUUID();
-
-  let body: AiGatewayRequestBody;
+export async function POST(req: Request) {
   try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: 'Invalid JSON body.', requestId }, { status: 400 });
-  }
+    const body = await req.json();
+    const result = RequestBodySchema.safeParse(body);
 
-  if (!body || typeof body !== 'object') {
-    return NextResponse.json({ error: 'Request payload must be a JSON object.', requestId }, { status: 400 });
-  }
-
-  const moduleId = typeof body.moduleId === 'string' ? body.moduleId.trim() : '';
-  const taskId = typeof body.taskId === 'string' ? body.taskId.trim() : '';
-
-  if (!moduleId || !taskId) {
-    return NextResponse.json({ error: 'Both moduleId and taskId are required.', requestId }, { status: 400 });
-  }
-
-  const userAuth = await authenticateRequest(request);
-  if (!isAuthSuccess(userAuth)) {
-    const errorMessage = 'error' in userAuth ? userAuth.error : 'Unauthorized.';
-    return NextResponse.json({ error: errorMessage, requestId }, { status: userAuth.status });
-  }
-
-  const { userId, email } = userAuth;
-  const teamId = typeof body.teamId === 'string' ? body.teamId.trim() : undefined;
-
-  let task;
-  try {
-    task = loadTaskDefinition(moduleId, taskId);
-  } catch (error) {
-    if (error instanceof TaskNotFoundError) {
-      return NextResponse.json({ error: error.message, requestId }, { status: 404 });
+    if (!result.success) {
+      return NextResponse.json(
+        { error: 'Invalid request body', details: result.error.errors },
+        { status: 400 }
+      );
     }
-    if (error instanceof AiTaskValidationError) {
-      return NextResponse.json({ error: error.message, requestId }, { status: 422 });
+
+    const { moduleId, taskId, payload } = result.data;
+    const { inputs, toggles } = payload;
+
+    // 1. Authenticate User
+    const supabase = getSupabaseServerClient();
+    if (!supabase) {
+      return NextResponse.json({ error: 'Supabase client unavailable' }, { status: 500 });
     }
-    return NextResponse.json({ error: 'Failed to load AI task definition.', requestId }, { status: 500 });
-  }
 
-  const inputs = isRecord(body.inputs) ? body.inputs : {};
-  const toggleMap = normalizeToggleSelections(body.toggles);
-  let contextValues: Record<string, string>;
-  try {
-    contextValues = loadTaskContextValues(task);
-  } catch (error) {
-    const message = error instanceof Error ? error.message : 'Failed to load task context.';
-    return NextResponse.json({ error: message, requestId }, { status: 500 });
-  }
+    const authHeader = req.headers.get('Authorization');
+    const token = authHeader?.replace('Bearer ', '');
 
-  const prompt = renderTaskPrompt({
-    task,
-    moduleId,
-    inputs,
-    toggles: toggleMap,
-    context: contextValues,
-    auth: {
-      userId,
-      email,
-      teamId,
-    },
-  });
-  const responseFormat = extractResponseFormat(task.prompt);
-
-  let credentials: ProviderCredentials;
-  try {
-    credentials = await resolveProviderCredentials({
-      userId,
-      preferredProvider: body.provider,
-      teamId,
-    });
-  } catch (error) {
-    if (error instanceof ProviderResolutionError) {
-      return NextResponse.json({ error: error.message, requestId }, { status: 400 });
+    if (!token) {
+      return NextResponse.json({ error: 'Missing Authorization header' }, { status: 401 });
     }
-    return NextResponse.json({ error: 'Failed to resolve AI provider.', requestId }, { status: 500 });
-  }
 
-  const adapter = createProviderAdapter(credentials);
-  const cacheConfig = task.cache;
-  const cacheEnabled = cacheConfig?.strategy === 'prompt-hash' && cacheConfig.enabled !== false;
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser(token);
 
-  if (cacheEnabled && body.cache?.bypass !== true) {
-    const cacheFingerprint = JSON.stringify({ inputs, toggles: toggleMap });
-    const cacheKey = buildPromptCacheKey({
-      prompt,
-      provider: credentials.provider,
-      model: credentials.model,
-      taskId: task.id,
-      payloadFingerprint: cacheFingerprint,
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // 2. Load Task Definition
+    let task;
+    try {
+      task = loadTaskDefinition(moduleId, taskId);
+    } catch (error: any) {
+      if (error.name === 'TaskNotFoundError') {
+        return NextResponse.json({ error: 'Task not found' }, { status: 404 });
+      }
+      throw error;
+    }
+
+    // 3. Load Context
+    const context = loadTaskContextValues(task);
+
+    // 4. Resolve Provider
+    // Note: teamId is not yet available in MVP auth context, passing undefined.
+    const credentials = await resolveProviderCredentials({
+      userId: user.id,
+      // teamId: ... 
     });
 
-    const cacheHit = await getCachedResponse(cacheKey);
-    if (cacheHit) {
-      const response: AiGatewayResponse = {
-        requestId,
-        moduleId: task.moduleId,
-        taskId: task.id,
-        provider: cacheHit.providerName ?? credentials.provider,
-        model: cacheHit.response.model ?? cacheHit.modelName ?? credentials.model ?? 'unknown',
-        cache: {
-          hit: true,
-          ttlRemainingSeconds: cacheHit.ttlRemainingSeconds,
-        },
-        content: cacheHit.response.content,
-        metadata: {
-          ...(cacheHit.response.metadata ?? {}),
-          isUserSuppliedProvider: credentials.isUserSupplied,
-          source: 'cache',
-        },
-        capturedData: cacheHit.response.capturedData,
-      };
-
-      return NextResponse.json(response);
-    }
-  }
-
-  let providerResult: ProviderRunResult;
-  try {
-    providerResult = await adapter.run({
-      prompt,
-      responseFormat,
-    });
-  } catch (error) {
-    console.error('AI provider execution failed', error);
-    return NextResponse.json({ error: 'AI provider execution failed.', requestId }, { status: 502 });
-  }
-
-  const response: AiGatewayResponse = {
-    requestId,
-    moduleId: task.moduleId,
-    taskId: task.id,
-    provider: adapter.name,
-    model: providerResult.model,
-    cache: {
-      hit: false,
-    },
-    content: providerResult.content,
-    metadata: {
-      isUserSuppliedProvider: credentials.isUserSupplied,
-    },
-  };
-
-  try {
-    const templateContextWithResponse = buildTemplateContext({
+    // 5. Construct Prompt
+    const authContext = { userId: user.id, email: user.email };
+    const promptRenderParams = {
       task,
       moduleId,
       inputs,
-      toggles: toggleMap,
-      context: contextValues,
-      auth: {
-        userId,
-        email,
-        teamId,
-      },
-      response: {
-        content: providerResult.content,
-        raw: providerResult.rawResponse,
-        model: providerResult.model,
-      },
-    });
+      toggles,
+      context,
+      auth: authContext,
+    };
+    
+    const renderedPrompt = renderTaskPrompt(promptRenderParams);
 
-    await executeDataCapture({
-      task,
-      dataCapture: task.dataCapture,
-      templateContext: templateContextWithResponse,
-    });
-
-    if (task.dataCapture?.operations?.length) {
-      response.capturedData = {
-        executed: true,
-        operations: task.dataCapture.operations.length,
-      };
-      response.metadata.dataCapture = {
-        executed: true,
-        operations: task.dataCapture.operations.length,
-      };
-    }
-  } catch (error) {
-    console.error('AI data capture failed', error);
-    return NextResponse.json({ error: 'Failed to persist AI task results.', requestId }, { status: 500 });
-  }
-
-  if (cacheEnabled && cacheConfig?.ttlSeconds && cacheConfig.ttlSeconds > 0) {
-    const cacheFingerprint = JSON.stringify({ inputs, toggles: toggleMap });
+    // 6. Check Cache
     const cacheKey = buildPromptCacheKey({
-      prompt,
+      prompt: renderedPrompt,
       provider: credentials.provider,
-      model: providerResult.model,
+      model: credentials.model,
       taskId: task.id,
-      payloadFingerprint: cacheFingerprint,
+      // Optional: fingerprint inputs if strictly needed, but prompt hash covers content variation
     });
 
-    await storeCachedResponse({
-      cacheKey,
-      providerName: credentials.provider,
-      modelName: providerResult.model,
-      taskId: task.id,
-      response: {
-        model: providerResult.model,
-        content: providerResult.content,
-        metadata: response.metadata,
-        capturedData: response.capturedData,
-      },
-      ttlSeconds: cacheConfig.ttlSeconds,
+    let responseEnvelope;
+    let cachedHit = null;
+
+    if (task.cache?.enabled !== false) {
+      cachedHit = await getCachedResponse(cacheKey);
+    }
+
+    if (cachedHit) {
+      responseEnvelope = cachedHit.response;
+    } else {
+      // 7. Run Adapter
+      const adapter = createProviderAdapter(credentials);
+      const runResult = await adapter.run({
+        prompt: renderedPrompt,
+        responseFormat: task.prompt.responseFormat,
+      });
+
+      responseEnvelope = {
+        model: runResult.model,
+        content: runResult.content,
+        metadata: {
+          provider: credentials.provider,
+          cached: false,
+        },
+      };
+
+      // 8. Store in Cache
+      if (task.cache?.enabled !== false) {
+        await storeCachedResponse({
+          cacheKey,
+          providerName: credentials.provider,
+          modelName: runResult.model,
+          taskId: task.id,
+          response: responseEnvelope,
+          ttlSeconds: task.cache?.ttlSeconds || 2592000, // Default 30 days
+        });
+      }
+    }
+
+    // 9. Data Capture (Telemetry / Persistence)
+    // We rebuild template context to include the response
+    const finalTemplateContext = buildTemplateContext({
+      ...promptRenderParams,
+      response: responseEnvelope,
     });
-  }
 
-  return NextResponse.json(response);
-}
-
-function isAuthSuccess(result: AuthResult): result is AuthSuccessResult {
-  return result.status === 200 && 'userId' in result;
-}
-
-async function authenticateRequest(
-  request: NextRequest
-): Promise<AuthResult> {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  if (!url || !anonKey) {
-    console.error('Missing Supabase environment variables in authenticateRequest');
-    return { status: 500, error: 'Server configuration error.' };
-  }
-
-  const authHeader = request.headers.get('authorization') ?? '';
-  if (!authHeader.toLowerCase().startsWith('bearer ')) {
-    return { status: 401, error: 'Unauthorized.' };
-  }
-
-  const accessToken = authHeader.slice(7).trim();
-  if (!accessToken) {
-    return { status: 401, error: 'Unauthorized.' };
-  }
-
-  const userClient = createClient(url, anonKey, {
-    auth: {
-      persistSession: false,
-      detectSessionInUrl: false,
-    },
-    global: {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    },
-  });
-
-  const {
-    data: { user },
-    error,
-  } = await userClient.auth.getUser();
-
-  if (error || !user?.id) {
-    return { status: 401, error: 'Unauthorized.' };
-  }
-
-  return { status: 200, userId: user.id, email: user.email ?? null };
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return Boolean(value) && typeof value === 'object' && !Array.isArray(value);
-}
-
-function normalizeToggleSelections(raw: unknown) {
-  if (!isRecord(raw)) {
-    return {};
-  }
-
-  const normalized: Record<string, string | string[] | undefined> = {};
-
-  for (const [key, value] of Object.entries(raw)) {
-    if (typeof value === 'string') {
-      normalized[key] = value;
-      continue;
+    // Execute capture asynchronously (or await if critical)
+    if (task.dataCapture) {
+      await executeDataCapture({
+        task,
+        dataCapture: task.dataCapture,
+        templateContext: finalTemplateContext,
+      });
     }
 
-    if (Array.isArray(value) && value.every((item) => typeof item === 'string')) {
-      normalized[key] = value;
-    }
-  }
+    // Log to ai_task_runs (System Telemetry)
+    // This is separate from user-defined dataCapture, typically always logged
+    await supabase.from('ai_task_runs').insert({
+      user_id: user.id,
+      module_id: moduleId,
+      task_id: taskId,
+      inputs: inputs,
+      response: responseEnvelope.content,
+      metadata: {
+        model: responseEnvelope.model,
+        provider: credentials.provider,
+        cached: !!cachedHit,
+        executionTimeMs: 0, // TODO: Measure time
+      }
+    });
 
-  return normalized;
+    return NextResponse.json(responseEnvelope);
+
+  } catch (error: any) {
+    console.error('AI Gateway Error:', error);
+    return NextResponse.json(
+      { error: 'Internal Server Error', message: error.message },
+      { status: 500 }
+    );
+  }
 }

@@ -10,12 +10,14 @@ import ContentCard from './cards/ContentCard';
 import InstructorNoteCard from './cards/InstructorNoteCard';
 import TableOfContents from './TableOfContents';
 import type { ContentChunk, InstructorNote, PageMetadata, TableOfContentsItem } from '@/lib/content';
+import type { AiTaskDefinition } from '@/lib/ai/schema';
 
 type ModulePageContentProps = {
   metadata: PageMetadata;
   chunks: ContentChunk[];
   instructorNote?: InstructorNote;
   tableOfContents: TableOfContentsItem[];
+  aiTasks?: AiTaskDefinition[];
   progressStatus: 'idle' | 'loading' | 'unauthenticated' | 'ready' | 'error';
   progressError?: string;
   isCompleted: boolean;
@@ -28,6 +30,7 @@ export default function ModulePageContent({
   chunks,
   instructorNote,
   tableOfContents,
+  aiTasks = [],
   progressStatus,
   progressError,
   isCompleted,
@@ -160,7 +163,7 @@ export default function ModulePageContent({
             )}
 
             {chunks.map((chunk) => (
-              <ContentCard key={chunk.id} chunk={chunk} />
+              <ContentCard key={chunk.id} chunk={chunk} aiTasks={aiTasks} />
             ))}
 
             {isInstructorMode && hasInstructorNotes && showInstructorCard && instructorNote && (

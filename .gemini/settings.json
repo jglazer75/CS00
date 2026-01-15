@@ -4,5 +4,14 @@
       "AGENTS.md",
       "GEMINI.md"
     ]
+  },
+  "mcpServers": {
+    "github": {
+      "httpUrl": "https://api.githubcopilot.com/mcp/",
+      "trust": true,
+      "headers": {
+        "Authorization": "Bearer REDACTED"
+      }
+    }
   }
 }

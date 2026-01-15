@@ -4,5 +4,5 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [x] **Track: Runtime Migration (DB-First Routing)**
-  *Link: [./tracks/runtime_migration_20260114/](./tracks/runtime_migration_20260114/)*
+- [x] **Track: AI Gateway Foundation**
+  *Link: [./tracks/ai_gateway_foundation_20260115/](./tracks/ai_gateway_foundation_20260115/)*

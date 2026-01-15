@@ -80,3 +80,9 @@ navigation:
         title: "Source Documents & Resources"
         type: "page"
         content_source: "instructor/sourcedocs-and-resources.md"
+
+  - id: "test-ai"
+    title: "AI Gateway Test"
+    type: "page"
+    content_source: "99-test-ai.md"
+    layout: "reader"

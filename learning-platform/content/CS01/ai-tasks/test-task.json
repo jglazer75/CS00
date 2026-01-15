@@ -1,0 +1,41 @@
+{
+  "version": "1.0.0",
+  "id": "test-task",
+  "moduleId": "CS01",
+  "status": "active",
+  "metadata": {
+    "title": "Test AI Analysis",
+    "summary": "A simple test to verify the AI Gateway connection.",
+    "estimatedDurationMinutes": 5
+  },
+  "placement": {
+    "pageSlug": "99-test-ai",
+    "anchorId": "test-anchor"
+  },
+  "ui": {
+    "component": "DocumentAnalyzer",
+    "props": {
+      "submitLabel": "Run Test"
+    }
+  },
+  "inputs": [
+    {
+      "id": "userInput",
+      "kind": "text",
+      "name": "userInput",
+      "label": "Say something to Gemini"
+    }
+  ],
+  "prompt": {
+    "segments": [
+      {
+        "role": "system",
+        "template": "You are a helpful assistant."
+      },
+      {
+        "role": "user",
+        "template": "User said: {{inputs.userInput}}"
+      }
+    ]
+  }
+}
