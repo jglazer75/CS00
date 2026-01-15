@@ -84,6 +84,13 @@ export default function ContentCard({ chunk, aiTasks = [] }: ContentCardProps) {
         }
       />
       <CardContent>
+        {aiTasks.length > 0 && (
+            <Box sx={{ mb: 2, p: 1, bgcolor: '#f0f0f0', fontSize: '10px', fontFamily: 'monospace' }}>
+                DEBUG: Tasks: {aiTasks.length} | Anchor: {aiTasks[0].placement.anchorId} | HTML includes anchor: {html.includes('AI_TASK_ANCHOR').toString()}
+                <br/>
+                First 100 chars of HTML: {html.substring(0, 100).replace(/</g, '&lt;')}
+            </Box>
+        )}
         {contentParts.map((part, index) => {
             if (part.type === 'html' && part.content) {
                 return <MarkdownContent key={index} html={part.content} />;
