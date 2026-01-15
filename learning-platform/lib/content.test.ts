@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { getAllModuleIds, getModuleStructure, getPageData } from './content';
+import { getAllModuleIds, getModuleStructure, getPageData, getModulePages } from './content';
 import { getSupabaseServerClient } from './supabase/server';
 import fs from 'fs';
 
@@ -7,17 +7,38 @@ vi.mock('./supabase/server');
 vi.mock('fs');
 
 describe('content data layer', () => {
-  const mockSupabase = {
-    from: vi.fn().mockReturnThis(),
-    select: vi.fn().mockReturnThis(),
-    eq: vi.fn().mockReturnThis(),
-    limit: vi.fn().mockResolvedValue({ data: [], error: null }),
-    order: vi.fn().mockResolvedValue({ data: [], error: null }),
-  };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let mockSupabase: any;
 
   beforeEach(() => {
     vi.clearAllMocks();
+    mockSupabase = {
+      from: vi.fn().mockReturnThis(),
+      select: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      limit: vi.fn().mockImplementation(async () => ({ data: [], error: null })),
+      order: vi.fn().mockImplementation(async () => ({ data: [], error: null })),
+    };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     vi.mocked(getSupabaseServerClient).mockReturnValue(mockSupabase as any);
+  });
+
+  describe('getModulePages', () => {
+    it('should return a flat list of pages from module structure', async () => {
+      const mockNodes = [
+        { node_id: 'p1', parent_node_id: null, type: 'page', title: 'Page 1', sort_order: 1 },
+        { node_id: 's1', parent_node_id: null, type: 'section', title: 'Section 1', sort_order: 2 },
+        { node_id: 'p2', parent_node_id: 's1', type: 'page', title: 'Page 2', sort_order: 1 }
+      ];
+
+      mockSupabase.order.mockResolvedValueOnce({ data: mockNodes, error: null });
+
+      const result = await getModulePages('CS01');
+
+      expect(result).toHaveLength(2);
+      expect(result[0].slug).toBe('p1');
+      expect(result[1].slug).toBe('p2');
+    });
   });
 
   describe('getAllModuleIds', () => {

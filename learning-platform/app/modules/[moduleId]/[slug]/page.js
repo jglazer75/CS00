@@ -1,4 +1,4 @@
-import { getAllModuleIds, getPageData, getSortedPagesData } from '@/lib/content';
+import { getAllModuleIds, getPageData, getModulePages, getModuleStructure } from '@/lib/content';
 import ModulePageClient from '@/app/components/ModulePageClient';
 
 export async function generateStaticParams() {
@@ -7,11 +7,11 @@ export async function generateStaticParams() {
 
   for (const { params } of moduleIds) {
     const { moduleId } = params;
-    const pagesData = await getSortedPagesData(moduleId);
-    for (const pageData of pagesData) {
+    const pages = await getModulePages(moduleId);
+    for (const page of pages) {
       paths.push({
         moduleId: moduleId,
-        slug: pageData.slug,
+        slug: page.slug,
       });
     }
   }
@@ -27,7 +27,7 @@ async function getPageContent(moduleId, slug) {
 export default async function Page({ params }) {
   const { moduleId, slug } = params;
   const pageData = await getPageContent(moduleId, slug);
-  const navData = await getSortedPagesData(moduleId); // Fetch navigation data here
+  const navData = await getModuleStructure(moduleId);
 
   return <ModulePageClient moduleId={moduleId} slug={slug} navData={navData} pageData={pageData} />;
 }

@@ -69,6 +69,7 @@ export async function resolveProviderCredentials(params: {
 
 async function lookupUserProvider(userId: string, providerName: ProviderIdentifier): Promise<ProviderCredentials | null> {
   const supabase = getSupabaseServerClient();
+  if (!supabase) return null;
 
   const { data, error } = await supabase
     .from('user_ai_providers')
@@ -92,6 +93,7 @@ async function lookupUserProvider(userId: string, providerName: ProviderIdentifi
 
 async function lookupTeamProvider(teamId: string): Promise<TeamProviderLookupResult | null> {
   const supabase = getSupabaseServerClient();
+  if (!supabase) return null;
 
   const { data, error } = await supabase
     .from('team_ai_settings')
@@ -144,6 +146,7 @@ async function lookupTeamProvider(teamId: string): Promise<TeamProviderLookupRes
 
 async function fetchProviderRecordById(providerId: string): Promise<UserProviderRecord | null> {
   const supabase = getSupabaseServerClient();
+  if (!supabase) return null;
 
   const { data, error } = await supabase
     .from('user_ai_providers')

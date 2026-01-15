@@ -15,6 +15,10 @@ export async function executeDataCapture(params: ExecuteDataCaptureParams) {
   }
 
   const supabase = getSupabaseServerClient();
+  if (!supabase) {
+    console.warn('Supabase client not available for executeDataCapture');
+    return;
+  }
 
   for (const operation of dataCapture.operations) {
     const row = buildRowFromOperation(operation, templateContext);

@@ -30,6 +30,7 @@ export type CacheHit = {
 
 export async function getCachedResponse(cacheKey: string): Promise<CacheHit | null> {
   const supabase = getSupabaseServerClient();
+  if (!supabase) return null;
 
   const { data, error } = await supabase
     .from('ai_request_cache')
@@ -74,6 +75,7 @@ export async function storeCachedResponse(params: {
   ttlSeconds: number;
 }) {
   const supabase = getSupabaseServerClient();
+  if (!supabase) return;
   const expiresAt = new Date(Date.now() + params.ttlSeconds * 1000).toISOString();
 
   const { error } = await supabase.from('ai_request_cache').upsert(

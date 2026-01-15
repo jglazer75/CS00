@@ -6,23 +6,16 @@ type InviteRequestBody = {
   email?: string;
 };
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Supabase URL or anon key is not configured.');
-}
-
-const resolvedSupabaseUrl = supabaseUrl as string;
-const resolvedSupabaseAnonKey = supabaseAnonKey as string;
-const resolvedServiceKey = supabaseServiceKey as string;
-
-if (!supabaseServiceKey) {
-  throw new Error('SUPABASE_SERVICE_ROLE_KEY must be set to use the invite API.');
-}
-
 export async function POST(request: NextRequest) {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!supabaseUrl || !supabaseAnonKey || !supabaseServiceKey) {
+    console.error('Missing Supabase configuration');
+    return NextResponse.json({ error: 'Server configuration error.' }, { status: 500 });
+  }
+
   const adminEmails = getAdminEmails('server');
   if (adminEmails.length === 0) {
     return NextResponse.json({ error: 'Admin list is not configured.' }, { status: 500 });
@@ -54,7 +47,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized.' }, { status: 401 });
   }
 
-  const userClient = createClient(resolvedSupabaseUrl, resolvedSupabaseAnonKey, {
+  const userClient = createClient(supabaseUrl, supabaseAnonKey, {
     auth: {
       persistSession: false,
       detectSessionInUrl: false,
@@ -75,7 +68,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Forbidden.' }, { status: 403 });
   }
 
-  const serviceClient = createClient(resolvedSupabaseUrl, resolvedServiceKey, {
+  const serviceClient = createClient(supabaseUrl, supabaseServiceKey, {
     auth: {
       persistSession: false,
     },

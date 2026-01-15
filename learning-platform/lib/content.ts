@@ -78,6 +78,10 @@ type RawChunk = {
 
 export async function getAllModuleIds() {
   const supabase = getSupabaseServerClient();
+  if (!supabase) {
+    console.warn('Supabase client not available. Skipping getAllModuleIds.');
+    return [];
+  }
   const { data, error } = await supabase
     .from('modules')
     .select('id')
@@ -101,6 +105,10 @@ export type ModuleStructureNode = {
 
 export async function getModuleStructure(moduleId: string): Promise<ModuleStructureNode[]> {
   const supabase = getSupabaseServerClient();
+  if (!supabase) {
+    console.warn('Supabase client not available. Skipping getModuleStructure.');
+    return [];
+  }
   const { data, error } = await supabase
     .from('module_nodes')
     .select('*')
@@ -144,6 +152,33 @@ export async function getModuleStructure(moduleId: string): Promise<ModuleStruct
   return rootNodes;
 }
 
+export type ModulePageListItem = {
+  slug: string;
+  title: string;
+};
+
+export async function getModulePages(moduleId: string): Promise<ModulePageListItem[]> {
+  const structure = await getModuleStructure(moduleId);
+  const pages: ModulePageListItem[] = [];
+
+  function flatten(nodes: ModuleStructureNode[]) {
+    for (const node of nodes) {
+      if (node.type === 'page' || node.type === 'ai-interaction') {
+        pages.push({
+          slug: node.id,
+          title: node.title,
+        });
+      }
+      if (node.children.length > 0) {
+        flatten(node.children);
+      }
+    }
+  }
+
+  flatten(structure);
+  return pages;
+}
+
 export async function getSortedPagesData(moduleId: string): Promise<ModulePageSummary[]> {
   const moduleDirectory = path.join(contentDirectory, moduleId);
   const entries = fs.readdirSync(moduleDirectory, { withFileTypes: true });
@@ -175,6 +210,9 @@ export async function getSortedPagesData(moduleId: string): Promise<ModulePageSu
 
 export async function getPageData(moduleId: string, slug: string): Promise<ModulePage> {
   const supabase = getSupabaseServerClient();
+  if (!supabase) {
+    throw new Error('Supabase client not available for getPageData');
+  }
   const { data, error } = await supabase
     .from('module_nodes')
     .select('*')
@@ -205,7 +243,7 @@ export async function getPageData(moduleId: string, slug: string): Promise<Modul
   const { data: frontmatter, content } = matter(fileContents);
   
   // Merge DB metadata with frontmatter, DB taking precedence if specified
-  const dbMetadata = (node.metadata as Record<string, any>) || {};
+  const dbMetadata = (node.metadata as Record<string, unknown>) || {};
   const mergedMetadata = {
     ...frontmatter,
     ...dbMetadata,

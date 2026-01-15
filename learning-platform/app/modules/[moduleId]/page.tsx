@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { getAllModuleIds, getSortedPagesData } from '@/lib/content';
+import { getAllModuleIds, getModulePages } from '@/lib/content';
 import ModuleRedirectClient from '@/app/components/ModuleRedirectClient';
 
 type ModuleParams = {
@@ -15,7 +15,7 @@ export async function generateStaticParams() {
 
 export default async function ModuleIndexPage({ params }: ModuleParams) {
   const { moduleId } = params;
-  const pages = await getSortedPagesData(moduleId);
+  const pages = await getModulePages(moduleId);
 
   if (!pages || pages.length === 0) {
     notFound();

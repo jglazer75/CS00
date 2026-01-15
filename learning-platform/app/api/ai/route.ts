@@ -49,16 +49,6 @@ type AuthSuccessResult = { status: 200; userId: string; email: string | null };
 type AuthErrorResult = { status: number; error: string };
 type AuthResult = AuthSuccessResult | AuthErrorResult;
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Supabase URL or anon key is not configured.');
-}
-
-const resolvedSupabaseUrl = supabaseUrl as string;
-const resolvedSupabaseAnonKey = supabaseAnonKey as string;
-
 export async function POST(request: NextRequest) {
   const requestId = randomUUID();
 
@@ -280,6 +270,14 @@ function isAuthSuccess(result: AuthResult): result is AuthSuccessResult {
 async function authenticateRequest(
   request: NextRequest
 ): Promise<AuthResult> {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!url || !anonKey) {
+    console.error('Missing Supabase environment variables in authenticateRequest');
+    return { status: 500, error: 'Server configuration error.' };
+  }
+
   const authHeader = request.headers.get('authorization') ?? '';
   if (!authHeader.toLowerCase().startsWith('bearer ')) {
     return { status: 401, error: 'Unauthorized.' };
@@ -290,7 +288,7 @@ async function authenticateRequest(
     return { status: 401, error: 'Unauthorized.' };
   }
 
-  const userClient = createClient(resolvedSupabaseUrl, resolvedSupabaseAnonKey, {
+  const userClient = createClient(url, anonKey, {
     auth: {
       persistSession: false,
       detectSessionInUrl: false,

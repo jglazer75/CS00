@@ -8,6 +8,7 @@ export type ModuleStateSummary = {
 
 export async function getUserModuleStates(userId: string): Promise<ModuleStateSummary[]> {
   const supabase = getSupabaseServerClient();
+  if (!supabase) return [];
 
   const { data, error } = await supabase
     .from('user_module_state')
