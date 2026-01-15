@@ -37,7 +37,8 @@ export default function DocumentAnalyzer({ task }: DocumentAnalyzerProps) {
       });
 
       if (!res.ok) {
-        throw new Error('Analysis failed');
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.message || errorData.error || `Analysis failed with status ${res.status}`);
       }
 
       const data = await res.json();
