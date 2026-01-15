@@ -10,7 +10,7 @@
       "httpUrl": "https://api.githubcopilot.com/mcp/",
       "trust": true,
       "headers": {
-        "Authorization": "Bearer REDACTED"
+        "Authorization": "Bearer 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"
       }
     }
   }
