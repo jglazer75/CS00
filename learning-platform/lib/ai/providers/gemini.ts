@@ -13,7 +13,7 @@ export class GeminiAdapter implements AiProviderAdapter {
 
   constructor(config: GeminiAdapterConfig) {
     this.client = new GoogleGenerativeAI(config.apiKey);
-    this.modelName = config.model || 'gemini-1.5-flash';
+    this.modelName = config.model || 'gemini-2.0-flash';
   }
 
   async run(options: ProviderRunOptions): Promise<ProviderRunResult> {
