@@ -9,6 +9,7 @@ import type { Literal, Parent } from 'unist';
 import { MarkdownNode, renderMarkdown, renderMarkdownFromNodes } from './markdown';
 import type { AiTaskDefinition } from './ai/schema';
 import { validateAiTaskDefinition, AiTaskValidationError } from './ai/validation';
+import { getSupabaseServerClient } from './supabase/server';
 
 const contentDirectory = path.join(process.cwd(), 'content');
 
@@ -76,14 +77,18 @@ type RawChunk = {
 };
 
 export async function getAllModuleIds() {
-  const moduleEntries = fs
-    .readdirSync(contentDirectory, { withFileTypes: true })
-    .filter((entry) => entry.isDirectory() && !entry.name.startsWith('.'))
-    .map((entry) => entry.name)
-    .sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }));
+  const supabase = getSupabaseServerClient();
+  const { data, error } = await supabase
+    .from('modules')
+    .select('id')
+    .order('id');
 
-  return moduleEntries.map((moduleId) => ({
-    params: { moduleId },
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return (data || []).map((module) => ({
+    params: { moduleId: module.id },
   }));
 }
 
