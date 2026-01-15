@@ -250,7 +250,7 @@ export async function POST(req: Request) {
       }
       
       // Inject updated state and history into response for the frontend
-      responseEnvelope.negotiation = {
+      (responseEnvelope as Record<string, unknown>).negotiation = {
           id: negotiationId,
           history: updatedHistory,
           currentState: updatedState

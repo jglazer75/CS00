@@ -241,13 +241,33 @@ export type AiTaskMetadata = z.infer<typeof AiTaskMetadataSchema>;
 export type AiTaskDefinition = z.infer<typeof AiTaskDefinitionSchema>;
 
 export type AiTaskResponseEnvelope = {
+
   taskId: string;
+
   moduleId: string;
+
   requestId: string;
+
   provider: string;
+
   model: string;
+
   runId?: string;
+
   content: string | Record<string, unknown>;
+
   capturedData?: Record<string, unknown>;
+
   metadata?: Record<string, unknown>;
+
+  negotiation?: {
+
+    id: string;
+
+    history: unknown[];
+
+    currentState: Record<string, unknown>;
+
+  };
+
 };
