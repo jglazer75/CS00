@@ -174,16 +174,45 @@ export async function getSortedPagesData(moduleId: string): Promise<ModulePageSu
 }
 
 export async function getPageData(moduleId: string, slug: string): Promise<ModulePage> {
+  const supabase = getSupabaseServerClient();
+  const { data, error } = await supabase
+    .from('module_nodes')
+    .select('*')
+    .eq('module_id', moduleId)
+    .eq('node_id', slug)
+    .limit(1);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  const node = data?.[0];
+  if (!node) {
+    throw new Error(`Module node "${slug}" not found in module "${moduleId}"`);
+  }
+
   const moduleDirectory = path.join(contentDirectory, moduleId);
-  const fullPath = path.join(moduleDirectory, `${slug}.md`);
+  const contentSource = node.content_source || `${slug}.md`;
+  const fullPath = path.isAbsolute(contentSource) 
+    ? contentSource 
+    : path.join(moduleDirectory, contentSource);
 
   if (!fs.existsSync(fullPath)) {
-    throw new Error(`Markdown file not found for slug "${slug}" in module "${moduleId}"`);
+    throw new Error(`Markdown file not found at "${fullPath}" for node "${slug}"`);
   }
 
   const fileContents = fs.readFileSync(fullPath, 'utf8');
-  const { data, content } = matter(fileContents);
-  const metadata = buildPageMetadata(data, slugToTitle(slug));
+  const { data: frontmatter, content } = matter(fileContents);
+  
+  // Merge DB metadata with frontmatter, DB taking precedence if specified
+  const dbMetadata = (node.metadata as Record<string, any>) || {};
+  const mergedMetadata = {
+    ...frontmatter,
+    ...dbMetadata,
+    title: node.title || frontmatter.title // DB title takes precedence
+  };
+
+  const metadata = buildPageMetadata(mergedMetadata, node.title || slugToTitle(slug));
 
   const processor = remark().use(remarkGfm).use(remarkKeyConcept);
   const parsedTree = processor.parse(content) as Root;

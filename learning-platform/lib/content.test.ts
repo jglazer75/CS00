@@ -1,14 +1,17 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { getAllModuleIds, getModuleStructure } from './content';
+import { getAllModuleIds, getModuleStructure, getPageData } from './content';
 import { getSupabaseServerClient } from './supabase/server';
+import fs from 'fs';
 
 vi.mock('./supabase/server');
+vi.mock('fs');
 
 describe('content data layer', () => {
   const mockSupabase = {
     from: vi.fn().mockReturnThis(),
     select: vi.fn().mockReturnThis(),
     eq: vi.fn().mockReturnThis(),
+    limit: vi.fn().mockResolvedValue({ data: [], error: null }),
     order: vi.fn().mockResolvedValue({ data: [], error: null }),
   };
 
@@ -65,6 +68,46 @@ describe('content data layer', () => {
           { id: 'p2', title: 'Page 2', type: 'page', children: [] }
         ]}
       ]);
+    });
+  });
+
+  describe('getPageData', () => {
+    it('should fetch metadata from DB and content from filesystem', async () => {
+      const mockNode = {
+        node_id: 'foundations',
+        module_id: 'CS01',
+        type: 'page',
+        title: 'Foundations of VC',
+        content_source: 'foundations.md',
+        metadata: {
+          learning_objectives: ['Obj 1'],
+          core_concepts: ['Concept 1'],
+          keywords: ['Term 1']
+        }
+      };
+
+      const mockMarkdown = '---\ntitle: Ignore Me\n---\n## Section 1\nContent';
+
+      mockSupabase.limit.mockResolvedValueOnce({ data: [mockNode], error: null });
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(fs.readFileSync).mockReturnValue(mockMarkdown);
+      vi.mocked(fs.readdirSync).mockReturnValue([]);
+
+      const result = await getPageData('CS01', 'foundations');
+
+      expect(mockSupabase.from).toHaveBeenCalledWith('module_nodes');
+      expect(mockSupabase.eq).toHaveBeenCalledWith('module_id', 'CS01');
+      expect(mockSupabase.eq).toHaveBeenCalledWith('node_id', 'foundations');
+      
+      expect(result.metadata.title).toBe('Foundations of VC');
+      expect(result.metadata.learningObjectives).toEqual(['Obj 1']);
+      expect(result.chunks[0].heading).toBe('Section 1');
+    });
+
+    it('should throw if node not found in DB', async () => {
+      mockSupabase.limit.mockResolvedValueOnce({ data: [], error: null });
+
+      await expect(getPageData('CS01', 'missing')).rejects.toThrow('Module node "missing" not found in module "CS01"');
     });
   });
 });
