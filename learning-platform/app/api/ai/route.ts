@@ -218,12 +218,13 @@ export async function POST(req: Request) {
 
     // 9. Update Negotiation State if applicable
     if (negotiationId) {
-      const aiResponseText = typeof responseEnvelope.content === 'string' 
-        ? responseEnvelope.content 
-        : (responseEnvelope.content as any).message || JSON.stringify(responseEnvelope.content);
+      const responseContent = responseEnvelope.content;
+      const aiResponseText = typeof responseContent === 'string' 
+        ? responseContent 
+        : (responseContent as Record<string, unknown>).message as string || JSON.stringify(responseContent);
       
-      const stateDelta = typeof responseEnvelope.content === 'object' 
-        ? (responseEnvelope.content as any).dealStateUpdates || {} 
+      const stateDelta = typeof responseContent === 'object' && responseContent !== null
+        ? (responseContent as Record<string, unknown>).dealStateUpdates as Record<string, unknown> || {} 
         : {};
 
       const updatedHistory = [...history, {

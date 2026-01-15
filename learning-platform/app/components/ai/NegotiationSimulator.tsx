@@ -15,6 +15,7 @@ import {
   Divider,
   List,
   ListItem,
+  ListItemText,
   Avatar,
   Grid,
   IconButton,
@@ -23,7 +24,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import SmartToyIcon from '@mui/icons-material/SmartToy';
 import SendIcon from '@mui/icons-material/Send';
 import type { AiTaskDefinition } from '@/lib/ai/schema';
-import type { NegotiationMessage, NegotiationSession } from '@/lib/ai/types';
+import type { NegotiationSession } from '@/lib/ai/types';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 import ReactMarkdown from 'react-markdown';
 
