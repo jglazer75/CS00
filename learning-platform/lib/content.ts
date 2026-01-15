@@ -92,6 +92,58 @@ export async function getAllModuleIds() {
   }));
 }
 
+export type ModuleStructureNode = {
+  id: string;
+  title: string;
+  type: 'page' | 'section' | 'ai-interaction';
+  children: ModuleStructureNode[];
+};
+
+export async function getModuleStructure(moduleId: string): Promise<ModuleStructureNode[]> {
+  const supabase = getSupabaseServerClient();
+  const { data, error } = await supabase
+    .from('module_nodes')
+    .select('*')
+    .eq('module_id', moduleId)
+    .order('sort_order');
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  const nodes = data || [];
+  const nodeMap = new Map<string, ModuleStructureNode>();
+  const rootNodes: ModuleStructureNode[] = [];
+
+  // Initialize nodes in map
+  nodes.forEach((node) => {
+    nodeMap.set(node.node_id, {
+      id: node.node_id,
+      title: node.title,
+      type: node.type as 'page' | 'section' | 'ai-interaction',
+      children: [],
+    });
+  });
+
+  // Reconstruct hierarchy
+  nodes.forEach((node) => {
+    const structNode = nodeMap.get(node.node_id)!;
+    if (node.parent_node_id) {
+      const parent = nodeMap.get(node.parent_node_id);
+      if (parent) {
+        parent.children.push(structNode);
+      } else {
+        // Fallback to root if parent not found (shouldn't happen with clean data)
+        rootNodes.push(structNode);
+      }
+    } else {
+      rootNodes.push(structNode);
+    }
+  });
+
+  return rootNodes;
+}
+
 export async function getSortedPagesData(moduleId: string): Promise<ModulePageSummary[]> {
   const moduleDirectory = path.join(contentDirectory, moduleId);
   const entries = fs.readdirSync(moduleDirectory, { withFileTypes: true });
