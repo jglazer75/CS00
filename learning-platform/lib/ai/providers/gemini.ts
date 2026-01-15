@@ -61,14 +61,14 @@ export class GeminiAdapter implements AiProviderAdapter {
       if (responseFormat?.type === 'json') {
         try {
           content = JSON.parse(text);
-        } catch (e) {
+        } catch {
           // If parse fails, return raw text but maybe log warning? 
           // For now, keep as string or try to extract JSON from markdown block
           const jsonMatch = text.match(/```json\n([\s\S]*?)\n```/);
           if (jsonMatch) {
             try {
               content = JSON.parse(jsonMatch[1]);
-            } catch (innerE) {
+            } catch {
               // ignore
             }
           }
@@ -80,9 +80,10 @@ export class GeminiAdapter implements AiProviderAdapter {
         content,
         rawResponse: result,
       };
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : 'Unknown error';
       // Improve error handling/wrapping
-      throw new Error(`Gemini API Error: ${error.message}`);
+      throw new Error(`Gemini API Error: ${msg}`);
     }
   }
 }

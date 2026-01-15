@@ -21,7 +21,7 @@ export const AiTaskToggleOptionSchema = z.object({
     user: z.array(z.string()).optional(),
     assistant: z.array(z.string()).optional(),
   }).optional(),
-  metadata: z.record(z.unknown()).optional(),
+  metadata: z.record(z.string(), z.unknown()).optional(),
 });
 
 export const AiTaskToggleGroupSchema = z.object({
@@ -129,7 +129,7 @@ export const AiTaskContextSourceSchema = z.union([
     id: z.string().min(1),
     type: z.literal('dataset'),
     table: z.string().min(1),
-    filter: z.record(z.unknown()).optional(),
+    filter: z.record(z.string(), z.unknown()).optional(),
     select: z.array(z.string()).optional(),
   }),
 ]);
@@ -150,7 +150,7 @@ export const AiTaskPromptSchema = z.object({
   segments: z.array(AiPromptTemplateSegmentSchema).min(1),
   responseFormat: z.object({
     type: ResponseFormatTypeSchema,
-    schema: z.record(z.unknown()).optional(),
+    schema: z.record(z.string(), z.unknown()).optional(),
   }).optional(),
 });
 
@@ -207,7 +207,7 @@ export const AiTaskDefinitionSchema = z.object({
   }),
   ui: z.object({
     component: z.string().min(1),
-    props: z.record(z.unknown()).optional(),
+    props: z.record(z.string(), z.unknown()).optional(),
   }),
   toggles: z.object({
     difficulty: AiTaskToggleGroupSchema.optional(),
@@ -221,7 +221,7 @@ export const AiTaskDefinitionSchema = z.object({
   cache: AiTaskCacheStrategySchema.optional(),
   telemetry: z.object({
     eventName: z.string().optional(),
-    additional: z.record(z.unknown()).optional(),
+    additional: z.record(z.string(), z.unknown()).optional(),
   }).optional(),
 });
 
@@ -235,6 +235,7 @@ export type AiTaskContextSource = z.infer<typeof AiTaskContextSourceSchema>;
 export type AiPromptTemplateSegment = z.infer<typeof AiPromptTemplateSegmentSchema>;
 export type AiTaskPrompt = z.infer<typeof AiTaskPromptSchema>;
 export type AiTaskDataCapture = z.infer<typeof AiTaskDataCaptureSchema>;
+export type AiTaskDataCaptureOperation = z.infer<typeof AiTaskDataCaptureOperationSchema>;
 export type AiTaskCacheStrategy = z.infer<typeof AiTaskCacheStrategySchema>;
 export type AiTaskMetadata = z.infer<typeof AiTaskMetadataSchema>;
 export type AiTaskDefinition = z.infer<typeof AiTaskDefinitionSchema>;

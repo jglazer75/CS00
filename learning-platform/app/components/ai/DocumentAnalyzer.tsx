@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Box, Button, Card, CardContent, Typography, TextField, CircularProgress } from '@mui/material';
+import { Box, Button, Card, CardContent, Typography, CircularProgress } from '@mui/material';
 import type { AiTaskDefinition } from '@/lib/ai/schema';
 
 export type DocumentAnalyzerProps = {
@@ -11,7 +11,7 @@ export type DocumentAnalyzerProps = {
 export default function DocumentAnalyzer({ task }: DocumentAnalyzerProps) {
   const [loading, setLoading] = useState(false);
   const [response, setResponse] = useState<string | null>(null);
-  const [inputs, setInputs] = useState<Record<string, any>>({});
+  // const [inputs, setInputs] = useState<Record<string, unknown>>({});
 
   const handleRun = async () => {
     setLoading(true);
@@ -30,7 +30,7 @@ export default function DocumentAnalyzer({ task }: DocumentAnalyzerProps) {
           moduleId: task.moduleId,
           taskId: task.id,
           payload: {
-            inputs: inputs, // TODO: Bind actual inputs
+            inputs: {}, // TODO: Bind actual inputs
             toggles: {}, // TODO: Bind actual toggles
           },
         }),
@@ -42,8 +42,9 @@ export default function DocumentAnalyzer({ task }: DocumentAnalyzerProps) {
 
       const data = await res.json();
       setResponse(typeof data.content === 'string' ? data.content : JSON.stringify(data.content, null, 2));
-    } catch (err: any) {
-      setResponse(`Error: ${err.message}`);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Unknown error';
+      setResponse(`Error: ${msg}`);
     } finally {
       setLoading(false);
     }

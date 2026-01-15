@@ -13,8 +13,8 @@ const RequestBodySchema = z.object({
   moduleId: z.string().min(1),
   taskId: z.string().min(1),
   payload: z.object({
-    inputs: z.record(z.unknown()).default({}),
-    toggles: z.record(z.union([z.string(), z.array(z.string())])).optional().default({}),
+    inputs: z.record(z.string(), z.unknown()).default({}),
+    toggles: z.record(z.string(), z.union([z.string(), z.array(z.string())])).optional().default({}),
   }),
 });
 
@@ -25,7 +25,7 @@ export async function POST(req: Request) {
 
     if (!result.success) {
       return NextResponse.json(
-        { error: 'Invalid request body', details: result.error.errors },
+        { error: 'Invalid request body', details: result.error.issues },
         { status: 400 }
       );
     }
@@ -59,8 +59,8 @@ export async function POST(req: Request) {
     let task;
     try {
       task = loadTaskDefinition(moduleId, taskId);
-    } catch (error: any) {
-      if (error.name === 'TaskNotFoundError') {
+    } catch (error: unknown) {
+      if (error instanceof Error && error.name === 'TaskNotFoundError') {
         return NextResponse.json({ error: 'Task not found' }, { status: 404 });
       }
       throw error;
@@ -171,10 +171,11 @@ export async function POST(req: Request) {
 
     return NextResponse.json(responseEnvelope);
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('AI Gateway Error:', error);
+    const message = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json(
-      { error: 'Internal Server Error', message: error.message },
+      { error: 'Internal Server Error', message },
       { status: 500 }
     );
   }

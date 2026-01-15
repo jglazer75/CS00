@@ -97,7 +97,7 @@ export default function ContentCard({ chunk, aiTasks = [] }: ContentCardProps) {
                         </Box>
                     );
                 }
-                return <Box key={index} sx={{ p: 2, border: '1px dashed error.main', color: 'error.main' }}>Component "{part.task.ui.component}" not found.</Box>;
+                return <Box key={index} sx={{ p: 2, border: '1px dashed error.main', color: 'error.main' }}>Component &quot;{part.task.ui.component}&quot; not found.</Box>;
             }
             return null;
         })}

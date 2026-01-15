@@ -1,5 +1,4 @@
 import { AiTaskDefinitionSchema, type AiTaskDefinition } from './schema';
-import { z } from 'zod';
 
 type ValidationOptions = {
   source?: string;
@@ -26,7 +25,7 @@ export function validateAiTaskDefinition(
   const result = AiTaskDefinitionSchema.safeParse(raw);
 
   if (!result.success) {
-    const formattedErrors = result.error.errors.map(err => {
+    const formattedErrors = result.error.issues.map(err => {
       const path = err.path.join('.');
       return `${path}: ${err.message}`;
     });

@@ -61,8 +61,9 @@ export default function AiSettingsPage() {
       setMessage({ type: 'success', text: 'API Key saved successfully.' });
       setHasKey(true);
       setApiKey('');
-    } catch (err: any) {
-      setMessage({ type: 'error', text: err.message });
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Unknown error';
+      setMessage({ type: 'error', text: msg });
     } finally {
       setLoading(false);
     }
