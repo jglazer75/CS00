@@ -4,18 +4,31 @@ import { useEffect, useMemo } from 'react';
 import { Box } from '@mui/material';
 import ModuleNav from './ModuleNav';
 import ModulePageContent from './ModulePageContent';
-import type { ModulePage, ModulePageSummary } from '@/lib/content';
+import type { ModulePage, ModuleStructureNode } from '@/lib/content';
 import { useModuleProgress } from '../hooks/useModuleProgress';
 
 type ModulePageClientProps = {
   moduleId: string;
   slug: string;
-  navData: ModulePageSummary[];
+  navData: ModuleStructureNode[];
   pageData: ModulePage;
 };
 
 export default function ModulePageClient({ moduleId, slug, navData, pageData }: ModulePageClientProps) {
-  const slugs = useMemo(() => navData.map((page) => page.slug), [navData]);
+  const slugs = useMemo(() => {
+    const list: string[] = [];
+    function collect(nodes: ModuleStructureNode[]) {
+      nodes.forEach((n) => {
+        if (n.type === 'page' || n.type === 'ai-interaction') {
+          list.push(n.id);
+        }
+        collect(n.children);
+      });
+    }
+    collect(navData);
+    return list;
+  }, [navData]);
+
   const { metadata, chunks, instructorNote, tableOfContents } = pageData;
 
   const {
@@ -44,7 +57,7 @@ export default function ModulePageClient({ moduleId, slug, navData, pageData }: 
       <ModuleNav
         moduleId={moduleId}
         activeSlug={slug}
-        pages={navData}
+        structure={navData}
         completedSlugs={completedSlugs}
         percentComplete={percentComplete}
         lastVisitedSlug={lastVisitedSlug}
