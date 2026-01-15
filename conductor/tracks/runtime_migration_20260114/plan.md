@@ -16,7 +16,7 @@
 - [x] Task: Update `generateStaticParams` 3f4dba7
     - [ ] Modify `app/modules/[moduleId]/[slug]/page.js` (or `.tsx`) to use the new DB functions.
     - [ ] Ensure nested routes are handled if necessary (currently flat `[slug]` might need adjustment or mapping).
-- [ ] Task: Refactor `ModuleNav` Component
+- [x] Task: Refactor `ModuleNav` Component a8b965c
     - [ ] Update component to render the hierarchical structure returned by `getModuleStructure`.
     - [ ] Implement collapsible sections if not present.
 - [ ] Task: Verify Metadata Flow
