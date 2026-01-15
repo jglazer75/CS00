@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Box, Button, Card, CardContent, Typography, CircularProgress } from '@mui/material';
 import type { AiTaskDefinition } from '@/lib/ai/schema';
+import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 
 export type DocumentAnalyzerProps = {
   task: AiTaskDefinition;
@@ -17,14 +18,18 @@ export default function DocumentAnalyzer({ task }: DocumentAnalyzerProps) {
     setLoading(true);
     setResponse(null);
     try {
+      const supabase = getSupabaseBrowserClient();
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        throw new Error('You must be signed in to run AI tasks.');
+      }
+
       const res = await fetch('/api/ai', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          // Note: In a real app, ensure Auth header is passed if using a custom client, 
-          // but Next.js middleware or cookies typically handle it. 
-          // Here we assume the browser cookie is sufficient or we need to pass the access token.
-          // For MVP with Supabase Auth Helpers, cookies are automatic.
+          'Authorization': `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({
           moduleId: task.moduleId,
