@@ -13,7 +13,7 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Data Layer Refactor' (Protocol in workflow.md)
 
 ## Phase 2: Frontend Integration
-- [ ] Task: Update `generateStaticParams`
+- [x] Task: Update `generateStaticParams` 3f4dba7
     - [ ] Modify `app/modules/[moduleId]/[slug]/page.js` (or `.tsx`) to use the new DB functions.
     - [ ] Ensure nested routes are handled if necessary (currently flat `[slug]` might need adjustment or mapping).
 - [ ] Task: Refactor `ModuleNav` Component
