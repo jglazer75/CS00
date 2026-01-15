@@ -9,6 +9,6 @@ learning_objectives:
 
 Below is the AI component.
 
-<!-- AI_TASK_ANCHOR: test-anchor -->
+AI_TASK_ANCHOR: test-anchor
 
 End of test.

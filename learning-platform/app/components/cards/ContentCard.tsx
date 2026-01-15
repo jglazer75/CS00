@@ -20,32 +20,37 @@ export default function ContentCard({ chunk, aiTasks = [] }: ContentCardProps) {
       return [{ type: 'html' as const, content: html }];
     }
 
-    // Regex matches <!-- AI_TASK_ANCHOR: id --> with flexibility for whitespace
-    const regex = /<!--\s*AI_TASK_ANCHOR:\s*([a-zA-Z0-9\-_]+)\s*-->/g;
+    // Regex matches <!-- AI_TASK_ANCHOR: id --> OR AI_TASK_ANCHOR: id (plain text)
+    // Markdown might wrap plain text in <p>, so we just look for the string sequence.
+    // Updated regex to handle both:
+    // 1. <!-- AI_TASK_ANCHOR: id -->
+    // 2. AI_TASK_ANCHOR: id
+    // We capture 'id' in group 1 or 2.
+    const regex = /(?:<!--\s*AI_TASK_ANCHOR:\s*([a-zA-Z0-9\-_]+)\s*-->)|(?:AI_TASK_ANCHOR:\s*([a-zA-Z0-9\-_]+))/g;
     const split = html.split(regex);
     
-    // split results in [html, captured_id, html, captured_id, html]
+    // split results can be complex with multiple capturing groups.
+    // If we have 2 groups, split output will be: [text, group1, group2, text, group1, group2...]
+    // If group1 matches, group2 is undefined.
+    
     const result: Array<{ type: 'html' | 'task'; content?: string; task?: AiTaskDefinition }> = [];
 
-    for (let i = 0; i < split.length; i++) {
-      const segment = split[i];
-      
-      // Even indices are HTML content
-      if (i % 2 === 0) {
-        if (segment) { // allow empty strings if necessary to preserve spacing, but usually we just want content
-           // Check if it's purely whitespace? No, markdown html usually is significant.
-           // However, if split resulted in empty string (e.g. anchor at start/end), ignore?
-           // If anchor is at start: ["", "id", "text"]. We push ""? 
-           // MarkdownContent handles empty strings gracefully.
-           result.push({ type: 'html', content: segment });
-        }
-      } else {
-        // Odd indices are captured IDs
-        const task = aiTasks.find(t => t.placement.anchorId === segment);
+    for (let i = 0; i < split.length; i += 3) {
+      const textSegment = split[i];
+      const group1 = split[i + 1]; // comment capture
+      const group2 = split[i + 2]; // text capture
+      const capturedId = group1 || group2;
+
+      if (textSegment) {
+        result.push({ type: 'html', content: textSegment });
+      }
+
+      if (capturedId) {
+        const task = aiTasks.find(t => t.placement.anchorId === capturedId);
         if (task) {
           result.push({ type: 'task', task });
         } else {
-            console.warn(`AI Task anchor found for "${segment}" but no matching task definition.`);
+             // Debugging or warning
         }
       }
     }
