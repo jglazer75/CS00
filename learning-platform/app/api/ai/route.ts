@@ -9,6 +9,7 @@ import { executeDataCapture } from '@/lib/ai/dataCapture';
 import { loadTaskContextValues } from '@/lib/ai/taskLoader';
 import { extractTextFromBuffer } from '@/lib/ai/extraction';
 import { z } from 'zod';
+import type { NegotiationMessage, NegotiationSession } from '@/lib/ai/types';
 
 const RequestBodySchema = z.object({
   moduleId: z.string().min(1),
@@ -16,6 +17,8 @@ const RequestBodySchema = z.object({
   payload: z.object({
     inputs: z.record(z.string(), z.unknown()).default({}),
     toggles: z.record(z.string(), z.union([z.string(), z.array(z.string())])).optional().default({}),
+    negotiationId: z.string().uuid().optional(),
+    message: z.string().optional(),
   }),
 });
 
@@ -32,7 +35,7 @@ export async function POST(req: Request) {
     }
 
     const { moduleId, taskId, payload } = result.data;
-    const { inputs, toggles } = payload;
+    const { inputs, toggles, negotiationId, message } = payload;
 
     // 1. Authenticate User
     const supabase = getSupabaseServerClient();
@@ -67,20 +70,55 @@ export async function POST(req: Request) {
       throw error;
     }
 
+    // 2.5 Handle Negotiation State
+    let history: NegotiationMessage[] = [];
+    let currentState: Record<string, unknown> = {};
+    let negotiation: NegotiationSession | null = null;
+
+    if (negotiationId) {
+      const { data, error: navError } = await supabase
+        .from('negotiations')
+        .select('*')
+        .eq('id', negotiationId)
+        .eq('user_id', user.id)
+        .single();
+
+      if (navError || !data) {
+        return NextResponse.json({ error: 'Negotiation not found' }, { status: 404 });
+      }
+
+      negotiation = {
+        ...data,
+        currentState: data.current_state,
+        userRole: data.user_role,
+        aiRole: data.ai_role,
+        createdAt: data.created_at,
+        updatedAt: data.updated_at,
+      } as NegotiationSession;
+
+      history = negotiation.history;
+      currentState = negotiation.currentState;
+
+      // Add the new user message to history if provided
+      if (message) {
+        history.push({
+          role: 'user',
+          content: message,
+          timestamp: new Date().toISOString(),
+        });
+      }
+    }
+
     // 3. Load Context
     const context = loadTaskContextValues(task);
 
     // 3.5 Process File Inputs (Extract Text)
-    // If any input is a file and matches a task input definition of kind 'file', 
-    // we need to download it from storage and extract text for the prompt.
     const hydratedInputs = { ...inputs };
     for (const inputDef of task.inputs) {
       if (inputDef.kind === 'file') {
         const filePath = inputs[inputDef.name];
         if (typeof filePath === 'string' && filePath.trim() !== '') {
           try {
-            // Assume filePath is the path within the bucket
-            // In a real app, bucket name might come from task config or env
             const bucketName = 'term-sheet-submissions'; 
             const { data: fileData, error: downloadError } = await supabase.storage
               .from(bucketName)
@@ -95,9 +133,6 @@ export async function POST(req: Request) {
               const buffer = Buffer.from(await fileData.arrayBuffer());
               const extractedText = await extractTextFromBuffer(buffer, fileData.type);
               
-              // We inject the content into the inputs so the prompt template can use {{inputs.name.content}}
-              // Actually, the taskLoader expects inputs[name] to be the value.
-              // We can make it an object if it's a file.
               hydratedInputs[inputDef.name] = {
                 path: filePath,
                 content: extractedText,
@@ -106,18 +141,15 @@ export async function POST(req: Request) {
             }
           } catch (extractionError) {
             console.error(`Error processing file input ${inputDef.name}:`, extractionError);
-            // Optionally fail the request or proceed with empty content
           }
         }
       }
     }
 
     // 4. Resolve Provider
-    // Note: teamId is not yet available in MVP auth context, passing undefined.
     const credentials = await resolveProviderCredentials({
       userId: user.id,
       moduleId: moduleId,
-      // teamId: ... 
     });
 
     // 5. Construct Prompt
@@ -125,27 +157,30 @@ export async function POST(req: Request) {
     const promptRenderParams = {
       task,
       moduleId,
-      inputs: hydratedInputs,
+      inputs: { ...hydratedInputs, ...currentState }, // Merge current deal state into inputs
       toggles,
       context,
       auth: authContext,
+      history,
+      userRole: negotiation?.userRole,
+      aiRole: negotiation?.aiRole,
     };
     
     const renderedPrompt = renderTaskPrompt(promptRenderParams);
 
-    // 6. Check Cache
+    // 6. Check Cache (Skip cache for negotiations to ensure dynamic response)
+    const skipCache = !!negotiationId;
     const cacheKey = buildPromptCacheKey({
       prompt: renderedPrompt,
       provider: credentials.provider,
       model: credentials.model,
       taskId: task.id,
-      // Optional: fingerprint inputs if strictly needed, but prompt hash covers content variation
     });
 
     let responseEnvelope;
     let cachedHit = null;
 
-    if (task.cache?.enabled !== false) {
+    if (!skipCache && task.cache?.enabled !== false) {
       cachedHit = await getCachedResponse(cacheKey);
     }
 
@@ -169,26 +204,64 @@ export async function POST(req: Request) {
       };
 
       // 8. Store in Cache
-      if (task.cache?.enabled !== false) {
+      if (!skipCache && task.cache?.enabled !== false) {
         await storeCachedResponse({
           cacheKey,
           providerName: credentials.provider,
           modelName: runResult.model,
           taskId: task.id,
           response: responseEnvelope,
-          ttlSeconds: task.cache?.ttlSeconds || 2592000, // Default 30 days
+          ttlSeconds: task.cache?.ttlSeconds || 2592000, 
         });
       }
     }
 
-    // 9. Data Capture (Telemetry / Persistence)
-    // We rebuild template context to include the response
+    // 9. Update Negotiation State if applicable
+    if (negotiationId) {
+      const aiResponseText = typeof responseEnvelope.content === 'string' 
+        ? responseEnvelope.content 
+        : (responseEnvelope.content as any).message || JSON.stringify(responseEnvelope.content);
+      
+      const stateDelta = typeof responseEnvelope.content === 'object' 
+        ? (responseEnvelope.content as any).dealStateUpdates || {} 
+        : {};
+
+      const updatedHistory = [...history, {
+        role: 'assistant' as const,
+        content: aiResponseText,
+        timestamp: new Date().toISOString(),
+        stateDelta: Object.keys(stateDelta).length > 0 ? stateDelta : undefined,
+      }];
+
+      const updatedState = { ...currentState, ...stateDelta };
+
+      const { error: updateError } = await supabase
+        .from('negotiations')
+        .update({
+          history: updatedHistory,
+          current_state: updatedState,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', negotiationId);
+
+      if (updateError) {
+        console.error('Failed to update negotiation state:', updateError);
+      }
+      
+      // Inject updated state and history into response for the frontend
+      responseEnvelope.negotiation = {
+          id: negotiationId,
+          history: updatedHistory,
+          currentState: updatedState
+      };
+    }
+
+    // 10. Data Capture (Telemetry / Persistence)
     const finalTemplateContext = buildTemplateContext({
       ...promptRenderParams,
       response: responseEnvelope,
     });
 
-    // Execute capture asynchronously (or await if critical)
     if (task.dataCapture) {
       await executeDataCapture({
         task,
@@ -197,8 +270,7 @@ export async function POST(req: Request) {
       });
     }
 
-    // Log to ai_task_runs (System Telemetry)
-    // This is separate from user-defined dataCapture, typically always logged
+    // Log to ai_task_runs
     await supabase.from('ai_task_runs').insert({
       user_id: user.id,
       module_id: moduleId,
@@ -209,7 +281,8 @@ export async function POST(req: Request) {
         model: responseEnvelope.model,
         provider: credentials.provider,
         cached: !!cachedHit,
-        executionTimeMs: 0, // TODO: Measure time
+        negotiationId,
+        executionTimeMs: 0,
       }
     });
 

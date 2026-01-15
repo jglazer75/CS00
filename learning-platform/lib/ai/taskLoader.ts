@@ -1,13 +1,8 @@
 import fs from 'fs';
 import path from 'path';
-import type {
-  AiTaskDefinition,
-  AiTaskPrompt,
-  AiTaskToggleGroup,
-  AiTaskToggleOption,
-} from './schema';
+import type { AiTaskDefinition, AiTaskPrompt, AiTaskToggleGroup, AiTaskToggleOption } from './schema';
 import { validateAiTaskDefinition } from './validation';
-import type { RenderedPrompt } from './types';
+import type { RenderedPrompt, NegotiationMessage } from './types';
 
 const contentRoot = path.join(process.cwd(), 'content');
 
@@ -29,6 +24,9 @@ type PromptRenderParams = {
     email?: string | null;
     teamId?: string | null;
   };
+  history?: NegotiationMessage[];
+  userRole?: string;
+  aiRole?: string;
 };
 
 export function loadTaskDefinition(moduleId: string, taskId: string): AiTaskDefinition {
@@ -64,7 +62,7 @@ export function loadTaskDefinition(moduleId: string, taskId: string): AiTaskDefi
 }
 
 export function renderTaskPrompt(params: PromptRenderParams): RenderedPrompt {
-  const { task, toggles, inputs, context, moduleId, auth } = params;
+  const { task, toggles, inputs, context, moduleId, auth, history, userRole, aiRole } = params;
   const prompt = task.prompt;
 
   const templateVariables = buildTemplateContext({
@@ -74,16 +72,26 @@ export function renderTaskPrompt(params: PromptRenderParams): RenderedPrompt {
     toggles,
     context,
     auth,
+    userRole,
+    aiRole,
   });
 
-  const segments = (prompt?.segments ?? [])
+  const baseSegments = (prompt?.segments ?? [])
     .filter((segment) => shouldIncludeSegment(segment, toggles))
     .map((segment) => ({
       role: segment.role,
       content: renderTemplateString(segment.template, templateVariables),
     }));
 
-  return { segments };
+  if (history && history.length > 0) {
+    const historySegments = history.map((msg) => ({
+      role: msg.role,
+      content: msg.content,
+    }));
+    return { segments: [...baseSegments, ...historySegments] };
+  }
+
+  return { segments: baseSegments };
 }
 
 export function extractResponseFormat(prompt: AiTaskPrompt | undefined) {
@@ -106,10 +114,12 @@ type TemplateContextParams = {
     raw?: unknown;
     model?: string;
   };
+  userRole?: string;
+  aiRole?: string;
 };
 
 export function buildTemplateContext(params: TemplateContextParams): Record<string, unknown> {
-  const { task, moduleId, inputs, toggles, context, auth, response } = params;
+  const { task, moduleId, inputs, toggles, context, auth, response, userRole, aiRole } = params;
 
   const toggleContext = buildToggleTemplateContext(task, toggles);
 
@@ -127,6 +137,8 @@ export function buildTemplateContext(params: TemplateContextParams): Record<stri
     toggles: toggleContext,
     context,
     auth,
+    userRole,
+    aiRole,
     response: response
       ? {
           ...response,

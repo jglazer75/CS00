@@ -44,6 +44,12 @@ Once you have marked up the Term Sheet, it is sent to BigTech and their lawyers.
 
 [CONFIDENTIAL: FOR BIG TECH EYES ONLY!!](./bigtech-confidential.html)
 
+### DealCraft: AI Negotiation Simulator
+
+If you are working independently, or want to practice your strategy before the face-off, use the simulator below. You can choose to represent either NewCo or BigTech.
+
+AI_TASK_ANCHOR: negotiation-simulator-anchor
+
 ## Part 2 - Classroom Instructions {#pt2-instructions}
 
 For the second part of this exercise, half of the teams will become BigTech and represent Big Tech's interests (either as BigTech's Executives or Lawyers). The BigTech teams should read the "CONFIDENTIAL: For BigTech Eyes Only!!" note above.

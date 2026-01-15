@@ -26,3 +26,34 @@ export type ProviderCredentials = {
   model?: string;
   isUserSupplied: boolean;
 };
+
+/**
+ * Negotiation & Simulation Types
+ */
+
+export type MessageRole = 'system' | 'user' | 'assistant';
+
+export type NegotiationMessage = {
+  role: MessageRole;
+  content: string;
+  timestamp: string;
+  stateDelta?: Record<string, unknown>; // Optional changes to the deal state in this turn
+  metadata?: Record<string, unknown>;
+};
+
+export type NegotiationStatus = 'active' | 'completed' | 'stalemate' | 'aborted';
+
+export type NegotiationSession = {
+  id: string;
+  userId: string;
+  moduleId: string;
+  taskId: string;
+  status: NegotiationStatus;
+  userRole: string;
+  aiRole: string;
+  currentState: Record<string, unknown>;
+  history: NegotiationMessage[];
+  metadata: Record<string, unknown>;
+  createdAt: string;
+  updatedAt: string;
+};

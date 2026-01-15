@@ -1,0 +1,65 @@
+{
+  "version": "1.0.0",
+  "id": "term-sheet-negotiation",
+  "moduleId": "CS01",
+  "status": "active",
+  "metadata": {
+    "title": "DealCraft: Term Sheet Negotiation",
+    "summary": "Step into the room and negotiate the final terms of the NewCo spin-off. Your decisions will shape the future of the company.",
+    "estimatedDurationMinutes": 30
+  },
+  "placement": {
+    "pageSlug": "the-exercise-pt2",
+    "anchorId": "negotiation-simulator-anchor"
+  },
+  "ui": {
+    "component": "NegotiationSimulator",
+    "props": {
+      "initialState": {
+        "valuation": "$10,000,000",
+        "equityStake": "15%",
+        "antiDilution": "Full Ratchet",
+        "boardControl": "BigTech (2 seats)",
+        "ipOwnership": "BigTech (Exclusive License)"
+      }
+    }
+  },
+  "inputs": [],
+  "context": [
+    {
+      "id": "foundations",
+      "type": "markdown",
+      "path": "CS01/foundations.md"
+    },
+    {
+      "id": "theDeal",
+      "type": "markdown",
+      "path": "CS01/the-deal.md"
+    },
+    {
+      "id": "bigtechConfidential",
+      "type": "markdown",
+      "path": "CS01/bigtech-confidential.md"
+    }
+  ],
+  "prompt": {
+    "version": "prompt-v1",
+    "segments": [
+      {
+        "role": "system",
+        "template": "You are simulating a negotiation between NewCo (founders Baker and Carter) and BigTechCo.\n\nLearner Role: {{userRole}}\nAI Role: {{aiRole}}\n\nYour Persona ({{aiRole}}):\nIf you are BigTech: You are a senior VP of Corporate Development. You want to protect BigTech's IP but also see NewCo succeed (as you own equity). You are firm on maintaining at least 10% equity and some form of IP reversion if things go south.\nIf you are NewCo: You are a founder who is passionate about the technology. You feel BigTech is being too greedy with the 15% non-dilutable stake and you want more control over the board.\n\nContext:\n{{context.foundations}}\n{{context.theDeal}}\n\nConfidential Info for BigTech:\n{{context.bigtechConfidential}}\n\nCurrent State of the Deal:\n{{inputs.json}}\n\nINSTRUCTIONS:\n1. Conduct a professional negotiation.\n2. You MUST respond with a JSON object containing two fields:\n   - \"message\": Your spoken response to the user.\n   - \"dealStateUpdates\": A JSON object containing ONLY the fields from the Deal Status that have changed in this turn. If nothing changed, return an empty object.\n\nExample Output:\n{\n  \"message\": \"I understand your concern about the valuation. We might be willing to go to $12M if you agree to the original IP license terms.\",\n  \"dealStateUpdates\": {\n    \"valuation\": \"$12,000,000\"\n  }\n}\n\nKeep your messages concise and stay in character."
+      }
+    ],
+    "responseFormat": {
+      "type": "json",
+      "schema": {
+        "type": "object",
+        "properties": {
+          "message": { "type": "string" },
+          "dealStateUpdates": { "type": "object" }
+        },
+        "required": ["message", "dealStateUpdates"]
+      }
+    }
+  }
+}
