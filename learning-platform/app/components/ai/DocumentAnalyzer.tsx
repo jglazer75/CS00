@@ -15,7 +15,7 @@ import {
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import type { AiTaskDefinition } from '@/lib/ai/schema';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
-import MarkdownContent from '../MarkdownContent';
+import ReactMarkdown from 'react-markdown';
 
 export type DocumentAnalyzerProps = {
   task: AiTaskDefinition;
@@ -208,7 +208,14 @@ export default function DocumentAnalyzer({ task }: DocumentAnalyzerProps) {
               Analysis Feedback
             </Typography>
             <Box sx={{ p: 3, bgcolor: 'background.paper', borderRadius: 1, border: 1, borderColor: 'divider' }}>
-              <MarkdownContent html={response} />
+              <Box sx={{
+                '& h1, & h2, & h3': { fontSize: '1.1rem', fontWeight: 600, mt: 2, mb: 1 },
+                '& ul, & ol': { pl: 3, mb: 2 },
+                '& p': { mb: 2 },
+                '& strong': { fontWeight: 600, color: 'primary.dark' }
+              }}>
+                <ReactMarkdown>{response}</ReactMarkdown>
+              </Box>
             </Box>
           </Box>
         )}
