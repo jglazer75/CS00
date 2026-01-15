@@ -4,7 +4,7 @@
 - [x] Task: Create DB-backed `getAllModuleIds` 42064b3
     - [ ] Update `lib/content.ts` to fetch modules from Supabase.
     - [ ] Add caching/memoization if necessary.
-- [ ] Task: Create DB-backed `getModuleStructure`
+- [x] Task: Create DB-backed `getModuleStructure` 4cc9866
     - [ ] Implement `getModuleStructure(moduleId)` in `lib/content.ts`.
     - [ ] Query `module_nodes` and reconstruct the tree structure (sections -> children).
 - [ ] Task: Refactor `getPageData`
