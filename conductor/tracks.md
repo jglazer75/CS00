@@ -4,5 +4,10 @@ This file tracks all major tracks for the project. Each track has its own detail
 
 ---
 
-- [ ] **Track: Negotiation Simulator (DealCraft)**
-  *Link: [./tracks/negotiation_simulator_20260115/](./tracks/negotiation_simulator_20260115/)*
+- [ ] **Track: Guided Annotation Walkthrough**
+  *Link: [./tracks/guided_annotation_20260115/](./tracks/guided_annotation_20260115/)*
+
+## Archived Tracks
+
+- [x] **Track: Negotiation Simulator (DealCraft)**
+  *Link: [./archive/negotiation_simulator_20260115/](./archive/negotiation_simulator_20260115/)*
