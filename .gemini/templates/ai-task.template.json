@@ -1,0 +1,42 @@
+{
+  "version": "1.0.0",
+  "id": "template-task-id",
+  "moduleId": "CSXX",
+  "status": "draft",
+  "metadata": {
+    "title": "Title Here",
+    "summary": "Summary of the task.",
+    "estimatedDurationMinutes": 10
+  },
+  "placement": {
+    "pageSlug": "slug-here",
+    "anchorId": "anchor-here"
+  },
+  "ui": {
+    "component": "ComponentSelector",
+    "props": {
+      "title": "Display Title",
+      "description": "User instructions."
+    }
+  },
+  "toggles": {
+    "difficulty": {
+      "id": "difficulty",
+      "label": "Difficulty",
+      "type": "single",
+      "defaultValue": "standard",
+      "options": [
+        { "id": "standard", "label": "Standard", "promptInjections": { "system": [] } }
+      ]
+    }
+  },
+  "inputs": [],
+  "prompt": {
+    "version": "prompt-v1",
+    "segments": [
+      { "role": "system", "template": "Instruction here." }
+    ],
+    "responseFormat": { "type": "markdown" }
+  },
+  "dataCapture": { "operations": [] }
+}

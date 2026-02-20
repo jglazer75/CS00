@@ -1,0 +1,16 @@
+{
+  "version": "1.0.0",
+  "project_name": "CS00 Learning Platform",
+  "documentation_map": {
+    "core": ["AGENTS.md", "conductor/product.md", "conductor/tech-stack.md"],
+    "roles": {
+      "frontend": [".gemini/coding-rules/react.md", ".gemini/coding-rules/tailwind.md", ".gemini/coding-rules/typescript.md"],
+      "backend": [".gemini/coding-rules/database.md", ".gemini/coding-rules/typescript.md"],
+      "content_author": ["docs/module-author-guide.md", ".gemini/frontmatter.md"]
+    },
+    "features": {
+      "ai_gateway": [".gemini/blueprints/document-analyzer.spec.md", ".gemini/blueprints/negotiation-simulator.spec.md"],
+      "content_engine": [".gemini/contentengine.md", ".gemini/uiux.md"]
+    }
+  }
+}
