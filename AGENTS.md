@@ -13,11 +13,15 @@ When working on a specific area, read the corresponding documentation:
 *   **AI Blueprint Registry:** [./.gemini/blueprints/](./.gemini/blueprints/) (Specs and Plans for AI features).
 *   **Content Architecture:** [./docs/module-author-guide.md](./docs/module-author-guide.md)
 
-## 3. Current Mission: Phase 1 — AI-Ready MVP
-We are currently in **Phase 1.5: AI Gateway Foundation**. 
+## 3. Current Mission: Phase 1.6 — Classroom Launch Hardening
 
-### Active Tracks:
-*   **AI Gateway Implementation**: See [./conductor/tracks/guided_annotation_20260115/](./conductor/tracks/guided_annotation_20260115/) (Note: Check current priority vs. Document Analyzer).
+Phase 1.5 (AI Gateway Foundation) is complete. We are now in **Phase 1.6: Classroom Launch Hardening** — hardening the platform for real human load before the first classroom session.
+
+### Active Track:
+*   **Launch Hardening Sprint**: See [./conductor/tracks/launch_hardening_20260220/](./conductor/tracks/launch_hardening_20260220/)
+*   **Current Item: P1 — Authentication Middleware** (`learning-platform/middleware.ts`)
+*   Full plan and checklist: [./conductor/tracks/launch_hardening_20260220/plan.md](./conductor/tracks/launch_hardening_20260220/plan.md)
+*   Source analysis: [./conductor/20260220.SystemObservations.md](./conductor/20260220.SystemObservations.md) | [./conductor/20260220.SystemSolutions.md](./conductor/20260220.SystemSolutions.md)
 
 ## 4. Architectural Rules of Engagement
 1.  **Strict Typing:** No `any`. Use Zod for all network boundaries.
