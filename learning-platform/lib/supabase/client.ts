@@ -1,6 +1,7 @@
 'use client';
 
-import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import { createBrowserClient } from '@supabase/ssr';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 let browserClient: SupabaseClient | undefined;
 
@@ -16,11 +17,7 @@ export function getSupabaseBrowserClient(): SupabaseClient {
   }
 
   if (!browserClient) {
-    browserClient = createClient(url, anonKey, {
-      auth: {
-        persistSession: true,
-      },
-    });
+    browserClient = createBrowserClient(url, anonKey);
   }
 
   return browserClient;
