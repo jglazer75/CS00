@@ -238,5 +238,5 @@ Aggregate view of `user_module_state` and `ai_task_runs` per student.
 - [x] P6 Page type UX
 - [x] P8 Consolidate content pipeline
 - [x] P10 Bulk invite / roster
-- [ ] P3b Encrypt stored keys
-- [ ] P11 Instructor progress dashboard
+- [x] P3b Encrypt stored keys
+- [x] P11 Instructor progress dashboard

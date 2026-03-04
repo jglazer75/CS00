@@ -1,4 +1,5 @@
 import { getSupabaseServerClient } from '@/lib/supabase/server';
+import { decryptApiKey } from './crypto';
 import type { ProviderCredentials, ProviderIdentifier } from './types';
 
 type UserProviderRecord = {
@@ -208,9 +209,11 @@ async function fetchProviderRecordById(providerId: string): Promise<UserProvider
 }
 
 function toProviderCredentials(record: UserProviderRecord): ProviderCredentials {
+  // Attempt decryption; fall back to raw value for rows stored before encryption was added
+  const apiKey = decryptApiKey(record.encrypted_api_key) ?? record.encrypted_api_key;
   return {
     provider: record.provider_name,
-    apiKey: record.encrypted_api_key,
+    apiKey,
     model: record.model_preferences?.default,
     isUserSupplied: true,
   };

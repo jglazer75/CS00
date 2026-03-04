@@ -60,22 +60,22 @@ export default function AiSettingsPage() {
     setMessage(null);
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error('Not authenticated');
 
-      const { error } = await supabase
-        .from('user_ai_providers')
-        .upsert(
-          {
-            user_id: user.id,
-            provider_name: 'gemini',
-            encrypted_api_key: apiKey, // Note: In production, encrypt this client-side or send to API to encrypt!
-            updated_at: new Date().toISOString(),
-          },
-          { onConflict: 'user_id, provider_name' }
-        );
+      const res = await fetch('/api/user/ai-key', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({ providerName: 'gemini', apiKey }),
+      });
 
-      if (error) throw error;
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error((data as { error?: string }).error ?? 'Failed to save key');
+      }
 
       setMessage({ type: 'success', text: 'API Key saved successfully.' });
       setHasKey(true);
