@@ -1,7 +1,8 @@
 import { getAllModuleIds, getPageData, getModulePages, getModuleStructure } from '@/lib/content';
 import ModulePageClient from '@/app/components/ModulePageClient';
 import { redirect } from 'next/navigation';
-import { getSupabaseServerClient, getSupabaseUserClient } from '@/lib/supabase/server';
+import { getSupabaseServerClient } from '@/lib/supabase/server';
+import { getSupabaseUserClient } from '@/lib/supabase/serverUser';
 import { isAdminEmail } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';

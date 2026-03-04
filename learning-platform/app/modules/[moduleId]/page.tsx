@@ -1,7 +1,8 @@
 import { notFound, redirect } from 'next/navigation';
 import { getAllModuleIds, getModulePages } from '@/lib/content';
 import ModuleRedirectClient from '@/app/components/ModuleRedirectClient';
-import { getSupabaseServerClient, getSupabaseUserClient } from '@/lib/supabase/server';
+import { getSupabaseServerClient } from '@/lib/supabase/server';
+import { getSupabaseUserClient } from '@/lib/supabase/serverUser';
 import { isAdminEmail } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
