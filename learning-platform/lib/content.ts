@@ -100,6 +100,7 @@ export type ModuleStructureNode = {
   id: string;
   title: string;
   type: 'page' | 'section' | 'ai-interaction';
+  layout?: string;
   children: ModuleStructureNode[];
 };
 
@@ -136,10 +137,12 @@ export async function getModuleStructure(
   // Initialize nodes in map, filtering by visibility
   nodes.forEach((node) => {
     if (!nodeIsVisible(node.visibility_rules, userRoles)) return;
+    const config = (node.config as Record<string, unknown> | null) ?? {};
     nodeMap.set(node.node_id, {
       id: node.node_id,
       title: node.title,
       type: node.type as 'page' | 'section' | 'ai-interaction',
+      layout: config.layout as string | undefined,
       children: [],
     });
   });

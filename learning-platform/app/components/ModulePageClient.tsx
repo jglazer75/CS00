@@ -15,19 +15,21 @@ type ModulePageClientProps = {
 };
 
 export default function ModulePageClient({ moduleId, slug, navData, pageData }: ModulePageClientProps) {
-  const slugs = useMemo(() => {
+  const { slugs, currentNode } = useMemo(() => {
     const list: string[] = [];
+    let found: ModuleStructureNode | undefined;
     function collect(nodes: ModuleStructureNode[]) {
       nodes.forEach((n) => {
         if (n.type === 'page' || n.type === 'ai-interaction') {
           list.push(n.id);
+          if (n.id === slug) found = n;
         }
         collect(n.children);
       });
     }
     collect(navData);
-    return list;
-  }, [navData]);
+    return { slugs: list, currentNode: found };
+  }, [navData, slug]);
 
   const { metadata, chunks, instructorNote, tableOfContents, aiTasks } = pageData;
 
@@ -73,6 +75,9 @@ export default function ModulePageClient({ moduleId, slug, navData, pageData }: 
         isCompleted={isCompleted}
         isProcessingProgress={isProcessing}
         onMarkComplete={() => markPageCompleted(slug)}
+        isExercise={
+          currentNode?.type === 'ai-interaction' || currentNode?.layout === 'workbench'
+        }
       />
     </Box>
   );

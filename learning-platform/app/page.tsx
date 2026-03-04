@@ -1,22 +1,26 @@
-import { getAllModuleIds, getSortedPagesData } from '@/lib/content';
+import { getSupabaseServerClient } from '@/lib/supabase/server';
 import DashboardClient from './components/DashboardClient';
 
 export default async function Home() {
-  const moduleIds = await getAllModuleIds();
+  const supabase = getSupabaseServerClient();
+  const moduleLinks: { id: string; href: string; title: string; description: string }[] = [];
 
-  const moduleLinks = await Promise.all(
-    moduleIds.map(async ({ params }) => {
-      const { moduleId } = params;
-      const pages = await getSortedPagesData(moduleId);
-      const hasPages = pages.length > 0;
-      return {
-        id: moduleId,
-        href: hasPages ? `/modules/${moduleId}` : '#',
-        title: `Venture Capital Term Sheet`, 
-        description: `An interactive case study on negotiating a venture capital term sheet.`
-      };
-    })
-  );
+  if (supabase) {
+    const { data: modules } = await supabase
+      .from('modules')
+      .select('id, title, description')
+      .eq('is_active', true)
+      .order('id');
+
+    for (const mod of modules ?? []) {
+      moduleLinks.push({
+        id: mod.id,
+        href: `/modules/${mod.id}`,
+        title: mod.title ?? mod.id,
+        description: mod.description ?? '',
+      });
+    }
+  }
 
   return <DashboardClient moduleLinks={moduleLinks} />;
 }

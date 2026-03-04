@@ -6,6 +6,7 @@ import {
   Box,
   Button,
   CircularProgress,
+  Divider,
   Paper,
   Switch,
   Table,
@@ -14,6 +15,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TextField,
   Typography,
 } from '@mui/material';
 import { useSupabaseClient } from '@/app/context/SupabaseClientContext';
@@ -33,6 +35,11 @@ export default function AdminUsersPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState<string | null>(null);
+
+  // Bulk invite state
+  const [bulkEmails, setBulkEmails] = useState('');
+  const [bulkInviting, setBulkInviting] = useState(false);
+  const [bulkResult, setBulkResult] = useState<{ sent: string[]; failed: string[] } | null>(null);
 
   const fetchUsers = useCallback(async () => {
     if (!supabase) return;
@@ -114,6 +121,39 @@ export default function AdminUsersPage() {
     setSaving(null);
   };
 
+  const handleBulkInvite = async () => {
+    setBulkInviting(true);
+    setBulkResult(null);
+    const { data: { session } } = await getSupabaseBrowserClient().auth.getSession();
+    if (!session) { setBulkInviting(false); return; }
+
+    const emails = bulkEmails
+      .split(/[\n,]+/)
+      .map((e) => e.trim().toLowerCase())
+      .filter((e) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e));
+
+    const sent: string[] = [];
+    const failed: string[] = [];
+
+    for (const email of emails) {
+      const res = await fetch('/api/admin/invite', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({ email }),
+      });
+      if (res.ok) sent.push(email);
+      else failed.push(email);
+    }
+
+    setBulkResult({ sent, failed });
+    if (sent.length > 0) setBulkEmails('');
+    setBulkInviting(false);
+    if (sent.length > 0) fetchUsers();
+  };
+
   if (loading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', py: 8 }}>
@@ -132,6 +172,49 @@ export default function AdminUsersPage() {
       </Box>
 
       {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+
+      {/* Bulk invite */}
+      <Paper variant="outlined" sx={{ p: 2, mb: 3 }}>
+        <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 1 }}>Bulk Invite</Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
+          Paste email addresses (one per line or comma-separated). Each will receive an invitation email.
+        </Typography>
+        <TextField
+          multiline
+          minRows={3}
+          maxRows={8}
+          fullWidth
+          placeholder="alice@example.com&#10;bob@example.com"
+          value={bulkEmails}
+          onChange={(e) => setBulkEmails(e.target.value)}
+          size="small"
+          sx={{ mb: 1.5, fontFamily: 'monospace' }}
+        />
+        <Button
+          variant="contained"
+          onClick={handleBulkInvite}
+          disabled={bulkInviting || !bulkEmails.trim()}
+          startIcon={bulkInviting ? <CircularProgress size={16} color="inherit" /> : null}
+        >
+          {bulkInviting ? 'Sending…' : 'Send Invites'}
+        </Button>
+        {bulkResult && (
+          <Box sx={{ mt: 1.5, display: 'flex', flexDirection: 'column', gap: 1 }}>
+            {bulkResult.sent.length > 0 && (
+              <Alert severity="success" sx={{ fontSize: '0.8rem' }}>
+                Invited: {bulkResult.sent.join(', ')}
+              </Alert>
+            )}
+            {bulkResult.failed.length > 0 && (
+              <Alert severity="error" sx={{ fontSize: '0.8rem' }}>
+                Failed: {bulkResult.failed.join(', ')}
+              </Alert>
+            )}
+          </Box>
+        )}
+      </Paper>
+
+      <Divider sx={{ mb: 3 }} />
 
       <TableContainer component={Paper} variant="outlined">
         <Table size="small">

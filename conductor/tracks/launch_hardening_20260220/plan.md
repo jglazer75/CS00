@@ -235,8 +235,8 @@ Aggregate view of `user_module_state` and `ai_task_runs` per student.
 - [x] P3a Hide BYOK from students
 - [x] P4 Enforce visibility rules (team-derived roles)
 - [x] P7 Rate limiting
-- [ ] P6 Page type UX
-- [ ] P8 Consolidate content pipeline
-- [ ] P10 Bulk invite / roster
+- [x] P6 Page type UX
+- [x] P8 Consolidate content pipeline
+- [x] P10 Bulk invite / roster
 - [ ] P3b Encrypt stored keys
 - [ ] P11 Instructor progress dashboard

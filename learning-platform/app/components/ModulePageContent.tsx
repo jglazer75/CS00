@@ -23,6 +23,7 @@ type ModulePageContentProps = {
   isCompleted: boolean;
   isProcessingProgress: boolean;
   onMarkComplete: () => Promise<void> | void;
+  isExercise?: boolean;
 };
 
 export default function ModulePageContent({
@@ -36,6 +37,7 @@ export default function ModulePageContent({
   isCompleted,
   isProcessingProgress,
   onMarkComplete,
+  isExercise = false,
 }: ModulePageContentProps) {
   const { isInstructorMode } = useInstructorMode();
   const [showInstructorCard, setShowInstructorCard] = useState(false);
@@ -100,9 +102,14 @@ export default function ModulePageContent({
               }}
             >
               <Box>
-                <Typography variant="h1" component="h1" sx={{ mb: 1 }}>
-                  {metadata.title}
-                </Typography>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, flexWrap: 'wrap', mb: 1 }}>
+                  <Typography variant="h1" component="h1">
+                    {metadata.title}
+                  </Typography>
+                  {isExercise && (
+                    <Chip label="Required Exercise" color="secondary" size="small" />
+                  )}
+                </Box>
                 {authorAndDate && (
                   <Typography variant="body2" color="text.secondary">
                     {authorAndDate}

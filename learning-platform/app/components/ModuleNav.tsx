@@ -15,6 +15,7 @@ import {
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
+import Chip from '@mui/material/Chip';
 import type { ModuleStructureNode } from '@/lib/content';
 
 type ModuleNavProps = {
@@ -156,6 +157,8 @@ function NavNode({
     );
   }
 
+  const isExercise = node.type === 'ai-interaction' || node.layout === 'workbench';
+
   return (
     <ListItem disablePadding>
       <ListItemButton
@@ -179,6 +182,15 @@ function NavNode({
               ) : undefined
             }
           />
+          {isExercise && (
+            <Chip
+              label="Exercise"
+              size="small"
+              color="secondary"
+              variant="outlined"
+              sx={{ height: 18, fontSize: '0.65rem', flexShrink: 0 }}
+            />
+          )}
           {isCompleted && (
             <CheckCircleOutlineIcon
               fontSize="small"
