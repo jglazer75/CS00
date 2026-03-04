@@ -18,10 +18,6 @@ export default function AiSettingsPage() {
   const [hasKey, setHasKey] = useState(false);
   const [authorized, setAuthorized] = useState<boolean | null>(null);
 
-  useEffect(() => {
-    checkAccess();
-  }, []);
-
   const checkAccess = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { setAuthorized(false); return; }
@@ -39,6 +35,9 @@ export default function AiSettingsPage() {
     if (profile?.is_instructor) { setAuthorized(true); checkExistingKey(); }
     else { setAuthorized(false); }
   };
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { checkAccess(); }, []);
 
   const checkExistingKey = async () => {
     const { data: { user } } = await supabase.auth.getUser();

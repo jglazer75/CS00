@@ -187,7 +187,7 @@ export default function AdminTeamsPage() {
 
       {/* Teams list */}
       {teams.length === 0 ? (
-        <Typography color="text.secondary">No teams yet. Use "Generate Teams" to create them.</Typography>
+        <Typography color="text.secondary">No teams yet. Use &ldquo;Generate Teams&rdquo; to create them.</Typography>
       ) : (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           {teams.map((team) => (
