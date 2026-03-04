@@ -5,6 +5,8 @@
  * Generate one with: node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
  */
 
+import { createCipheriv, createDecipheriv, randomBytes } from 'crypto';
+
 const ALG = 'aes-256-gcm';
 const IV_BYTES = 12;
 const TAG_BYTES = 16;
@@ -25,7 +27,6 @@ function getKey(): Buffer {
  * Encrypts plaintext and returns a base64 string: iv + ciphertext + tag
  */
 export function encryptApiKey(plaintext: string): string {
-  const { createCipheriv, randomBytes } = require('crypto') as typeof import('crypto');
   const key = getKey();
   const iv = randomBytes(IV_BYTES);
   const cipher = createCipheriv(ALG, key, iv);
@@ -40,7 +41,6 @@ export function encryptApiKey(plaintext: string): string {
  */
 export function decryptApiKey(encoded: string): string | null {
   try {
-    const { createDecipheriv } = require('crypto') as typeof import('crypto');
     const key = getKey();
     const buf = Buffer.from(encoded, 'base64');
     if (buf.length < IV_BYTES + TAG_BYTES + 1) return null;
