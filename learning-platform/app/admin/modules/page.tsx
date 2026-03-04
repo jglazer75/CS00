@@ -13,6 +13,7 @@ import {
   Alert,
 } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
+import GroupsIcon from '@mui/icons-material/Groups';
 import Link from 'next/link';
 import { useSupabaseClient } from '@/app/context/SupabaseClientContext';
 
@@ -89,6 +90,14 @@ export default function AdminModulesPage() {
                   startIcon={<SettingsIcon />}
                 >
                   AI Settings
+                </Button>
+                <Button
+                  size="small"
+                  component={Link}
+                  href={`/admin/modules/${module.id}/teams`}
+                  startIcon={<GroupsIcon />}
+                >
+                  Teams
                 </Button>
               </CardActions>
             </Card>

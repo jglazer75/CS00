@@ -1,4 +1,6 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import { createServerClient } from '@supabase/ssr';
+import { cookies } from 'next/headers';
 
 let serverClient: SupabaseClient | undefined;
 
@@ -22,4 +24,28 @@ export function getSupabaseServerClient(): SupabaseClient | null {
   }
 
   return serverClient;
+}
+
+/**
+ * Returns a cookie-based Supabase client for server components that need to
+ * read the currently authenticated user from the session cookie.
+ */
+export async function getSupabaseUserClient() {
+  const cookieStore = await cookies();
+  return createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return cookieStore.getAll();
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) =>
+            cookieStore.set(name, value, options)
+          );
+        },
+      },
+    }
+  );
 }

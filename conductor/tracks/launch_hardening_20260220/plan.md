@@ -23,7 +23,7 @@ Module public/private access is **not** enforced here — middleware only gates 
 
 ---
 
-### → P9 — Remove Development Artifact (test-ai page)  `[ IN PROGRESS ]`
+### ✓ P9 — Remove Development Artifact (test-ai page)  `[ DONE ]`
 **Files:**
 - `learning-platform/content/CS01/module.yaml` — remove the `test-ai` node block
 - Re-run `scripts/ingest.ts` to sync removal to `module_nodes`
@@ -31,7 +31,7 @@ Module public/private access is **not** enforced here — middleware only gates 
 
 ---
 
-### P2 + P2T — User Profiles, AI Permissioning & Team Management  `[ ]`
+### ✓ P2 + P2T — User Profiles, AI Permissioning & Team Management  `[ DONE ]`
 *Combined workstream — one migration, one admin area, parallel UI work.*
 
 **Migration:** `supabase/migrations/YYYYMMDD_create_profiles_and_teams.sql`
@@ -121,14 +121,14 @@ Admin UI additions (on the teams page or a settings tab):
 
 ---
 
-### P3a — Hide BYOK Settings from Students  `[ ]`
+### ✓ P3a — Hide BYOK Settings from Students  `[ DONE ]`
 **File:** `learning-platform/app/settings/ai/page.tsx`
 **Scope:** Add role check at page render. If user is not admin/instructor, redirect to `/` or show a "not available" message.
 **Dependency:** P2 (profiles table with role concept must exist).
 
 ---
 
-### P4 — Enforce module.yaml Visibility Rules  `[ ]`
+### ✓ P4 — Enforce module.yaml Visibility Rules  `[ DONE ]`
 **Files:**
 - `learning-platform/app/modules/[moduleId]/[slug]/page.js` — derive user roles; pass to content layer
 - `learning-platform/lib/content.ts` — add `userRoles: string[]` param to `getModuleStructure()` and `loadInstructorNote()`; filter nodes
@@ -154,7 +154,7 @@ if (teamData?.teams?.role) userRoles.push(teamData.teams.role);
 
 ---
 
-### P7 — AI Rate Limiting  `[ ]`
+### ✓ P7 — AI Rate Limiting  `[ DONE ]`
 **File:** `learning-platform/app/api/ai/route.ts`
 **Scope:** ~15 lines added after auth check.
 
@@ -223,18 +223,18 @@ Aggregate view of `user_module_state` and `ai_task_runs` per student.
 ## Completion Checklist
 
 - [x] P1 Auth middleware
-- [ ] P9 Remove test-ai artifact
-- [ ] P2+P2T+PMD Migration (profiles + teams + team_members + module_enrollments + modules.is_public)
-- [ ] P2 AI gateway permissioning check (ai_enabled)
-- [ ] P2 Admin users page (roster + AI toggle)
-- [ ] P2T Team generation API
-- [ ] P2T Admin teams page (generate + manual assign + role assign)
-- [ ] P2T NegotiationSimulator auto-role from team
-- [ ] PMD Module public/private toggle in admin
-- [ ] PMD Access check in module page routes
-- [ ] P3a Hide BYOK from students
-- [ ] P4 Enforce visibility rules (team-derived roles)
-- [ ] P7 Rate limiting
+- [x] P9 Remove test-ai artifact
+- [x] P2+P2T+PMD Migration (profiles + teams + team_members + module_enrollments + modules.is_public)
+- [x] P2 AI gateway permissioning check (ai_enabled)
+- [x] P2 Admin users page (roster + AI toggle)
+- [x] P2T Team generation API
+- [x] P2T Admin teams page (generate + manual assign + role assign)
+- [x] P2T NegotiationSimulator auto-role from team
+- [x] PMD Module public/private toggle in admin
+- [x] PMD Access check in module page routes
+- [x] P3a Hide BYOK from students
+- [x] P4 Enforce visibility rules (team-derived roles)
+- [x] P7 Rate limiting
 - [ ] P6 Page type UX
 - [ ] P8 Consolidate content pipeline
 - [ ] P10 Bulk invite / roster

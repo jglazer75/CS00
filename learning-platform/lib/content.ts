@@ -103,7 +103,17 @@ export type ModuleStructureNode = {
   children: ModuleStructureNode[];
 };
 
-export async function getModuleStructure(moduleId: string): Promise<ModuleStructureNode[]> {
+function nodeIsVisible(visibilityRules: unknown, userRoles: string[]): boolean {
+  if (!visibilityRules) return true;
+  const rules = visibilityRules as { role?: string[] };
+  if (!rules.role || rules.role.length === 0) return true;
+  return rules.role.some((r) => userRoles.includes(r));
+}
+
+export async function getModuleStructure(
+  moduleId: string,
+  userRoles: string[] = []
+): Promise<ModuleStructureNode[]> {
   const supabase = getSupabaseServerClient();
   if (!supabase) {
     console.warn('Supabase client not available. Skipping getModuleStructure.');
@@ -123,8 +133,9 @@ export async function getModuleStructure(moduleId: string): Promise<ModuleStruct
   const nodeMap = new Map<string, ModuleStructureNode>();
   const rootNodes: ModuleStructureNode[] = [];
 
-  // Initialize nodes in map
+  // Initialize nodes in map, filtering by visibility
   nodes.forEach((node) => {
+    if (!nodeIsVisible(node.visibility_rules, userRoles)) return;
     nodeMap.set(node.node_id, {
       id: node.node_id,
       title: node.title,
@@ -135,14 +146,14 @@ export async function getModuleStructure(moduleId: string): Promise<ModuleStruct
 
   // Reconstruct hierarchy
   nodes.forEach((node) => {
-    const structNode = nodeMap.get(node.node_id)!;
+    const structNode = nodeMap.get(node.node_id);
+    if (!structNode) return; // filtered out
     if (node.parent_node_id) {
       const parent = nodeMap.get(node.parent_node_id);
       if (parent) {
         parent.children.push(structNode);
       } else {
-        // Fallback to root if parent not found (shouldn't happen with clean data)
-        rootNodes.push(structNode);
+        // Parent was filtered out or not found — skip this node too
       }
     } else {
       rootNodes.push(structNode);

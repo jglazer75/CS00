@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Button, Container, TextField, Typography, Alert, Paper } from '@mui/material';
 import { createClient } from '@supabase/supabase-js';
+import { isAdminEmail } from '@/lib/auth';
 
 // Note: In a real app, use the context or hook that provides the Supabase client
 // Here we instantiate for the client-side interaction using env vars
@@ -15,10 +16,29 @@ export default function AiSettingsPage() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [hasKey, setHasKey] = useState(false);
+  const [authorized, setAuthorized] = useState<boolean | null>(null);
 
   useEffect(() => {
-    checkExistingKey();
+    checkAccess();
   }, []);
+
+  const checkAccess = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) { setAuthorized(false); return; }
+
+    // Admins always have access
+    if (user.email && isAdminEmail(user.email)) { setAuthorized(true); checkExistingKey(); return; }
+
+    // Check is_instructor from profiles
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('is_instructor')
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    if (profile?.is_instructor) { setAuthorized(true); checkExistingKey(); }
+    else { setAuthorized(false); }
+  };
 
   const checkExistingKey = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -68,6 +88,16 @@ export default function AiSettingsPage() {
       setLoading(false);
     }
   };
+
+  if (authorized === null) return null;
+
+  if (!authorized) {
+    return (
+      <Container maxWidth="sm" sx={{ py: 8 }}>
+        <Alert severity="info">AI provider settings are not available for your account.</Alert>
+      </Container>
+    );
+  }
 
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>

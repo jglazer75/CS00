@@ -38,6 +38,8 @@ export default function NegotiationSimulator({ task }: NegotiationSimulatorProps
   const [initializing, setInitializing] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [teamRole, setTeamRole] = useState<string | null>(null);
+  const [checkingTeam, setCheckingTeam] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -45,6 +47,27 @@ export default function NegotiationSimulator({ task }: NegotiationSimulatorProps
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [session?.history]);
+
+  // On mount, look up the user's team role for this module
+  useEffect(() => {
+    async function lookupTeamRole() {
+      const supabase = getSupabaseBrowserClient();
+      const { data: { session: authSession } } = await supabase.auth.getSession();
+      if (!authSession) { setCheckingTeam(false); return; }
+
+      const { data } = await supabase
+        .from('team_members')
+        .select('teams!inner(role)')
+        .eq('user_id', authSession.user.id)
+        .eq('teams.module_id', task.moduleId)
+        .maybeSingle();
+
+      const role = (data?.teams as { role?: string } | null)?.role ?? null;
+      setTeamRole(role);
+      setCheckingTeam(false);
+    }
+    lookupTeamRole();
+  }, [task.moduleId]);
 
   const startNegotiation = async (userRole: string) => {
     setInitializing(true);
@@ -149,6 +172,14 @@ export default function NegotiationSimulator({ task }: NegotiationSimulatorProps
   };
 
   if (!session) {
+    if (checkingTeam) {
+      return (
+        <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+          <CircularProgress />
+        </Box>
+      );
+    }
+
     return (
       <Card variant="outlined" sx={{ my: 4, borderLeft: 6, borderLeftColor: 'secondary.main' }}>
         <CardContent>
@@ -161,26 +192,44 @@ export default function NegotiationSimulator({ task }: NegotiationSimulatorProps
 
           {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
-          <Typography variant="subtitle1" gutterBottom sx={{ mt: 3, fontWeight: 600 }}>
-            Choose your role to begin:
-          </Typography>
-          <Stack direction="row" spacing={2} sx={{ mt: 1 }}>
-            <Button 
-              variant="contained" 
-              onClick={() => startNegotiation('NewCo')}
-              disabled={initializing}
-              startIcon={initializing ? <CircularProgress size={20} /> : null}
-            >
-              Represent NewCo
-            </Button>
-            <Button 
-              variant="outlined" 
-              onClick={() => startNegotiation('BigTech')}
-              disabled={initializing}
-            >
-              Represent BigTech
-            </Button>
-          </Stack>
+          {teamRole ? (
+            <>
+              <Alert severity="info" sx={{ mb: 2 }}>
+                You are representing <strong>{teamRole}</strong> based on your team assignment.
+              </Alert>
+              <Button
+                variant="contained"
+                onClick={() => startNegotiation(teamRole)}
+                disabled={initializing}
+                startIcon={initializing ? <CircularProgress size={20} /> : null}
+              >
+                Begin as {teamRole}
+              </Button>
+            </>
+          ) : (
+            <>
+              <Typography variant="subtitle1" gutterBottom sx={{ mt: 3, fontWeight: 600 }}>
+                Choose your role to begin:
+              </Typography>
+              <Stack direction="row" spacing={2} sx={{ mt: 1 }}>
+                <Button
+                  variant="contained"
+                  onClick={() => startNegotiation('NewCo')}
+                  disabled={initializing}
+                  startIcon={initializing ? <CircularProgress size={20} /> : null}
+                >
+                  Represent NewCo
+                </Button>
+                <Button
+                  variant="outlined"
+                  onClick={() => startNegotiation('BigTech')}
+                  disabled={initializing}
+                >
+                  Represent BigTech
+                </Button>
+              </Stack>
+            </>
+          )}
         </CardContent>
       </Card>
     );

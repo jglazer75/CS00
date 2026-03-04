@@ -14,6 +14,7 @@ import {
   Typography,
 } from '@mui/material';
 import DashboardIcon from '@mui/icons-material/Dashboard';
+import PeopleIcon from '@mui/icons-material/People';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest';
 import { useAuth } from '@/app/context/AuthContext';
@@ -23,6 +24,7 @@ import { usePathname } from 'next/navigation';
 
 const ADMIN_LINKS = [
   { text: 'Modules', href: '/admin/modules', icon: <DashboardIcon /> },
+  { text: 'Users', href: '/admin/users', icon: <PeopleIcon /> },
   { text: 'Invite', href: '/admin/invite', icon: <PersonAddIcon /> },
   { text: 'System AI', href: '/settings/ai', icon: <SettingsSuggestIcon /> },
 ];

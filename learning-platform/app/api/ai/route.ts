@@ -59,6 +59,30 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // 1a. Check AI permission (profiles.ai_enabled)
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('ai_enabled, is_instructor')
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    if (!profile?.ai_enabled && !profile?.is_instructor) {
+      return NextResponse.json({ error: 'AI access is not enabled for your account.' }, { status: 403 });
+    }
+
+    // 1b. Rate limiting — max AI_RATE_LIMIT_PER_HOUR requests per user per hour
+    const RATE_LIMIT = parseInt(process.env.AI_RATE_LIMIT_PER_HOUR ?? '25');
+    const oneHourAgo = new Date(Date.now() - 3_600_000).toISOString();
+    const { count } = await supabase
+      .from('ai_task_runs')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', user.id)
+      .gte('created_at', oneHourAgo);
+
+    if ((count ?? 0) >= RATE_LIMIT) {
+      return NextResponse.json({ error: 'Rate limit reached. Please try again later.' }, { status: 429 });
+    }
+
     // 2. Load Task Definition
     let task;
     try {
