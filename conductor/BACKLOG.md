@@ -102,4 +102,41 @@ Students browsing available modules have no way to preview what a module covers 
 
 ---
 
+## Content & Files
+
+### BUG-005 — Source documents: broken page, no upload/storage system, copyright considerations
+**Reported:** 2026-03-05
+
+**Observed:** `/modules/CS01/instructor-sourcedocs/` renders a blank page (the route likely exists as a stub or leftover slug with no content backing it).
+
+**Bigger gap:** There is no defined system for Module Owners to attach supplementary reading materials (PDFs, docs, etc.) to a module and make them available to enrolled students for download or on-site reading.
+
+**What's needed (three layered problems):**
+
+**1. Storage & delivery**
+- Module Owner uploads files (PDF, DOCX, etc.) to a per-module folder in Supabase Storage
+- Students with module access can list and download/view those files
+- Files are scoped to a module — no cross-module leakage
+- Likely route: `/modules/[moduleId]/sourcedocs` renders a file list; clicking opens/downloads the file
+
+**2. Schema**
+- No `module_documents` table (or equivalent Storage bucket structure) exists yet
+- Could be pure Storage (bucket `module-docs/[moduleId]/`) with no DB table, relying on Storage RLS
+- Or a `module_documents` table (id, module_id, file_path, display_name, uploaded_by, created_at) for richer metadata and soft-delete
+
+**3. Copyright / legal (deferred, but plan for it)**
+- Most source documents will be third-party materials (case studies, articles, legal filings) that the Module Owner may not hold copyright on
+- Short-term: upload disclaimer in Module Owner UI — "By uploading, you confirm you have rights to distribute this material to enrolled students"
+- Medium-term: add `terms_acknowledged_at` timestamp on upload to create audit trail
+- Long-term: DMCA takedown request flow (receive complaint → notify uploader → remove file → log action); standard safe-harbor compliance
+
+**Affected (new work):**
+- Supabase Storage bucket + RLS policy (`module-docs` bucket, scoped by module_id)
+- `app/modules/[moduleId]/sourcedocs/page.tsx` — student file browser
+- `app/module-owner/[moduleId]/page.tsx` — upload UI with disclaimer
+- `app/api/module-owner/[moduleId]/documents/route.ts` — signed URL generation + delete
+- Optional: `supabase/migrations/XXXXXX_module_documents.sql`
+
+---
+
 <!-- Add new items below this line -->
