@@ -51,4 +51,33 @@ Module Owners have no way to toggle `modules.is_public` for their own module. Cu
 
 ---
 
+## Content Authoring
+
+### BUG-004 — Page classification taxonomy is undefined and unenforceable
+**Reported:** 2026-03-05
+
+**Context:** The manifest schema has two orthogonal concepts that are currently conflated or underspecified:
+
+| Field | Current values | Purpose |
+|-------|---------------|---------|
+| `type` | `page`, `section`, `ai-interaction` | Structural/rendering type |
+| `layout` | `reader`, `workbench`, `immersive` | Display layout |
+| `metadata.*` | free-form JSON | Catch-all, including any nav badge hints from P6 |
+
+**Problems:**
+1. **No pedagogical classification.** There is no formal field for "what kind of activity is this page?" A `page` node could be a reading, a required written exercise, a group discussion prompt, a quiz, or a non-AI simulation — but the schema treats them identically. `ai-interaction` is the only node type that implies "exercise," and only for AI-driven ones.
+2. **No `required` flag.** There is no standard way to mark a page as required vs. optional. Any such marking currently lives in free-form `metadata`, undocumented and unenforced.
+3. **Nav badges (P6) read from an informal vocabulary.** The badge system introduced in Sprint 2 reads classification from somewhere in `node.metadata` or `node.config`, but there is no schema validation, no documented list of valid values, and no authoring guide telling a Module Owner what strings to write in their YAML.
+4. **Non-AI exercises have no type.** An exercise that involves a written deliverable, a group negotiation without AI, or an in-class activity cannot be distinguished from a plain reading page in the DB or the UI.
+
+**Proposed resolution (design, not code yet):**
+- Add a formal `page_category` (or `badge`) field to `PageNodeSchema` (and optionally `AiInteractionNodeSchema`) with a defined enum: e.g., `reading | exercise | discussion | simulation | reference`
+- Add a boolean `required` field to `BaseNodeSchema`
+- Update nav badges to read from `page_category` (validated at ingest) rather than free-form metadata
+- Document the full taxonomy in `content/AUTHORING.md` for Module Owners
+
+**Affected:** `lib/schema/manifest.ts`, `scripts/ingest.ts`, nav badge component (P6), Module Owner dashboard
+
+---
+
 <!-- Add new items below this line -->
