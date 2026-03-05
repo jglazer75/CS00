@@ -32,4 +32,23 @@ Module Owners have no way to toggle `modules.is_public` for their own module. Cu
 
 ---
 
+## Navigation & Progress
+
+### BUG-003 — Module entry point redirects to a stale/deleted page slug
+**Reported:** 2026-03-05
+**Observed:** Clicking "Start Module" (or equivalent entry point) navigates to `/modules/CS01/tips/`, a slug that no longer exists in the manifest. User must manually edit the URL.
+
+**Root cause:** `user_module_state.last_module_page_id` stores a UUID from the `module_pages` table. When a page is removed from the manifest and re-ingested, the `module_nodes` record is deleted but the `module_pages` row may persist (the ingest script does not clean `module_pages`). The UUID still resolves to a slug via `useModuleProgress`'s `idToSlug` map, and any navigation path that doesn't validate the resolved slug against the current live slug list will follow it blindly into a 404.
+
+`ModuleLandingClient` has a `slugs.includes(lastVisitedSlug)` guard that should catch this, but the bug reproduces — likely via a different entry point (home page "Start Module" link or similar) that uses the stored slug directly.
+
+**Fix options (pick one):**
+1. **Validate everywhere** — any component that reads `lastVisitedSlug` must check it against the current `slugs` prop before navigating; fall back to `slugs[0]` if missing.
+2. **Clean `module_pages` on ingest** — delete `module_pages` rows whose slugs are no longer in the manifest, making stale UUIDs unresolvable at the hook level.
+3. **Both** — belt-and-suspenders.
+
+**Affected:** `app/hooks/useModuleProgress.ts`, `scripts/ingest.ts`, any component that navigates to `lastVisitedSlug` without validation.
+
+---
+
 <!-- Add new items below this line -->
