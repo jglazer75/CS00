@@ -62,13 +62,40 @@ export async function syncModule(manifest: ModuleManifest) {
 
   const supabase = createClient(supabaseUrl, supabaseKey);
 
-  // 1. Upsert the module itself
-  const { error: moduleError } = await supabase.from('modules').upsert({
+  // 1. Resolve owner_user_id from owner_email if present
+  let ownerUserId: string | undefined;
+  if (manifest.owner_email) {
+    const { data: { users: authUsers } } = await supabase.auth.admin.listUsers();
+    const ownerUser = authUsers.find((u) => u.email === manifest.owner_email);
+    if (ownerUser) {
+      ownerUserId = ownerUser.id;
+    } else {
+      console.warn(`  Warning: owner_email ${manifest.owner_email} not found in auth.users — skipping owner_user_id`);
+    }
+  }
+
+  // Build attribution metadata
+  const attributionMetadata: Record<string, unknown> = {};
+  if (manifest.author) attributionMetadata.author = manifest.author;
+  if (manifest.terms_of_use) attributionMetadata.terms_of_use = manifest.terms_of_use;
+  if (manifest.prerequisites) attributionMetadata.prerequisites = manifest.prerequisites;
+  if (manifest.learning_objectives) attributionMetadata.learning_objectives = manifest.learning_objectives;
+
+  // 2. Upsert the module itself
+  const moduleRow: Record<string, unknown> = {
     id: manifest.id,
     title: manifest.title,
     description: manifest.description,
     is_active: true,
-  });
+  };
+  if (Object.keys(attributionMetadata).length > 0) {
+    moduleRow.metadata = attributionMetadata;
+  }
+  if (ownerUserId) {
+    moduleRow.owner_user_id = ownerUserId;
+  }
+
+  const { error: moduleError } = await supabase.from('modules').upsert(moduleRow);
 
   if (moduleError) throw moduleError;
 

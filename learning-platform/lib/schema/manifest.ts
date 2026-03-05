@@ -64,6 +64,12 @@ export const ModuleManifestSchema = z.object({
   description: z.string().optional(),
   roles: z.array(z.string()).optional(),
   navigation: z.array(ModuleNodeSchema),
+  // Attribution fields
+  owner_email: z.string().email().optional(),
+  author: z.string().optional(),
+  terms_of_use: z.string().optional(),
+  prerequisites: z.array(z.string()).optional(),
+  learning_objectives: z.array(z.string()).optional(),
 }).strict();
 
 export type ModuleManifest = z.infer<typeof ModuleManifestSchema>;

@@ -14,6 +14,7 @@ import {
 } from '@mui/material';
 import SettingsIcon from '@mui/icons-material/Settings';
 import GroupsIcon from '@mui/icons-material/Groups';
+import PersonIcon from '@mui/icons-material/Person';
 import Link from 'next/link';
 import { useSupabaseClient } from '@/app/context/SupabaseClientContext';
 
@@ -21,6 +22,8 @@ type ModuleRecord = {
   id: string;
   title: string;
   description: string | null;
+  owner_user_id: string | null;
+  metadata: Record<string, unknown> | null;
 };
 
 export default function AdminModulesPage() {
@@ -35,7 +38,7 @@ export default function AdminModulesPage() {
       setLoading(true);
       const { data, error } = await supabase
         .from('modules')
-        .select('id, title, description')
+        .select('id, title, description, owner_user_id, metadata')
         .order('id');
 
       if (error) {
@@ -81,6 +84,21 @@ export default function AdminModulesPage() {
                 <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
                   {module.description || 'No description provided.'}
                 </Typography>
+                {Boolean((module.metadata as Record<string, unknown>)?.author) && (
+                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.5 }}>
+                    {'Author: ' + String((module.metadata as Record<string, unknown>).author)}
+                  </Typography>
+                )}
+                {Boolean((module.metadata as Record<string, unknown>)?.terms_of_use) && (
+                  <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 0.25, fontStyle: 'italic' }}>
+                    {'Terms: ' + String((module.metadata as Record<string, unknown>).terms_of_use).slice(0, 80) + (String((module.metadata as Record<string, unknown>).terms_of_use).length > 80 ? '…' : '')}
+                  </Typography>
+                )}
+                {module.owner_user_id && (
+                  <Typography variant="caption" color="primary" sx={{ display: 'block', mt: 0.5 }}>
+                    Owner set
+                  </Typography>
+                )}
               </CardContent>
               <CardActions>
                 <Button
@@ -98,6 +116,14 @@ export default function AdminModulesPage() {
                   startIcon={<GroupsIcon />}
                 >
                   Teams
+                </Button>
+                <Button
+                  size="small"
+                  component={Link}
+                  href={`/module-owner/${module.id}`}
+                  startIcon={<PersonIcon />}
+                >
+                  Owner View
                 </Button>
               </CardActions>
             </Card>

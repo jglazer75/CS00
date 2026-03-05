@@ -5,9 +5,18 @@ import {
   Alert,
   Box,
   Button,
+  Chip,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Divider,
+  FormControl,
+  InputLabel,
+  MenuItem,
   Paper,
+  Select,
   Switch,
   Table,
   TableBody,
@@ -18,6 +27,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material';
+import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import { useSupabaseClient } from '@/app/context/SupabaseClientContext';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 
@@ -29,9 +39,28 @@ type UserRow = {
   is_instructor: boolean;
 };
 
+type ModuleRecord = {
+  id: string;
+  title: string;
+};
+
+type UserRoles = {
+  instructorModules: string[];
+  enrolledModules: string[];
+};
+
+type ManageState = {
+  user: UserRow;
+  roles: UserRoles;
+  selectedModuleId: string;
+  busy: string | null;
+  message: string | null;
+};
+
 export default function AdminUsersPage() {
   const supabase = useSupabaseClient();
   const [users, setUsers] = useState<UserRow[]>([]);
+  const [modules, setModules] = useState<ModuleRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState<string | null>(null);
@@ -41,15 +70,14 @@ export default function AdminUsersPage() {
   const [bulkInviting, setBulkInviting] = useState(false);
   const [bulkResult, setBulkResult] = useState<{ sent: string[]; failed: string[] } | null>(null);
 
+  // Manage dialog state
+  const [manageState, setManageState] = useState<ManageState | null>(null);
+
   const fetchUsers = useCallback(async () => {
     if (!supabase) return;
     setLoading(true);
     setError(null);
 
-    // Fetch auth users via service-role (admin API not available client-side;
-    // we read from profiles joined to auth.users via the admin API route instead).
-    // For now, query profiles only — email comes from auth.users which is server-side only.
-    // We'll use the admin route that exposes user list.
     const { data, error: fetchError } = await supabase
       .from('profiles')
       .select('user_id, ai_enabled, is_instructor, created_at');
@@ -60,7 +88,6 @@ export default function AdminUsersPage() {
       return;
     }
 
-    // Fetch emails from admin API (requires auth token)
     const { data: { session } } = await getSupabaseBrowserClient().auth.getSession();
     const res = await fetch('/api/admin/users', {
       headers: session ? { Authorization: `Bearer ${session.access_token}` } : {},
@@ -85,9 +112,16 @@ export default function AdminUsersPage() {
     setLoading(false);
   }, [supabase]);
 
+  const fetchModules = useCallback(async () => {
+    if (!supabase) return;
+    const { data } = await supabase.from('modules').select('id, title').order('id');
+    setModules(data ?? []);
+  }, [supabase]);
+
   useEffect(() => {
     fetchUsers();
-  }, [fetchUsers]);
+    fetchModules();
+  }, [fetchUsers, fetchModules]);
 
   const updateProfile = async (userId: string, field: 'ai_enabled' | 'is_instructor', value: boolean) => {
     if (!supabase) return;
@@ -152,6 +186,108 @@ export default function AdminUsersPage() {
     if (sent.length > 0) setBulkEmails('');
     setBulkInviting(false);
     if (sent.length > 0) fetchUsers();
+  };
+
+  const openManage = async (user: UserRow) => {
+    if (!supabase) return;
+
+    const [{ data: instructorRows }, { data: enrollmentRows }] = await Promise.all([
+      supabase.from('module_instructors').select('module_id').eq('user_id', user.id),
+      supabase.from('module_enrollments').select('module_id').eq('user_id', user.id),
+    ]);
+
+    const roles: UserRoles = {
+      instructorModules: (instructorRows ?? []).map((r) => r.module_id),
+      enrolledModules: (enrollmentRows ?? []).map((r) => r.module_id),
+    };
+
+    setManageState({
+      user,
+      roles,
+      selectedModuleId: modules[0]?.id ?? '',
+      busy: null,
+      message: null,
+    });
+  };
+
+  const closeManage = () => setManageState(null);
+
+  const manageAction = async (
+    action: 'assign-instructor' | 'remove-instructor' | 'enroll' | 'unenroll' | 'reset-progress'
+  ) => {
+    if (!manageState) return;
+    const { data: { session } } = await getSupabaseBrowserClient().auth.getSession();
+    if (!session) return;
+
+    const { user, selectedModuleId } = manageState;
+    setManageState((s) => s ? { ...s, busy: action, message: null } : s);
+
+    let res: Response;
+
+    if (action === 'reset-progress') {
+      const confirmReset = window.confirm(
+        `Reset all progress for ${user.email} in module ${selectedModuleId}? This cannot be undone.`
+      );
+      if (!confirmReset) {
+        setManageState((s) => s ? { ...s, busy: null } : s);
+        return;
+      }
+      res = await fetch('/api/admin/progress/reset', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
+        body: JSON.stringify({ userId: user.id, moduleId: selectedModuleId }),
+      });
+    } else if (action === 'assign-instructor') {
+      res = await fetch('/api/admin/module-instructors', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
+        body: JSON.stringify({ moduleId: selectedModuleId, userId: user.id }),
+      });
+    } else if (action === 'remove-instructor') {
+      res = await fetch('/api/admin/module-instructors', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
+        body: JSON.stringify({ moduleId: selectedModuleId, userId: user.id }),
+      });
+    } else if (action === 'enroll') {
+      res = await fetch('/api/admin/enrollments', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
+        body: JSON.stringify({ moduleId: selectedModuleId, userId: user.id }),
+      });
+    } else {
+      // unenroll
+      res = await fetch('/api/admin/enrollments', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
+        body: JSON.stringify({ moduleId: selectedModuleId, userId: user.id }),
+      });
+    }
+
+    const json = await res.json();
+    if (!res.ok) {
+      setManageState((s) => s ? { ...s, busy: null, message: `Error: ${json.error}` } : s);
+      return;
+    }
+
+    // Refresh roles after successful action
+    if (!supabase) return;
+    const [{ data: instructorRows }, { data: enrollmentRows }] = await Promise.all([
+      supabase.from('module_instructors').select('module_id').eq('user_id', user.id),
+      supabase.from('module_enrollments').select('module_id').eq('user_id', user.id),
+    ]);
+
+    const updatedRoles: UserRoles = {
+      instructorModules: (instructorRows ?? []).map((r) => r.module_id),
+      enrolledModules: (enrollmentRows ?? []).map((r) => r.module_id),
+    };
+
+    setManageState((s) => s ? {
+      ...s,
+      roles: updatedRoles,
+      busy: null,
+      message: 'Done.',
+    } : s);
   };
 
   if (loading) {
@@ -223,7 +359,8 @@ export default function AdminUsersPage() {
               <TableCell>Email</TableCell>
               <TableCell>Joined</TableCell>
               <TableCell align="center">AI Enabled</TableCell>
-              <TableCell align="center">Instructor</TableCell>
+              <TableCell align="center">Global Instructor</TableCell>
+              <TableCell align="center">Manage</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -247,11 +384,21 @@ export default function AdminUsersPage() {
                     onChange={(e) => updateProfile(user.id, 'is_instructor', e.target.checked)}
                   />
                 </TableCell>
+                <TableCell align="center">
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    startIcon={<ManageAccountsIcon />}
+                    onClick={() => openManage(user)}
+                  >
+                    Manage
+                  </Button>
+                </TableCell>
               </TableRow>
             ))}
             {users.length === 0 && (
               <TableRow>
-                <TableCell colSpan={4} align="center" sx={{ color: 'text.secondary', py: 4 }}>
+                <TableCell colSpan={5} align="center" sx={{ color: 'text.secondary', py: 4 }}>
                   No users found.
                 </TableCell>
               </TableRow>
@@ -259,6 +406,107 @@ export default function AdminUsersPage() {
           </TableBody>
         </Table>
       </TableContainer>
+
+      {/* Manage Dialog */}
+      {manageState && (
+        <Dialog open onClose={closeManage} maxWidth="sm" fullWidth>
+          <DialogTitle>
+            Manage: <Typography component="span" sx={{ fontFamily: 'monospace', fontSize: '0.9em' }}>
+              {manageState.user.email}
+            </Typography>
+          </DialogTitle>
+          <DialogContent dividers>
+            {manageState.message && (
+              <Alert severity="info" sx={{ mb: 2 }}>{manageState.message}</Alert>
+            )}
+
+            {/* Current roles summary */}
+            <Typography variant="subtitle2" sx={{ mb: 1 }}>Current Module Roles</Typography>
+            <Box sx={{ mb: 2 }}>
+              {manageState.roles.instructorModules.length === 0 && manageState.roles.enrolledModules.length === 0 ? (
+                <Typography variant="body2" color="text.secondary">No module assignments.</Typography>
+              ) : (
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75 }}>
+                  {manageState.roles.instructorModules.map((m) => (
+                    <Chip key={`i-${m}`} label={`${m} (Instructor)`} size="small" color="primary" />
+                  ))}
+                  {manageState.roles.enrolledModules.map((m) => (
+                    <Chip key={`e-${m}`} label={`${m} (Enrolled)`} size="small" variant="outlined" />
+                  ))}
+                </Box>
+              )}
+            </Box>
+
+            <Divider sx={{ mb: 2 }} />
+
+            {/* Module selector */}
+            <FormControl fullWidth size="small" sx={{ mb: 2 }}>
+              <InputLabel>Module</InputLabel>
+              <Select
+                value={manageState.selectedModuleId}
+                label="Module"
+                onChange={(e) => setManageState((s) => s ? { ...s, selectedModuleId: e.target.value, message: null } : s)}
+              >
+                {modules.map((m) => (
+                  <MenuItem key={m.id} value={m.id}>{m.id} — {m.title}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+
+            {/* Action buttons */}
+            <Box sx={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1 }}>
+              <Button
+                variant="contained"
+                size="small"
+                disabled={!!manageState.busy}
+                onClick={() => manageAction('assign-instructor')}
+              >
+                {manageState.busy === 'assign-instructor' ? <CircularProgress size={16} /> : 'Assign as Instructor'}
+              </Button>
+              <Button
+                variant="outlined"
+                size="small"
+                color="warning"
+                disabled={!!manageState.busy}
+                onClick={() => manageAction('remove-instructor')}
+              >
+                {manageState.busy === 'remove-instructor' ? <CircularProgress size={16} /> : 'Remove Instructor'}
+              </Button>
+              <Button
+                variant="contained"
+                size="small"
+                color="success"
+                disabled={!!manageState.busy}
+                onClick={() => manageAction('enroll')}
+              >
+                {manageState.busy === 'enroll' ? <CircularProgress size={16} /> : 'Enroll'}
+              </Button>
+              <Button
+                variant="outlined"
+                size="small"
+                color="warning"
+                disabled={!!manageState.busy}
+                onClick={() => manageAction('unenroll')}
+              >
+                {manageState.busy === 'unenroll' ? <CircularProgress size={16} /> : 'Unenroll'}
+              </Button>
+              <Button
+                variant="outlined"
+                size="small"
+                color="error"
+                disabled={!!manageState.busy}
+                onClick={() => manageAction('reset-progress')}
+                sx={{ gridColumn: '1 / -1' }}
+              >
+                {manageState.busy === 'reset-progress' ? <CircularProgress size={16} /> : 'Reset Progress'}
+              </Button>
+            </Box>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={closeManage}>Close</Button>
+          </DialogActions>
+        </Dialog>
+      )}
     </Box>
   );
 }

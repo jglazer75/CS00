@@ -1,5 +1,5 @@
 'use client';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useMemo } from 'react';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
@@ -12,12 +12,42 @@ import Link from 'next/link';
 import { useInstructorMode } from '../context/InstructorModeContext';
 import { useAuth } from '../context/AuthContext';
 import { getAdminEmails, isAdminEmail } from '@/lib/auth';
+import { useSupabaseClient } from '../context/SupabaseClientContext';
 
 const PUBLIC_ADMIN_EMAILS = getAdminEmails('public');
 
 export default function Header() {
   const { isInstructorMode, setIsInstructorMode } = useInstructorMode();
   const { user, loading, signOut } = useAuth();
+  const supabase = useSupabaseClient();
+  const [instructorModuleId, setInstructorModuleId] = useState(null);
+
+  useEffect(() => {
+    if (!user || !supabase) { setInstructorModuleId(null); return; }
+    if (isAdminEmail(user.email, 'public')) { setInstructorModuleId(null); return; }
+
+    supabase
+      .from('module_instructors')
+      .select('module_id')
+      .eq('user_id', user.id)
+      .limit(1)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data) {
+          setInstructorModuleId(data.module_id);
+        } else {
+          // Fall back to global is_instructor flag
+          supabase
+            .from('profiles')
+            .select('is_instructor')
+            .eq('user_id', user.id)
+            .maybeSingle()
+            .then(({ data: profile }) => {
+              setInstructorModuleId(profile?.is_instructor ? '__global__' : null);
+            });
+        }
+      });
+  }, [user, supabase]);
 
   const handleToggle = (event) => {
     setIsInstructorMode(event.target.checked);
@@ -69,6 +99,17 @@ export default function Header() {
             sx={{ mr: { xs: 0, sm: 1 } }}
           >
             Admin
+          </Button>
+        )}
+        {!loading && user && instructorModuleId && !isAdminEmail(user.email ?? '', 'public') && (
+          <Button
+            component={Link}
+            href={instructorModuleId === '__global__' ? '/instructor' : `/instructor/${instructorModuleId}`}
+            variant="outlined"
+            color="inherit"
+            sx={{ mr: { xs: 0, sm: 1 } }}
+          >
+            Instructor
           </Button>
         )}
         {!loading && (
