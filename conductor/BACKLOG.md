@@ -80,4 +80,26 @@ Module Owners have no way to toggle `modules.is_public` for their own module. Cu
 
 ---
 
+## Student Experience
+
+### FEATURE-001 — Module summary popover on the "Available Modules" selection screen
+**Reported:** 2026-03-05
+
+Students browsing available modules have no way to preview what a module covers before entering it. The module card shows only a title and short description.
+
+**Requested:** An info/expand action on each module card (e.g., an icon button) that reveals a summary panel containing:
+- Learning objectives (`modules.metadata.learning_objectives`)
+- Key concepts / topics (new field — `modules.metadata.key_concepts`? or derived from manifest sections)
+- Prerequisites (`modules.metadata.prerequisites`)
+- Author / terms of use if set
+
+**Notes:**
+- All data is already in `modules.metadata` for modules that have been ingested with Sprint 3 attribution fields; the gap is the UI surface and the `key_concepts` field (not yet in schema or ingest)
+- The popover/drawer should be read-only for students; Module Owners editing this content is covered by BUG-001/BUG-004 work
+- Consider whether this also appears on the module orientation landing page (`ModuleLandingClient`) or only on the selection screen
+
+**Affected:** module listing/home page (wherever "Available Modules" cards render), `lib/schema/manifest.ts` (add `key_concepts`), `scripts/ingest.ts`
+
+---
+
 <!-- Add new items below this line -->
