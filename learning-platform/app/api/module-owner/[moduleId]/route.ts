@@ -7,8 +7,8 @@ const PatchSchema = z.object({
   metadata: z.record(z.string(), z.unknown()),
 });
 
-export async function PATCH(req: Request, { params }: { params: { moduleId: string } }) {
-  const { moduleId } = params;
+export async function PATCH(req: Request, { params }: { params: Promise<{ moduleId: string }> }) {
+  const { moduleId } = await params;
   const supabase = getSupabaseServerClient();
   if (!supabase) {
     return NextResponse.json({ error: 'Server unavailable' }, { status: 500 });

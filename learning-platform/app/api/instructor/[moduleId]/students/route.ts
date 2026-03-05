@@ -2,8 +2,8 @@ import { NextResponse } from 'next/server';
 import { getSupabaseServerClient } from '@/lib/supabase/server';
 import { isAdminEmail } from '@/lib/auth';
 
-export async function GET(req: Request, { params }: { params: { moduleId: string } }) {
-  const { moduleId } = params;
+export async function GET(req: Request, { params }: { params: Promise<{ moduleId: string }> }) {
+  const { moduleId } = await params;
   const supabase = getSupabaseServerClient();
   if (!supabase) {
     return NextResponse.json({ error: 'Server unavailable' }, { status: 500 });
