@@ -57,11 +57,11 @@ export default function ThemeShowcase() {
           <Paper elevation={4} square sx={{ position: 'sticky', top: 0, zIndex: 1100, py: 2, borderBottom: '1px solid', borderColor: 'divider' }}>
             <Container maxWidth="xl">
               <Grid container alignItems="center" spacing={2}>
-                <Grid item xs={12} md={4}>
+                <Grid size={{ xs: 12, md: 4 }}>
                   <Typography variant="h4" component="h1" color="primary.main" sx={{fontWeight: 700}}>CS00 UI Lab</Typography>
                   <Typography variant="body2" color="text.secondary">Senior Design Pitch Showcase</Typography>
                 </Grid>
-                <Grid item xs={12} md={8} sx={{ textAlign: { md: 'right' } }}>
+                <Grid size={{ xs: 12, md: 8 }} sx={{ textAlign: { md: 'right' } }}>
                   <Stack direction={{xs: 'column', sm: 'row'}} spacing={2} alignItems="center" justifyContent={{md: 'flex-end'}}>
                     <Box>
                         <Typography variant="subtitle2" color="text.primary">{name}</Typography>
@@ -104,7 +104,7 @@ export default function ThemeShowcase() {
 
             <Grid container spacing={4}>
                 {/* Main Content Side */}
-                <Grid item xs={12} md={8}>
+                <Grid size={{ xs: 12, md: 8 }}>
                     
                     {/* 3. MetadataCard */}
                     <Typography variant="caption" color="text.secondary" display="block" gutterBottom>3. MetadataCard</Typography>
@@ -143,12 +143,12 @@ export default function ThemeShowcase() {
                     <Typography variant="h5" gutterBottom sx={{mb: 3, fontWeight: 700}}>Atoms & Independent Components</Typography>
                     <Grid container spacing={3} alignItems="center">
                         {/* 6. ProgressRing */}
-                        <Grid item xs={6} sm={3} sx={{textAlign: 'center'}}>
+                        <Grid size={{ xs: 6, sm: 3 }} sx={{textAlign: 'center'}}>
                             <Typography variant="caption" color="text.secondary" display="block" gutterBottom>6. ProgressRing</Typography>
                             <C.ProgressRing percent={75} label="Phase 1" />
                         </Grid>
                         {/* 7. RoleBadge */}
-                        <Grid item xs={6} sm={9}>
+                        <Grid size={{ xs: 6, sm: 9 }}>
                             <Typography variant="caption" color="text.secondary" display="block" gutterBottom>7. RoleBadge</Typography>
                             <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
                                 <C.RoleBadge role="student" />
@@ -164,7 +164,7 @@ export default function ThemeShowcase() {
                     {/* 1. ModuleCard Collection */}
                     <Typography variant="caption" color="text.secondary" display="block" gutterBottom>1. ModuleCard (Selection Grid)</Typography>
                     <Grid container spacing={3} sx={{mt: 1}}>
-                        <Grid item xs={12} sm={6}>
+                        <Grid size={{ xs: 12, sm: 6 }}>
                             <C.ModuleCard 
                                 title="Rural Entity Selection"
                                 description="Choosing between LLC, S-Corp, and General Partnerships for agritourism ventures."
@@ -175,7 +175,7 @@ export default function ThemeShowcase() {
                                 onClick={() => alert('Clicked')}
                             />
                         </Grid>
-                        <Grid item xs={12} sm={6}>
+                        <Grid size={{ xs: 12, sm: 6 }}>
                             <C.ModuleCard 
                                 title="Water Rights & Contracts"
                                 description="Analyzing irrigation agreements and DNR permits for high-capacity wells."
@@ -191,7 +191,7 @@ export default function ThemeShowcase() {
                 </Grid>
 
                 {/* Sidebar Side */}
-                <Grid item xs={12} md={4}>
+                <Grid size={{ xs: 12, md: 4 }}>
                     {/* 5. TableOfContents */}
                     <Typography variant="caption" color="text.secondary" display="block" gutterBottom>5. TableOfContents</Typography>
                     <Paper elevation={selectedTheme === 'A' ? 0 : 1} sx={{p: selectedTheme === 'C' ? 0 : 2, bgcolor: selectedTheme === 'C' ? 'transparent' : 'background.paper', border: selectedTheme === 'C' ? 'none' : '1px solid', borderColor: 'divider'}}>

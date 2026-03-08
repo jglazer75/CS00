@@ -38,7 +38,7 @@ export const ModuleLandingHero: React.FC<ModuleLandingHeroProps> = ({
 
       <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 1 }}>
         <Grid container spacing={6} alignItems="center">
-          <Grid item xs={12} md={8}>
+          <Grid size={{ xs: 12, md: 8 }}>
             <Stack direction="row" spacing={1} alignItems="center" mb={2}>
               <RocketLaunchIcon color="secondary" fontSize="small" />
               <Typography variant="subtitle1" sx={{ fontWeight: 600, color: theme.palette.secondary.main }}>
@@ -72,7 +72,7 @@ export const ModuleLandingHero: React.FC<ModuleLandingHeroProps> = ({
             </Stack>
           </Grid>
 
-          <Grid item xs={12} md={4}>
+          <Grid size={{ xs: 12, md: 4 }}>
             <Box sx={{ 
                 p: 4, 
                 bgcolor: neutralGrey, 

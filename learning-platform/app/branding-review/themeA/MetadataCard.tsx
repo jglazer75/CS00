@@ -38,13 +38,13 @@ export const MetadataCard: React.FC<MetadataCardProps> = ({ learningObjectives, 
   
   const content = (
     <Grid container spacing={4} sx={{ p: 1 }}>
-      <Grid item xs={12} md={4}>
+      <Grid size={{ xs: 12, md: 4 }}>
         <MetadataList title="Learning Objectives" items={learningObjectives} Icon={TargetIcon} />
       </Grid>
-      <Grid item xs={12} md={4}>
+      <Grid size={{ xs: 12, md: 4 }}>
         <MetadataList title="Core Concepts" items={coreConcepts} Icon={PsychologyIcon} />
       </Grid>
-      <Grid item xs={12} md={4}>
+      <Grid size={{ xs: 12, md: 4 }}>
         <MetadataList title="Keywords" items={keywords} Icon={TagIcon} />
       </Grid>
     </Grid>

@@ -29,7 +29,7 @@ export const ModuleLandingHero: React.FC<ModuleLandingHeroProps> = ({
     }}>
       <Container maxWidth="lg">
         <Grid container spacing={6} alignItems="center">
-          <Grid item xs={12} md={7}>
+          <Grid size={{ xs: 12, md: 7 }}>
             <Typography variant="subtitle1" gutterBottom sx={{ color: theme.palette.secondary.main, textTransform: 'uppercase', letterSpacing: 2 }}>
               Legal Case Study CS00
             </Typography>
@@ -58,7 +58,7 @@ export const ModuleLandingHero: React.FC<ModuleLandingHeroProps> = ({
             </Stack>
           </Grid>
 
-          <Grid item xs={12} md={5}>
+          <Grid size={{ xs: 12, md: 5 }}>
             <Card sx={{ bgcolor: alpha('#fff', 0.03), border: '1px solid', borderColor: alpha('#fff', 0.1), color: 'white', borderRadius: theme.shape.borderRadius }}>
               <CardContent sx={{ p: 4 }}>
                 <Typography variant="h6" gutterBottom sx={{ display: 'flex', alignItems: 'center', fontWeight: 700, color: theme.palette.secondary.main }}>

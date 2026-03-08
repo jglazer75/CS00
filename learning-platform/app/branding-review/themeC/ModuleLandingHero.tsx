@@ -31,7 +31,7 @@ export const ModuleLandingHero: React.FC<ModuleLandingHeroProps> = ({
     }}>
       <Container maxWidth="lg">
         <Grid container spacing={0}>
-          <Grid item xs={12} md={8} sx={{ p: { xs: 3, md: 6 }, border: `1px solid ${alpha('#fff', 0.2)}` }}>
+          <Grid size={{ xs: 12, md: 8 }} sx={{ p: { xs: 3, md: 6 }, border: `1px solid ${alpha('#fff', 0.2)}` }}>
             <Typography variant="subtitle1" gutterBottom sx={{ color: theme.palette.secondary.main, textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.2em', fontFamily: '"Montserrat", sans-serif' }}>
               Case Study Structure // CS00
             </Typography>
@@ -58,7 +58,7 @@ export const ModuleLandingHero: React.FC<ModuleLandingHeroProps> = ({
             </Stack>
           </Grid>
 
-          <Grid item xs={12} md={4} sx={{ p: { xs: 4, md: 6 }, border: `1px solid ${alpha('#fff', 0.2)}`, borderLeft: {md: 'none'}, borderTop: {xs: 'none', md: `1px solid ${alpha('#fff', 0.2)}`}, bgcolor: alpha('#000', 0.2) }}>
+          <Grid size={{ xs: 12, md: 4 }} sx={{ p: { xs: 4, md: 6 }, border: `1px solid ${alpha('#fff', 0.2)}`, borderLeft: {md: 'none'}, borderTop: {xs: 'none', md: `1px solid ${alpha('#fff', 0.2)}`}, bgcolor: alpha('#000', 0.2) }}>
             <Typography variant="h6" gutterBottom sx={{ color: 'white', fontFamily: '"Montserrat", sans-serif', textTransform: 'uppercase', letterSpacing: '0.1em', mb: 4 }}>
               System Objectives
             </Typography>

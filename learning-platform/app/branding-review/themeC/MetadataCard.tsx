@@ -41,13 +41,13 @@ export const MetadataCard: React.FC<MetadataCardProps> = ({ learningObjectives, 
   
   const content = (
     <Grid container spacing={0}>
-        <Grid item xs={12} md={4} sx={{ border: `1px solid ${theme.palette.divider}`, m: '-1px' }}>
+        <Grid size={{ xs: 12, md: 4 }} sx={{ border: `1px solid ${theme.palette.divider}`, m: '-1px' }}>
             <BlueprintSection title="Objectives" items={learningObjectives} Icon={ChangeHistoryIcon} />
         </Grid>
-        <Grid item xs={12} md={4} sx={{ border: `1px solid ${theme.palette.divider}`, m: '-1px' }}>
+        <Grid size={{ xs: 12, md: 4 }} sx={{ border: `1px solid ${theme.palette.divider}`, m: '-1px' }}>
             <BlueprintSection title="Concepts" items={coreConcepts} Icon={StopIcon} />
         </Grid>
-        <Grid item xs={12} md={4} sx={{ border: `1px solid ${theme.palette.divider}`, m: '-1px' }}>
+        <Grid size={{ xs: 12, md: 4 }} sx={{ border: `1px solid ${theme.palette.divider}`, m: '-1px' }}>
             <BlueprintSection title="Lexicon" items={keywords} Icon={HorizontalRuleIcon} />
         </Grid>
     </Grid>
