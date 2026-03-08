@@ -1,98 +1,124 @@
 'use client';
 
 import {
-  Card,
-  CardContent,
-  CardHeader,
-  Chip,
-  Divider,
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Box,
+  Grid,
+  Paper,
   Stack,
   Typography,
+  alpha,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
+import ChangeHistoryIcon from '@mui/icons-material/ChangeHistory';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import HorizontalRuleIcon from '@mui/icons-material/HorizontalRule';
+import StopIcon from '@mui/icons-material/Stop';
 import type { Keyword, PageMetadata } from '@/lib/content';
 
 type MetadataCardProps = {
   metadata: PageMetadata;
 };
 
-export default function MetadataCard({ metadata }: MetadataCardProps) {
-  const { learningObjectives, coreConcepts, keywords, description } = metadata;
-
+function BlueprintSection({ title, items, Icon }: { title: string; items: string[]; Icon: React.ElementType }) {
+  const theme = useTheme();
   return (
-    <Card component="section" sx={{ mb: 3 }}>
-      <CardHeader
-        title="Learning Overview"
-        subheader={description}
-        titleTypographyProps={{ variant: 'h3', component: 'h2' }}
-      />
-      <CardContent>
-        <Stack spacing={3}>
-          {learningObjectives.length > 0 && (
-            <MetadataList title="Learning Objectives" items={learningObjectives} />
-          )}
-          {coreConcepts.length > 0 && <MetadataList title="Core Concepts" items={coreConcepts} />}
-          {keywords.length > 0 && <KeywordList keywords={keywords} />}
-        </Stack>
-      </CardContent>
-    </Card>
-  );
-}
-
-type MetadataListProps = {
-  title: string;
-  items: string[];
-};
-
-function MetadataList({ title, items }: MetadataListProps) {
-  return (
-    <Stack spacing={1.5}>
-      <Typography variant="subtitle1" component="h3" sx={{ fontWeight: 600 }}>
-        {title}
-      </Typography>
-      <Stack component="ul" spacing={1} sx={{ listStyle: 'disc', pl: 3, m: 0 }}>
-        {items.map((item, index) => (
-          <Typography key={index} component="li" variant="body1" sx={{ lineHeight: 1.6 }}>
-            {item}
-          </Typography>
-        ))}
+    <Box sx={{ p: 3, height: '100%' }}>
+      <Stack direction="row" spacing={1.5} alignItems="center" mb={3}>
+        <Icon sx={{ color: theme.palette.secondary.main, fontSize: 20 }} />
+        <Typography variant="h6" sx={{ color: theme.palette.primary.main, textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: '0.9rem' }}>
+          {title}
+        </Typography>
       </Stack>
-    </Stack>
-  );
-}
-
-type KeywordListProps = {
-  keywords: Keyword[];
-};
-
-function KeywordList({ keywords }: KeywordListProps) {
-  return (
-    <Stack spacing={1.5}>
-      <Typography variant="subtitle1" component="h3" sx={{ fontWeight: 600 }}>
-        Key Terms
-      </Typography>
       <Stack spacing={1.5}>
-        {keywords.map((keyword) => (
-          <Stack
-            key={keyword.term}
-            direction={{ xs: 'column', sm: 'row' }}
-            spacing={1}
-            divider={<Divider orientation="vertical" flexItem sx={{ display: { xs: 'none', sm: 'block' } }} />}
-            alignItems={{ xs: 'flex-start', sm: 'center' }}
-          >
-            <Chip
-              label={keyword.term}
-              color="primary"
-              variant="outlined"
-              sx={{ fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}
-            />
-            {keyword.definition && (
-              <Typography variant="body2" color="text.secondary">
-                {keyword.definition}
-              </Typography>
-            )}
-          </Stack>
+        {items.map((item, i) => (
+          <Box key={i} display="flex" alignItems="flex-start">
+            <HorizontalRuleIcon sx={{ color: alpha(theme.palette.text.secondary, 0.3), mr: 1.5, mt: '2px', fontSize: 16, flexShrink: 0 }} />
+            <Typography variant="body2" color="text.secondary">{item}</Typography>
+          </Box>
         ))}
       </Stack>
-    </Stack>
+    </Box>
+  );
+}
+
+function KeywordSection({ keywords }: { keywords: Keyword[] }) {
+  const theme = useTheme();
+  return (
+    <Box sx={{ p: 3, height: '100%' }}>
+      <Stack direction="row" spacing={1.5} alignItems="center" mb={3}>
+        <HorizontalRuleIcon sx={{ color: theme.palette.secondary.main, fontSize: 20 }} />
+        <Typography variant="h6" sx={{ color: theme.palette.primary.main, textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: '0.9rem' }}>
+          Lexicon
+        </Typography>
+      </Stack>
+      <Stack spacing={2}>
+        {keywords.map((kw) => (
+          <Box key={kw.term}>
+            <Box display="flex" alignItems="flex-start">
+              <HorizontalRuleIcon sx={{ color: alpha(theme.palette.text.secondary, 0.3), mr: 1.5, mt: '2px', fontSize: 16, flexShrink: 0 }} />
+              <Box>
+                <Typography variant="body2" sx={{ fontWeight: 700, color: theme.palette.primary.main }}>
+                  {kw.term}
+                </Typography>
+                {kw.definition && (
+                  <Typography variant="body2" color="text.secondary" sx={{ mt: 0.25 }}>
+                    {kw.definition}
+                  </Typography>
+                )}
+              </Box>
+            </Box>
+          </Box>
+        ))}
+      </Stack>
+    </Box>
+  );
+}
+
+export default function MetadataCard({ metadata }: MetadataCardProps) {
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const { learningObjectives, coreConcepts, keywords } = metadata;
+
+  const content = (
+    <Grid container spacing={0}>
+      {learningObjectives.length > 0 && (
+        <Grid size={{ xs: 12, md: 4 }} sx={{ border: `1px solid ${theme.palette.divider}`, m: '-1px' }}>
+          <BlueprintSection title="Objectives" items={learningObjectives} Icon={ChangeHistoryIcon} />
+        </Grid>
+      )}
+      {coreConcepts.length > 0 && (
+        <Grid size={{ xs: 12, md: 4 }} sx={{ border: `1px solid ${theme.palette.divider}`, m: '-1px' }}>
+          <BlueprintSection title="Concepts" items={coreConcepts} Icon={StopIcon} />
+        </Grid>
+      )}
+      {keywords.length > 0 && (
+        <Grid size={{ xs: 12, md: 4 }} sx={{ border: `1px solid ${theme.palette.divider}`, m: '-1px' }}>
+          <KeywordSection keywords={keywords} />
+        </Grid>
+      )}
+    </Grid>
+  );
+
+  if (isMobile) {
+    return (
+      <Accordion elevation={0} sx={{ border: `2px solid ${theme.palette.primary.main}`, mb: 4, bgcolor: 'background.paper', borderRadius: 0 }}>
+        <AccordionSummary expandIcon={<ExpandMoreIcon sx={{ color: 'primary.main' }} />} sx={{ px: 3 }}>
+          <Typography variant="h6" color="primary.main" sx={{ textTransform: 'uppercase', letterSpacing: '0.1em' }}>
+            Lesson Schema
+          </Typography>
+        </AccordionSummary>
+        <AccordionDetails sx={{ p: 0 }}>{content}</AccordionDetails>
+      </Accordion>
+    );
+  }
+
+  return (
+    <Paper elevation={0} sx={{ my: 6, bgcolor: 'background.paper', p: 1, border: `1px solid ${theme.palette.divider}`, borderRadius: 0 }}>
+      {content}
+    </Paper>
   );
 }

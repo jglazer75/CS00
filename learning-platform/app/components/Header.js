@@ -36,7 +36,6 @@ export default function Header() {
         if (data) {
           setInstructorModuleId(data.module_id);
         } else {
-          // Fall back to global is_instructor flag
           supabase
             .from('profiles')
             .select('is_instructor')
@@ -54,13 +53,9 @@ export default function Header() {
   };
 
   const userInitials = useMemo(() => {
-    if (!user?.email) {
-      return '';
-    }
+    if (!user?.email) return '';
     const [namePart] = user.email.split('@');
-    if (!namePart) {
-      return '';
-    }
+    if (!namePart) return '';
     return namePart
       .split(/[._-]/)
       .filter(Boolean)
@@ -74,72 +69,55 @@ export default function Header() {
   };
 
   return (
-    <AppBar position="static">
+    <AppBar position="static" elevation={0} sx={{ borderBottom: '2px solid', borderColor: 'secondary.main' }}>
       <Toolbar sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+        <Typography variant="h6" component="div" sx={{ flexGrow: 1, fontWeight: 700, letterSpacing: '0.05em' }}>
           <Link href="/" passHref style={{ textDecoration: 'none', color: 'inherit' }}>
             Wisconsin Rural Entrepreneurship Legal Hub
           </Link>
         </Typography>
-        <Button
-          component={Link}
-          href="/docs/components"
-          variant="outlined"
-          color="inherit"
-          sx={{ mr: { xs: 0, sm: 1 } }}
-        >
+
+        <Button component={Link} href="/docs/components" variant="outlined" color="inherit" size="small">
           Docs
         </Button>
+
         {!loading && user?.email && PUBLIC_ADMIN_EMAILS.length > 0 && isAdminEmail(user.email, 'public') && (
-          <Button
-            component={Link}
-            href="/admin/modules"
-            variant="outlined"
-            color="inherit"
-            sx={{ mr: { xs: 0, sm: 1 } }}
-          >
+          <Button component={Link} href="/admin/modules" variant="outlined" color="inherit" size="small">
             Admin
           </Button>
         )}
+
         {!loading && user && instructorModuleId && !isAdminEmail(user.email ?? '', 'public') && (
           <Button
             component={Link}
             href={instructorModuleId === '__global__' ? '/instructor' : `/instructor/${instructorModuleId}`}
             variant="outlined"
             color="inherit"
-            sx={{ mr: { xs: 0, sm: 1 } }}
+            size="small"
           >
             Instructor
           </Button>
         )}
+
         {!loading && (
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             {user ? (
               <>
-                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
-                  <Typography variant="body2">{user.email}</Typography>
-                  {userInitials && (
-                    <Typography variant="caption" color="text.secondary">
-                      {userInitials}
-                    </Typography>
-                  )}
-                </Box>
-                <Button variant="outlined" color="inherit" onClick={handleSignOut}>
+                <Typography variant="caption" sx={{ opacity: 0.75, display: { xs: 'none', sm: 'block' } }}>
+                  {user.email}
+                </Typography>
+                <Button variant="outlined" color="inherit" size="small" onClick={handleSignOut}>
                   Sign out
                 </Button>
               </>
             ) : (
-              <Button
-                component={Link}
-                href="/login"
-                variant="outlined"
-                color="inherit"
-              >
+              <Button component={Link} href="/login" variant="outlined" color="inherit" size="small">
                 Sign in
               </Button>
             )}
           </Box>
         )}
+
         <FormControlLabel
           control={
             <Switch
@@ -150,7 +128,7 @@ export default function Header() {
             />
           }
           label="Instructor Mode"
-          sx={{ color: 'inherit' }}
+          sx={{ color: 'inherit', ml: 0 }}
         />
       </Toolbar>
     </AppBar>

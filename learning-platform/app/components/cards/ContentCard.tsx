@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { Card, CardContent, CardHeader, Chip, Box } from '@mui/material';
+import { Box, Divider, Stack, Typography, alpha, useTheme } from '@mui/material';
 import MarkdownContent from '../MarkdownContent';
 import type { ContentChunk } from '@/lib/content';
 import type { AiTaskDefinition } from '@/lib/ai/schema';
@@ -10,103 +10,131 @@ import { getAiComponent } from '../ai/registry';
 type ContentCardProps = {
   chunk: ContentChunk;
   aiTasks?: AiTaskDefinition[];
+  sectionIndex?: number;
 };
 
-export default function ContentCard({ chunk, aiTasks = [] }: ContentCardProps) {
+export default function ContentCard({ chunk, aiTasks = [], sectionIndex }: ContentCardProps) {
   const { id, heading, html, isKeyConcept } = chunk;
+  const theme = useTheme();
 
   const contentParts = useMemo(() => {
     if (!aiTasks.length || !html.includes('AI_TASK_ANCHOR')) {
       return [{ type: 'html' as const, content: html }];
     }
 
-    // Regex matches <!-- AI_TASK_ANCHOR: id --> OR AI_TASK_ANCHOR: id (plain text)
-    // Markdown might wrap plain text in <p>, so we just look for the string sequence.
-    // Updated regex to handle both:
-    // 1. <!-- AI_TASK_ANCHOR: id -->
-    // 2. AI_TASK_ANCHOR: id
-    // We capture 'id' in group 1 or 2.
     const regex = /(?:<!--\s*AI_TASK_ANCHOR:\s*([a-zA-Z0-9\-_]+)\s*-->)|(?:AI_TASK_ANCHOR:\s*([a-zA-Z0-9\-_]+))/g;
     const split = html.split(regex);
-    
-    // split results can be complex with multiple capturing groups.
-    // If we have 2 groups, split output will be: [text, group1, group2, text, group1, group2...]
-    // If group1 matches, group2 is undefined.
-    
+
     const result: Array<{ type: 'html' | 'task'; content?: string; task?: AiTaskDefinition }> = [];
 
     for (let i = 0; i < split.length; i += 3) {
       const textSegment = split[i];
-      const group1 = split[i + 1]; // comment capture
-      const group2 = split[i + 2]; // text capture
+      const group1 = split[i + 1];
+      const group2 = split[i + 2];
       const capturedId = group1 || group2;
 
-      if (textSegment) {
-        result.push({ type: 'html', content: textSegment });
-      }
+      if (textSegment) result.push({ type: 'html', content: textSegment });
 
       if (capturedId) {
-        const task = aiTasks.find(t => t.placement.anchorId === capturedId);
-        if (task) {
-          result.push({ type: 'task', task });
-        } else {
-             // Debugging or warning
-        }
+        const task = aiTasks.find((t) => t.placement.anchorId === capturedId);
+        if (task) result.push({ type: 'task', task });
       }
     }
 
     return result;
-
   }, [html, aiTasks]);
 
   return (
-    <Card
+    <Box
       id={id}
       component="section"
       aria-labelledby={`${id}-heading`}
       sx={{
-        mb: 3,
+        mb: 8,
         scrollMarginTop: { xs: 96, sm: 120 },
-        borderLeft: isKeyConcept ? 6 : 0,
-        borderColor: isKeyConcept ? 'warning.main' : 'transparent',
-        backgroundColor: isKeyConcept ? 'rgba(253, 184, 19, 0.08)' : 'background.paper',
+        position: 'relative',
+        ...(isKeyConcept && {
+          '&::before': {
+            content: '""',
+            position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+            backgroundImage: `linear-gradient(${alpha(theme.palette.primary.main, 0.03)} 1px, transparent 1px), linear-gradient(90deg, ${alpha(theme.palette.primary.main, 0.03)} 1px, transparent 1px)`,
+            backgroundSize: '20px 20px',
+            zIndex: 0,
+          },
+        }),
       }}
     >
-      <CardHeader
-        id={`${id}-heading`}
-        title={heading}
-        component="h2"
-        titleTypographyProps={{ variant: 'h4', component: 'h2' }}
-        action={
-          isKeyConcept ? (
-            <Chip
-              label="Key Concept"
-              size="small"
-              color="warning"
-              sx={{ fontWeight: 600, letterSpacing: 0.4 }}
-            />
-          ) : null
-        }
-      />
-      <CardContent>
-        {contentParts.map((part, index) => {
+      <Box
+        sx={{
+          borderLeft: `1px solid ${isKeyConcept ? theme.palette.secondary.main : theme.palette.divider}`,
+          pl: { xs: 3, md: 6 },
+          position: 'relative',
+          zIndex: 1,
+        }}
+      >
+        <Stack direction="row" spacing={3} alignItems="center" mb={4}>
+          {sectionIndex !== undefined && (
+            <Typography
+              variant="h3"
+              component="div"
+              sx={{
+                color: theme.palette.secondary.main,
+                bgcolor: theme.palette.primary.main,
+                p: 2,
+                minWidth: 60,
+                textAlign: 'center',
+                flexShrink: 0,
+                boxShadow: `4px 4px 0 ${alpha(theme.palette.text.primary, 0.9)}`,
+              }}
+            >
+              {sectionIndex.toString().padStart(2, '0')}
+            </Typography>
+          )}
+          <Box flex={1} id={`${id}-heading`}>
+            <Typography variant="h2" component="h2">
+              {heading}
+            </Typography>
+            <Divider sx={{ borderColor: theme.palette.secondary.main, mt: 1, width: '40%', borderBottomWidth: 2 }} />
+            {isKeyConcept && (
+              <Typography variant="caption" sx={{ color: theme.palette.secondary.main, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', mt: 0.5, display: 'block' }}>
+                Key Concept
+              </Typography>
+            )}
+          </Box>
+        </Stack>
+
+        <Box sx={{
+          color: 'text.primary',
+          maxWidth: '70ch',
+          '& p': { mb: 3 },
+          '& ul, & ol': { mb: 3, pl: 4 },
+          '& li': { mb: 1.5 },
+          '& strong': { fontWeight: 700, color: theme.palette.primary.main },
+          '& hr': { border: 'none', borderTop: `1px dashed ${theme.palette.divider}`, my: 4 },
+        }}>
+          {contentParts.map((part, index) => {
             if (part.type === 'html' && part.content) {
-                return <MarkdownContent key={index} html={part.content} />;
+              return <MarkdownContent key={index} html={part.content} />;
             }
             if (part.type === 'task' && part.task) {
-                const Component = getAiComponent(part.task.ui.component);
-                if (Component) {
-                    return (
-                        <Box key={index} sx={{ my: 3 }}>
-                            <Component task={part.task} />
-                        </Box>
-                    );
-                }
-                return <Box key={index} sx={{ p: 2, border: '1px dashed error.main', color: 'error.main' }}>Component &quot;{part.task.ui.component}&quot; not found.</Box>;
+              const Component = getAiComponent(part.task.ui.component);
+              if (Component) {
+                return (
+                  <Box key={index} sx={{ my: 3 }}>
+                    <Component task={part.task} />
+                  </Box>
+                );
+              }
+              return (
+                <Box key={index} sx={{ p: 2, border: '1px dashed', borderColor: 'error.main', color: 'error.main' }}>
+                  Component &quot;{part.task.ui.component}&quot; not found.
+                </Box>
+              );
             }
             return null;
-        })}
-      </CardContent>
-    </Card>
+          })}
+        </Box>
+      </Box>
+    </Box>
   );
 }

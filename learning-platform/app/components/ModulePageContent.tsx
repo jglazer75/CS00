@@ -169,8 +169,8 @@ export default function ModulePageContent({
               </Box>
             )}
 
-            {chunks.map((chunk) => (
-              <ContentCard key={chunk.id} chunk={chunk} aiTasks={aiTasks} />
+            {chunks.map((chunk, index) => (
+              <ContentCard key={chunk.id} chunk={chunk} aiTasks={aiTasks} sectionIndex={index + 1} />
             ))}
 
             {isInstructorMode && hasInstructorNotes && showInstructorCard && instructorNote && (

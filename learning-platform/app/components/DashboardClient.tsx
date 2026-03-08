@@ -2,7 +2,9 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { Container, Card, CardContent, CardActions, Button, Typography, Box, LinearProgress, Alert } from '@mui/material';
+import { Container, Card, CardActionArea, CardContent, Typography, Box, LinearProgress, Alert, Divider, alpha } from '@mui/material';
+import AdjustIcon from '@mui/icons-material/Adjust';
+import { useTheme } from '@mui/material/styles';
 import { useSupabaseClient } from '../context/SupabaseClientContext';
 
 type ModuleLink = {
@@ -18,6 +20,7 @@ type ModuleProgressInfo = {
 };
 
 export default function DashboardClient({ moduleLinks }: { moduleLinks: ModuleLink[] }) {
+  const theme = useTheme();
   const supabase = useSupabaseClient();
   const moduleIds = useMemo(() => moduleLinks.map((link) => link.id), [moduleLinks]);
   const moduleIdsKey = moduleIds.join('|');
@@ -158,57 +161,65 @@ export default function DashboardClient({ moduleLinks }: { moduleLinks: ModuleLi
             const isDisabled = !targetHref;
 
             return (
-            <Box
-              key={id}
-              sx={{
-                width: {
-                  xs: '100%', // Full width on extra-small screens
-                  sm: 'calc(50% - 16px)', // Half width on small screens (minus gap)
-                  md: 'calc(33.333% - 22px)', // One-third width on medium screens (minus gap)
-                },
-              }}
-            >
-              <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-                <CardContent sx={{ flexGrow: 1 }}>
-                  <Typography gutterBottom variant="h5" component="h2">
-                    {title}
-                  </Typography>
-                  <Typography>
-                    {description}
-                  </Typography>
-                  <Box sx={{ mt: 2 }}>
-                    {status === 'unauthenticated' ? (
-                      <Typography variant="body2" color="text.secondary">
-                        Sign in to track your progress.
-                      </Typography>
-                    ) : (
-                      <>
-                        <Typography variant="body2" color="text.secondary">
-                          {Math.round(progress)}% complete
-                        </Typography>
-                        <LinearProgress
-                          variant="determinate"
-                          value={progress}
-                          sx={{ mt: 1 }}
-                          aria-label={`${title} completion progress`}
-                        />
-                      </>
-                    )}
-                  </Box>
-                </CardContent>
-                <CardActions>
-                  <Button
-                    component={targetHref ? Link : 'button'}
+              <Box
+                key={id}
+                sx={{
+                  width: {
+                    xs: '100%',
+                    sm: 'calc(50% - 16px)',
+                    md: 'calc(33.333% - 22px)',
+                  },
+                }}
+              >
+                <Card sx={{
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  borderTop: `4px solid ${progress > 0 ? theme.palette.secondary.main : 'transparent'}`,
+                  transition: 'all 0.2s ease-out',
+                }}>
+                  <CardActionArea
+                    component={targetHref ? Link : 'div'}
                     href={targetHref || undefined}
-                    size="small"
-                    variant="contained"
                     disabled={isDisabled}
+                    sx={{ flexGrow: 1, display: 'flex', alignItems: 'stretch' }}
                   >
-                    {ctaLabel}
-                  </Button>
-                </CardActions>
-              </Card>
-            </Box>
+                    <CardContent sx={{ p: 4, display: 'flex', flexDirection: 'column', width: '100%' }}>
+                      <Box display="flex" alignItems="center" gap={1} mb={3}>
+                        <AdjustIcon sx={{ color: progress > 0 ? theme.palette.secondary.main : theme.palette.divider, fontSize: 18 }} />
+                        <Typography variant="caption" sx={{ fontWeight: 700, textTransform: 'uppercase', color: 'text.secondary' }}>
+                          {status === 'unauthenticated' ? 'Public Access' : progress === 100 ? 'Complete' : progress > 0 ? 'In Progress' : 'Not Started'}
+                        </Typography>
+                      </Box>
+
+                      <Typography variant="h5" component="h2" mb={2} sx={{ letterSpacing: '-0.02em' }}>
+                        {title}
+                      </Typography>
+
+                      <Typography variant="body2" color="text.secondary" sx={{
+                        display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden',
+                        fontStyle: 'italic', flexGrow: 1, mb: 4,
+                      }}>
+                        {description}
+                      </Typography>
+
+                      <Box sx={{ mt: 'auto' }}>
+                        <Divider sx={{ mb: 2, borderColor: alpha(theme.palette.primary.main, 0.1) }} />
+                        {status === 'unauthenticated' ? (
+                          <Typography variant="body2" color="text.secondary">Sign in to track your progress.</Typography>
+                        ) : (
+                          <>
+                            <Typography variant="caption" component="div" sx={{ fontWeight: 700, color: theme.palette.primary.main, mb: 0.5, textAlign: 'right' }}>
+                              PHASE: {Math.round(progress)}%
+                            </Typography>
+                            <LinearProgress variant="determinate" value={progress} color="secondary" aria-label={`${title} completion progress`} />
+                          </>
+                        )}
+                      </Box>
+                    </CardContent>
+                  </CardActionArea>
+                </Card>
+              </Box>
             );
           })}
         </Box>
