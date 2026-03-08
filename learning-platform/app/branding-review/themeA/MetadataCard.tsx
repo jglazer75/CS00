@@ -20,7 +20,7 @@ const MetadataList: React.FC<{ title: string; items: string[]; Icon: React.Eleme
       </Typography>
       <List dense disablePadding>
         {items.map(item => (
-          <ListItem key={item} disableGutters alignItems="start">
+          <ListItem key={item} disableGutters alignItems="flex-start">
             <ListItemIcon sx={{ minWidth: 24, mt: 0.5 }}>
               <Box component="span" sx={{ width: 6, height: 6, borderRadius: '50%', bgcolor: alpha(theme.palette.secondary.main, 0.5) }} />
             </ListItemIcon>
