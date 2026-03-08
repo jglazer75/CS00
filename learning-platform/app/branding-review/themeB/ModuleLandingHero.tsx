@@ -80,7 +80,7 @@ export const ModuleLandingHero: React.FC<ModuleLandingHeroProps> = ({
                 border: `1px solid ${theme.palette.divider}`
             }}>
                 <Typography variant="h6" gutterBottom color="text.primary" sx={{ fontWeight: 600, mb: 3 }}>
-                  What you'll master:
+                  What you&apos;ll master:
                 </Typography>
                 <Stack spacing={2.5}>
                   {learningObjectives.slice(0, 3).map((obj, index) => (

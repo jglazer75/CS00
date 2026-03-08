@@ -36,7 +36,7 @@ const sections = [
 
 export default function ThemeShowcase() {
   const [selectedTheme, setSelectedTheme] = useState<ThemeKey>('A');
-  const [activeSection, setActiveSection] = useState('liability');
+  const [activeSection] = useState('liability');
 
   const handleThemeChange = (event: React.MouseEvent<HTMLElement>, newTheme: ThemeKey | null) => {
     if (newTheme !== null) {
@@ -128,7 +128,7 @@ export default function ThemeShowcase() {
                             The primary motivation for incorporating a farm business is usually to create a specialized liability shield. This shield separates the personal assets of the farm owners (like their home or personal savings) from the business assets of the farm operation (like tractors, land, or livestock).
                         </Typography>
                         <Typography variant="body1">
-                            However, this shield is not impenetrable. Under certain specific circumstances, courts may decide to <strong>"pierce the corporate veil"</strong> and hold the individual shareholders or members personally liable for the business's debts or legal obligations. This is particularly common in rural areas where business formalities might not be strictly observed over decades of family operation.
+                            However, this shield is not impenetrable. Under certain specific circumstances, courts may decide to <strong>&ldquo;pierce the corporate veil&rdquo;</strong> and hold the individual shareholders or members personally liable for the business&apos;s debts or legal obligations. This is particularly common in rural areas where business formalities might not be strictly observed over decades of family operation.
                         </Typography>
                         <ul>
                             <li>Formalities (holding meetings, keeping separate books)</li>

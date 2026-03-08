@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, CircularProgress, useTheme } from '@mui/material';
+import { Box, Typography, CircularProgress } from '@mui/material';
 
 export interface ProgressRingProps {
   percent: number;
@@ -8,7 +8,6 @@ export interface ProgressRingProps {
 }
 
 export const ProgressRing: React.FC<ProgressRingProps> = ({ percent, size = 70, label }) => {
-  const theme = useTheme();
   const [drawingValue, setDrawingValue] = useState(0);
   const cappedPercent = Math.min(100, Math.max(0, percent));
   const neutralGrey = '#F3F4F6';

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Chip, alpha, useTheme } from '@mui/material';
+import { Chip, alpha } from '@mui/material';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import SchoolIcon from '@mui/icons-material/School';
 import HistoryEduIcon from '@mui/icons-material/HistoryEdu';
@@ -17,7 +17,6 @@ const roleConfigs = {
 };
 
 export const RoleBadge: React.FC<RoleBadgeProps> = ({ role }) => {
-  const theme = useTheme();
   const config = roleConfigs[role];
   const Icon = config.icon;
 
