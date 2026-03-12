@@ -5,7 +5,8 @@ function isPublicRoute(pathname: string): boolean {
   return (
     pathname === '/' ||
     pathname.startsWith('/login') ||
-    pathname.startsWith('/reset-password')
+    pathname.startsWith('/reset-password') ||
+    pathname.startsWith('/auth/callback')
   )
 }
 
