@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { Alert, Box, Button, Chip, CircularProgress, Container, IconButton, Stack, Tooltip, Typography } from '@mui/material';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import DownloadIcon from '@mui/icons-material/Download';
 import { useInstructorMode } from '../context/InstructorModeContext';
 import MetadataCard from './cards/MetadataCard';
 import ContentCard from './cards/ContentCard';
@@ -24,6 +25,7 @@ type ModulePageContentProps = {
   isProcessingProgress: boolean;
   onMarkComplete: () => Promise<void> | void;
   isExercise?: boolean;
+  exportHref?: string;
 };
 
 export default function ModulePageContent({
@@ -38,6 +40,7 @@ export default function ModulePageContent({
   isProcessingProgress,
   onMarkComplete,
   isExercise = false,
+  exportHref,
 }: ModulePageContentProps) {
   const { isInstructorMode } = useInstructorMode();
   const [showInstructorCard, setShowInstructorCard] = useState(false);
@@ -143,31 +146,45 @@ export default function ModulePageContent({
               </Alert>
             )}
 
-            {progressStatus !== 'unauthenticated' && (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                {isCompleted ? (
-                  <Chip
-                    color="success"
-                    icon={<CheckCircleOutlineIcon />}
-                    label="Completed"
-                    variant="outlined"
-                  />
-                ) : (
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={onMarkComplete}
-                    disabled={isProcessingProgress || progressStatus !== 'ready'}
-                    startIcon={!isProcessingProgress ? <CheckCircleOutlineIcon /> : undefined}
-                    endIcon={
-                      isProcessingProgress ? <CircularProgress size={18} color="inherit" /> : undefined
-                    }
-                  >
-                    {isProcessingProgress ? 'Saving progress...' : 'Mark as complete'}
-                  </Button>
-                )}
-              </Box>
-            )}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
+              {progressStatus !== 'unauthenticated' && (
+                <>
+                  {isCompleted ? (
+                    <Chip
+                      color="success"
+                      icon={<CheckCircleOutlineIcon />}
+                      label="Completed"
+                      variant="outlined"
+                    />
+                  ) : (
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={onMarkComplete}
+                      disabled={isProcessingProgress || progressStatus !== 'ready'}
+                      startIcon={!isProcessingProgress ? <CheckCircleOutlineIcon /> : undefined}
+                      endIcon={
+                        isProcessingProgress ? <CircularProgress size={18} color="inherit" /> : undefined
+                      }
+                    >
+                      {isProcessingProgress ? 'Saving progress...' : 'Mark as complete'}
+                    </Button>
+                  )}
+                </>
+              )}
+              {exportHref && (
+                <Button
+                  variant="outlined"
+                  size="small"
+                  startIcon={<DownloadIcon />}
+                  href={exportHref}
+                  component="a"
+                  download
+                >
+                  Download DOCX
+                </Button>
+              )}
+            </Box>
 
             {chunks.map((chunk, index) => (
               <ContentCard key={chunk.id} chunk={chunk} aiTasks={aiTasks} sectionIndex={index + 1} />

@@ -82,6 +82,7 @@ export default function ModulePageClient({ moduleId, slug, navData, pageData, te
         isExercise={
           currentNode?.type === 'ai-interaction' || currentNode?.layout === 'workbench'
         }
+        exportHref={`/api/modules/${moduleId}/export/${slug}/docx`}
       />
     </Box>
   );
