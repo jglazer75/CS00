@@ -70,8 +70,9 @@ export default function TableOfContents({ items }: TableOfContentsProps) {
       <List dense disablePadding sx={{ flexGrow: 1 }}>
         {items.map((item, index) => {
           const isActive = activeId === item.id;
+          const isKeyConcept = item.isKeyConcept;
           return (
-            <ListItem key={item.id} disablePadding sx={{ borderBottom: `1px solid ${alpha(theme.palette.divider, 0.5)}` }}>
+            <ListItem key={item.id} disablePadding sx={{ borderBottom: `1px solid ${alpha(theme.palette.divider, 0.5)}`, ...(isKeyConcept && { bgcolor: alpha(theme.palette.secondary.main, 0.04) }) }}>
               <ListItemButton
                 component="a"
                 href={`#${item.id}`}
@@ -91,8 +92,8 @@ export default function TableOfContents({ items }: TableOfContentsProps) {
                 <Typography variant="caption" sx={{ fontWeight: 700, color: theme.palette.secondary.main, mr: 2, width: 22, flexShrink: 0 }}>
                   {(index + 1).toString().padStart(2, '0')}
                 </Typography>
-                <Box sx={{ position: 'relative', flex: 1, overflow: 'hidden' }}>
-                  <Typography variant="body2" noWrap sx={{ textTransform: 'uppercase', fontSize: '0.72rem', letterSpacing: '0.05em', fontWeight: isActive ? 700 : 400, color: isActive ? 'text.primary' : 'text.secondary' }}>
+                <Box sx={{ position: 'relative', flex: 1 }}>
+                  <Typography variant="body2" sx={{ textTransform: 'uppercase', fontSize: '0.72rem', letterSpacing: '0.05em', fontWeight: isActive ? 700 : 400, color: isKeyConcept ? (isActive ? theme.palette.secondary.main : alpha(theme.palette.secondary.main, 0.8)) : (isActive ? 'text.primary' : 'text.secondary'), whiteSpace: 'normal', lineHeight: 1.4, fontStyle: isKeyConcept ? 'italic' : 'normal' }}>
                     {item.title}
                   </Typography>
                   <Box className="toc-line" sx={{ position: 'absolute', bottom: -4, left: 0, width: 0, height: 2, bgcolor: alpha(theme.palette.divider, 0.5), transition: 'all 0.3s ease' }} />

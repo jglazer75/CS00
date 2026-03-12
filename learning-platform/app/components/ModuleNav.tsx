@@ -25,6 +25,8 @@ type ModuleNavProps = {
   completedSlugs?: string[];
   percentComplete?: number;
   lastVisitedSlug?: string;
+  teamName?: string;
+  teamRole?: string;
 };
 
 export default function ModuleNav({
@@ -34,6 +36,8 @@ export default function ModuleNav({
   completedSlugs = [],
   percentComplete = 0,
   lastVisitedSlug,
+  teamName,
+  teamRole,
 }: ModuleNavProps) {
   const completedSet = new Set(completedSlugs);
   const progressValue = Number.isFinite(percentComplete) ? percentComplete : 0;
@@ -68,6 +72,12 @@ export default function ModuleNav({
         Module Navigation
       </Typography>
       <Box sx={{ px: 2, pb: 2 }}>
+        {teamName && (
+          <Box sx={{ mb: 1.5, display: 'flex', alignItems: 'center', gap: 0.75, flexWrap: 'wrap' }}>
+            <Chip label={teamName} size="small" color="primary" variant="outlined" />
+            {teamRole && <Chip label={teamRole} size="small" color="secondary" variant="outlined" />}
+          </Box>
+        )}
         <Typography variant="body2" color="text.secondary">
           {completedSet.size} of {allPages.length} complete
         </Typography>

@@ -4,7 +4,9 @@ import { isAdminEmail } from '@/lib/auth';
 import { z } from 'zod';
 
 const PatchSchema = z.object({
-  metadata: z.record(z.string(), z.unknown()),
+  metadata: z.record(z.string(), z.unknown()).optional(),
+  description: z.string().optional(),
+  is_public: z.boolean().optional(),
 });
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ moduleId: string }> }) {
@@ -43,23 +45,39 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ module
     return NextResponse.json({ error: 'Invalid request', details: parsed.error.issues }, { status: 400 });
   }
 
-  // Merge metadata (read existing first, then merge)
-  const { data: existing } = await supabase
-    .from('modules')
-    .select('metadata')
-    .eq('id', moduleId)
-    .maybeSingle();
+  const updatePayload: Record<string, unknown> = {};
 
-  const mergedMetadata = { ...(existing?.metadata ?? {}), ...parsed.data.metadata };
+  if (parsed.data.metadata !== undefined) {
+    // Merge metadata (read existing first, then merge)
+    const { data: existing } = await supabase
+      .from('modules')
+      .select('metadata')
+      .eq('id', moduleId)
+      .maybeSingle();
+
+    updatePayload.metadata = { ...(existing?.metadata ?? {}), ...parsed.data.metadata };
+  }
+
+  if (parsed.data.description !== undefined) {
+    updatePayload.description = parsed.data.description;
+  }
+
+  if (parsed.data.is_public !== undefined) {
+    updatePayload.is_public = parsed.data.is_public;
+  }
+
+  if (Object.keys(updatePayload).length === 0) {
+    return NextResponse.json({ success: true });
+  }
 
   const { error: updateError } = await supabase
     .from('modules')
-    .update({ metadata: mergedMetadata })
+    .update(updatePayload)
     .eq('id', moduleId);
 
   if (updateError) {
     return NextResponse.json({ error: updateError.message }, { status: 500 });
   }
 
-  return NextResponse.json({ success: true, metadata: mergedMetadata });
+  return NextResponse.json({ success: true, ...updatePayload });
 }

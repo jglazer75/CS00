@@ -77,9 +77,11 @@ export default function Header() {
           </Link>
         </Typography>
 
-        <Button component={Link} href="/docs/components" variant="outlined" color="inherit" size="small">
-          Docs
-        </Button>
+        {!loading && user?.email && PUBLIC_ADMIN_EMAILS.length > 0 && isAdminEmail(user.email, 'public') && (
+          <Button component={Link} href="/docs/components" variant="outlined" color="inherit" size="small">
+            Docs
+          </Button>
+        )}
 
         {!loading && user?.email && PUBLIC_ADMIN_EMAILS.length > 0 && isAdminEmail(user.email, 'public') && (
           <Button component={Link} href="/admin/modules" variant="outlined" color="inherit" size="small">

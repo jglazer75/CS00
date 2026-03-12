@@ -12,9 +12,11 @@ type ModulePageClientProps = {
   slug: string;
   navData: ModuleStructureNode[];
   pageData: ModulePage;
+  teamName?: string | null;
+  teamRole?: string | null;
 };
 
-export default function ModulePageClient({ moduleId, slug, navData, pageData }: ModulePageClientProps) {
+export default function ModulePageClient({ moduleId, slug, navData, pageData, teamName, teamRole }: ModulePageClientProps) {
   const { slugs, currentNode } = useMemo(() => {
     const list: string[] = [];
     let found: ModuleStructureNode | undefined;
@@ -63,6 +65,8 @@ export default function ModulePageClient({ moduleId, slug, navData, pageData }: 
         completedSlugs={completedSlugs}
         percentComplete={percentComplete}
         lastVisitedSlug={lastVisitedSlug}
+        teamName={teamName ?? undefined}
+        teamRole={teamRole ?? undefined}
       />
       <ModulePageContent
         metadata={metadata}

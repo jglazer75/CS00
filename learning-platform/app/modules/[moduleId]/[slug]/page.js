@@ -32,6 +32,8 @@ export default async function Page({ params }) {
   const { data: { user } } = await userClient.auth.getUser();
 
   const userRoles = [];
+  let teamName = null;
+  let teamRole = null;
 
   if (user) {
     const supabase = getSupabaseServerClient();
@@ -47,7 +49,7 @@ export default async function Page({ params }) {
           supabase.from('modules').select('is_public').eq('id', moduleId).maybeSingle(),
           supabase
             .from('team_members')
-            .select('teams!inner(role, module_id)')
+            .select('teams!inner(role, module_id, name)')
             .eq('user_id', user.id)
             .eq('teams.module_id', moduleId)
             .maybeSingle(),
@@ -71,14 +73,31 @@ export default async function Page({ params }) {
           }
         }
 
-        const teamRole = teamData?.teams?.role;
+        teamRole = teamData?.teams?.role ?? null;
+        teamName = teamData?.teams?.name ?? null;
         if (teamRole) userRoles.push(teamRole);
       }
     }
   }
 
-  const pageData = await getPageData(moduleId, slug);
   const navData = await getModuleStructure(moduleId, userRoles);
 
-  return <ModulePageClient moduleId={moduleId} slug={slug} navData={navData} pageData={pageData} />;
+  // Validate slug against the current module structure; redirect to first page if stale
+  const allSlugs = [];
+  function collectSlugs(nodes) {
+    nodes.forEach((n) => {
+      if (n.type === 'page' || n.type === 'ai-interaction') allSlugs.push(n.id);
+      collectSlugs(n.children);
+    });
+  }
+  collectSlugs(navData);
+
+  if (!allSlugs.includes(slug)) {
+    const fallback = allSlugs[0];
+    redirect(fallback ? `/modules/${moduleId}/${fallback}` : `/modules/${moduleId}`);
+  }
+
+  const pageData = await getPageData(moduleId, slug);
+
+  return <ModulePageClient moduleId={moduleId} slug={slug} navData={navData} pageData={pageData} teamName={teamName} teamRole={teamRole} />;
 }

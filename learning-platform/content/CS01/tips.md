@@ -21,6 +21,8 @@ core_concepts:
   - Exclusivity Period
 keywords: []
 ---
+Effective negotiation in venture deals is rarely about legal cleverness alone — it is about understanding power, perception, and the human dynamics on both sides of the table. This guide examines how your founding team's profile shapes investor behavior, and how the relative strength of your position affects what you can realistically win on specific term sheet clauses.
+
 *\* This material was developed by Google Gemini Pro 2.5 on June 19, 2025*
 
 ## On the Sociology of the Founding Team (Founder Archetypes)

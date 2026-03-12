@@ -8,6 +8,8 @@ import {
   Chip,
   CircularProgress,
   Divider,
+  FormControlLabel,
+  Switch,
   TextField,
   Typography,
 } from '@mui/material';
@@ -22,6 +24,7 @@ type ModuleData = {
   title: string;
   description: string | null;
   owner_user_id: string | null;
+  is_public: boolean;
   metadata: Record<string, unknown>;
 };
 
@@ -48,6 +51,7 @@ export default function ModuleOwnerPage() {
   // Edit form state
   const [editTerms, setEditTerms] = useState('');
   const [editDescription, setEditDescription] = useState('');
+  const [editIsPublic, setEditIsPublic] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
 
@@ -58,7 +62,7 @@ export default function ModuleOwnerPage() {
 
     const { data: mod, error: modError } = await supabase
       .from('modules')
-      .select('id, title, description, owner_user_id, metadata')
+      .select('id, title, description, owner_user_id, is_public, metadata')
       .eq('id', moduleId)
       .maybeSingle();
 
@@ -81,6 +85,7 @@ export default function ModuleOwnerPage() {
     });
     setEditTerms((mod.metadata as Record<string, unknown>)?.terms_of_use as string ?? '');
     setEditDescription(mod.description ?? '');
+    setEditIsPublic(mod.is_public ?? false);
 
     // Fetch aggregate stats (no PII)
     const [{ count: enrolled }, { count: taskRuns }] = await Promise.all([
@@ -147,6 +152,7 @@ export default function ModuleOwnerPage() {
           terms_of_use: editTerms,
         },
         description: editDescription,
+        is_public: editIsPublic,
       }),
     });
 
@@ -155,7 +161,7 @@ export default function ModuleOwnerPage() {
       setSaveMessage(`Error: ${json.error}`);
     } else {
       setSaveMessage('Saved.');
-      setModuleData((prev) => prev ? { ...prev, metadata: json.metadata, description: editDescription } : prev);
+      setModuleData((prev) => prev ? { ...prev, metadata: json.metadata ?? prev.metadata, description: editDescription, is_public: editIsPublic } : prev);
     }
     setSaving(false);
   };
@@ -264,6 +270,16 @@ export default function ModuleOwnerPage() {
       {/* Edit form */}
       <Typography variant="h6" sx={{ mb: 2 }}>Edit Module Info</Typography>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, maxWidth: 600 }}>
+        <FormControlLabel
+          control={
+            <Switch
+              checked={editIsPublic}
+              onChange={(e) => setEditIsPublic(e.target.checked)}
+              color="primary"
+            />
+          }
+          label={editIsPublic ? 'Public — anyone can view this module' : 'Private — enrolled users only'}
+        />
         <TextField
           label="Description"
           multiline

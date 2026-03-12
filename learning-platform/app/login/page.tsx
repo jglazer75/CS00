@@ -38,11 +38,27 @@ function LoginFormContents() {
   const [resetMessage, setResetMessage] = useState<string | null>(null);
   const [resetError, setResetError] = useState<string | null>(null);
 
+  // Invite flow state
+  const [inviteMode, setInviteMode] = useState(false);
+  const [invitePassword, setInvitePassword] = useState('');
+  const [invitePasswordConfirm, setInvitePasswordConfirm] = useState('');
+  const [inviteStatus, setInviteStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+  const [inviteError, setInviteError] = useState<string | null>(null);
+
+  // Detect invite token in URL hash
   useEffect(() => {
-    if (!loading && session) {
+    if (typeof window === 'undefined') return;
+    const hash = window.location.hash;
+    if (hash.includes('type=invite') || hash.includes('type=recovery')) {
+      setInviteMode(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!loading && session && !inviteMode) {
       router.replace(redirectTo);
     }
-  }, [loading, redirectTo, router, session]);
+  }, [loading, redirectTo, router, session, inviteMode]);
 
   const formDisabled = useMemo(() => status === 'submitting', [status]);
   const resetDisabled = resetStatus === 'submitting';
@@ -70,6 +86,38 @@ function LoginFormContents() {
 
     setStatus('success');
     router.replace(redirectTo);
+  }
+
+  async function handleInviteSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setInviteError(null);
+
+    if (!supabase) {
+      setInviteError('Supabase client is not available.');
+      return;
+    }
+
+    if (invitePassword !== invitePasswordConfirm) {
+      setInviteError('Passwords do not match.');
+      return;
+    }
+
+    if (invitePassword.length < 8) {
+      setInviteError('Password must be at least 8 characters.');
+      return;
+    }
+
+    setInviteStatus('submitting');
+    const { error } = await supabase.auth.updateUser({ password: invitePassword });
+
+    if (error) {
+      setInviteError(error.message);
+      setInviteStatus('error');
+      return;
+    }
+
+    setInviteStatus('success');
+    router.replace('/');
   }
 
   async function handleResetSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -108,6 +156,65 @@ function LoginFormContents() {
 
     setResetStatus('success');
     setResetMessage('Password reset email sent. Check your inbox for further instructions.');
+  }
+
+  // Invite / password-set flow
+  if (inviteMode) {
+    return (
+      <Container maxWidth="sm" sx={{ py: 8 }}>
+        <Stack spacing={4}>
+          <Box>
+            <Typography variant="h4" component="h1" gutterBottom>
+              Set your password
+            </Typography>
+            <Typography variant="body1" color="text.secondary">
+              You were invited to this platform. Choose a password to activate your account.
+            </Typography>
+          </Box>
+          {inviteStatus === 'success' ? (
+            <Alert severity="success">
+              Password set successfully. Redirecting you to the dashboard…
+            </Alert>
+          ) : (
+            <Box component="form" onSubmit={handleInviteSubmit} noValidate>
+              <Stack spacing={3}>
+                {inviteError && (
+                  <Alert severity="error" onClose={() => setInviteError(null)}>
+                    {inviteError}
+                  </Alert>
+                )}
+                <TextField
+                  type="password"
+                  label="New password"
+                  value={invitePassword}
+                  onChange={(e) => setInvitePassword(e.target.value)}
+                  autoComplete="new-password"
+                  required
+                  disabled={inviteStatus === 'submitting'}
+                  helperText="At least 8 characters."
+                />
+                <TextField
+                  type="password"
+                  label="Confirm password"
+                  value={invitePasswordConfirm}
+                  onChange={(e) => setInvitePasswordConfirm(e.target.value)}
+                  autoComplete="new-password"
+                  required
+                  disabled={inviteStatus === 'submitting'}
+                />
+                <Button
+                  type="submit"
+                  variant="contained"
+                  disabled={inviteStatus === 'submitting' || !invitePassword || !invitePasswordConfirm}
+                >
+                  {inviteStatus === 'submitting' ? 'Setting password…' : 'Set password & continue'}
+                </Button>
+              </Stack>
+            </Box>
+          )}
+        </Stack>
+      </Container>
+    );
   }
 
   return (

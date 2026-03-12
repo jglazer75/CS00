@@ -137,7 +137,7 @@ export default function ModulePageContent({
               </Alert>
             )}
 
-            {progressStatus === 'error' && progressError && (
+            {progressError && (
               <Alert severity="error" variant="outlined">
                 {progressError}
               </Alert>

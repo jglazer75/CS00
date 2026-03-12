@@ -4,6 +4,7 @@ import matter from 'gray-matter';
 import { remark } from 'remark';
 import remarkGfm from 'remark-gfm';
 import remarkKeyConcept from './remark/keyConcept';
+import remarkRewriteMdLinks from './remark/rewriteMdLinks';
 import type { Root, Heading } from 'mdast';
 import type { Literal, Parent } from 'unist';
 import { MarkdownNode, renderMarkdown, renderMarkdownFromNodes } from './markdown';
@@ -44,6 +45,7 @@ export type TableOfContentsItem = {
   id: string;
   title: string;
   order: number;
+  isKeyConcept?: boolean;
 };
 
 export type InstructorNote = {
@@ -243,10 +245,27 @@ export async function getPageData(moduleId: string, slug: string): Promise<Modul
     throw new Error(`Module node "${slug}" not found in module "${moduleId}"`);
   }
 
+  // Build content_source → node_id map for .md link rewriting
+  const { data: allNodes } = await supabase
+    .from('module_nodes')
+    .select('node_id, content_source')
+    .eq('module_id', moduleId);
+
+  const sourceToSlugMap = new Map<string, string>();
+  for (const n of allNodes ?? []) {
+    const src = n.content_source as string | null;
+    if (src && n.node_id) {
+      const basename = src.split('/').pop() ?? src;
+      sourceToSlugMap.set(src, n.node_id);
+      sourceToSlugMap.set(basename, n.node_id);
+      sourceToSlugMap.set(`./${basename}`, n.node_id);
+    }
+  }
+
   const moduleDirectory = path.join(contentDirectory, moduleId);
   const contentSource = node.content_source || `${slug}.md`;
-  const fullPath = path.isAbsolute(contentSource) 
-    ? contentSource 
+  const fullPath = path.isAbsolute(contentSource)
+    ? contentSource
     : path.join(moduleDirectory, contentSource);
 
   if (!fs.existsSync(fullPath)) {
@@ -255,7 +274,7 @@ export async function getPageData(moduleId: string, slug: string): Promise<Modul
 
   const fileContents = fs.readFileSync(fullPath, 'utf8');
   const { data: frontmatter, content } = matter(fileContents);
-  
+
   // Merge DB metadata with frontmatter, DB taking precedence if specified
   const dbMetadata = (node.metadata as Record<string, unknown>) || {};
   const mergedMetadata = {
@@ -266,7 +285,10 @@ export async function getPageData(moduleId: string, slug: string): Promise<Modul
 
   const metadata = buildPageMetadata(mergedMetadata, node.title || slugToTitle(slug));
 
-  const processor = remark().use(remarkGfm).use(remarkKeyConcept);
+  const processor = remark()
+    .use(remarkGfm)
+    .use(remarkKeyConcept)
+    .use(remarkRewriteMdLinks, { moduleId, sourceToSlugMap });
   const parsedTree = processor.parse(content) as Root;
   const transformedTree = (await processor.run(parsedTree)) as Root;
   const { rawChunks, tableOfContents } = splitIntoChunks(transformedTree.children ?? [], metadata.title);
@@ -416,6 +438,7 @@ function splitIntoChunks(nodes: MarkdownNode[], defaultTitle: string) {
           id: uniqueId,
           title: headingText,
           order: tableOfContents.length,
+          isKeyConcept: isKeyConceptNode(node),
         });
 
         pendingHeading = headingText;

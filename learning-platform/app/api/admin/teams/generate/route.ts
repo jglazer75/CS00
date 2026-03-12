@@ -52,17 +52,26 @@ export async function POST(req: Request) {
     }
   }
 
-  // Fetch non-instructor users enrolled or with profiles
-  const { data: profiles, error: profilesError } = await supabase
-    .from('profiles')
+  // Fetch users enrolled in this module (enrollment-scoped pool)
+  const { data: enrollments, error: enrollmentsError } = await supabase
+    .from('module_enrollments')
     .select('user_id')
-    .eq('is_instructor', false);
+    .eq('module_id', moduleId);
 
-  if (profilesError) {
-    return NextResponse.json({ error: profilesError.message }, { status: 500 });
+  if (enrollmentsError) {
+    return NextResponse.json({ error: enrollmentsError.message }, { status: 500 });
   }
 
-  const studentIds: string[] = (profiles ?? []).map((p) => p.user_id);
+  // Exclude module instructors from the student pool
+  const { data: moduleInstructors } = await supabase
+    .from('module_instructors')
+    .select('user_id')
+    .eq('module_id', moduleId);
+  const instructorSet = new Set((moduleInstructors ?? []).map((r) => r.user_id));
+
+  const studentIds: string[] = (enrollments ?? [])
+    .map((e) => e.user_id)
+    .filter((id) => !instructorSet.has(id));
 
   // Shuffle
   for (let i = studentIds.length - 1; i > 0; i--) {
