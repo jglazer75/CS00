@@ -1,9 +1,23 @@
-# CS00
-CS00 is an online resource for case studies in entrepreneurship. These case studies cover a wide range of legal and business issues raised in a variety of entrepreneurship contexts. Individual, simplified case studies are available in other repositories as Github Pages.
+# CS-00: The Guided Simulation Environment
 
-Case studies available allow students and entrepreneurs to explore contemporary issues in entrepreneurship, business, and law. They explore topics as diverse as corporate finance, entity selection, intellectual property licenses, supply chain management, trademark portfolio strategy, and pitch practice amongst others. 
+*A high-fidelity educational ecosystem bridging the gap between classroom theory and real-world execution.*
 
-Each case study is taken from real-life scenarios encountered by practicing lawyers; most have been inspired by issues handled by student attorneys in the [University of Wisconsin Law & Entrepreneurship Clinic](http://www.uwle.org). The intent is to allow students, lawyers, entrepreneurs, and other specialists to explore together in teams or individually how these issues arise and their multi-faceted solutions. Most (probably all) use artificial intelligence to help explore these edges and provide realistic feedback. 
+## Out of the Boardroom, Into the Field
+Understanding the structural mechanics of law and business isn't a passive exercise—it requires getting your hands dirty. CS-00 is a modern learning platform designed to take complex, static concepts out of the textbook and drop them into a dynamic, AI-assisted environment. 
+
+Originally conceived to support real-world entrepreneurial hubs, CS-00 transforms heavy legal and business manifests into interactive scenarios. We don't just teach students what a term sheet is; we give them the tools to map the terrain, negotiate the terms, and understand the long-term impact of their decisions. 
+
+## The Hybrid Dojo: Three Modes of Exploration
+The platform is built as a flexible "Hybrid Dojo," offering distinct interaction modes that adapt to the learner's journey from foundational understanding to active practice:
+
+* **The Reader (Foundational):** A schema-first, card-based interface that chunks dense legal and business text into highly digestible, interactive modules. 
+* **The Workbench (Active):** A split-screen analytical environment. Here, students work directly on real-world artifacts (like redlining a PDF or structuring a cap table) while an AI "Guide" provides side-by-side coaching and instant feedback.
+* **The Journey (Immersive):** A non-linear, branching simulation. Students role-play as startup founders, investors, or general counsel, navigating high-stakes negotiations where their choices fundamentally alter the outcome of the case study. 
+
+## Empowering Instructors and Leaders
+CS-00 isn't just a student tool; it’s a command center for educators and facilitators. The platform features robust Role-Based Access Control, giving instructors a comprehensive "God-mode" view of the simulation. From automated team generation to AI-enabled progress tracking, facilitators can monitor the tactical decisions their students are making in real-time, allowing for targeted, highly effective interventions and debriefs. 
+
+It’s an environment built for modern stewardship—giving learners the psychological safety to test their strategies, fail in private, and eventually walk into their first real-world negotiation with absolute confidence.
 
 ## Current Development Roadmap
 
