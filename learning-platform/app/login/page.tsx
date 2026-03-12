@@ -44,11 +44,25 @@ function LoginFormContents() {
   const [invitePasswordConfirm, setInvitePasswordConfirm] = useState('');
   const [inviteStatus, setInviteStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [inviteError, setInviteError] = useState<string | null>(null);
+  const [hashError, setHashError] = useState<string | null>(null);
 
-  // Detect invite token in URL hash
+  // Detect invite token or error in URL hash
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const hash = window.location.hash;
+    const hash = window.location.hash.slice(1);
+    const params = new URLSearchParams(hash);
+    const errorCode = params.get('error_code');
+    if (errorCode) {
+      const description = params.get('error_description')?.replace(/\+/g, ' ') ?? 'An error occurred with your link.';
+      if (errorCode === 'otp_expired') {
+        setHashError('Your invite link has expired. Ask an administrator to send you a new one.');
+      } else {
+        setHashError(description);
+      }
+      // Clear the hash so the error isn't bookmarked
+      window.history.replaceState(null, '', window.location.pathname + window.location.search);
+      return;
+    }
     if (hash.includes('type=invite') || hash.includes('type=recovery')) {
       setInviteMode(true);
     }
@@ -230,6 +244,11 @@ function LoginFormContents() {
         </Box>
         <Box component="form" onSubmit={handleSubmit} noValidate>
           <Stack spacing={3}>
+            {hashError && (
+              <Alert severity="warning" onClose={() => setHashError(null)}>
+                {hashError}
+              </Alert>
+            )}
             {errorMessage && (
               <Alert severity="error" onClose={() => setErrorMessage(null)}>
                 {errorMessage}
