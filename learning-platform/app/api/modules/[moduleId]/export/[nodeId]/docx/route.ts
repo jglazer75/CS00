@@ -25,7 +25,7 @@ export async function GET(
   // Check module access
   const { data: module } = await supabase
     .from('modules')
-    .select('is_public, title')
+    .select('is_public, allow_unauthenticated, title')
     .eq('id', moduleId)
     .maybeSingle();
 
@@ -33,7 +33,7 @@ export async function GET(
     return NextResponse.json({ error: 'Module not found' }, { status: 404 });
   }
 
-  if (!module.is_public) {
+  if (!module.is_public && !module.allow_unauthenticated) {
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }

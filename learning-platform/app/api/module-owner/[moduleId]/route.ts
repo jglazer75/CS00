@@ -7,6 +7,7 @@ const PatchSchema = z.object({
   metadata: z.record(z.string(), z.unknown()).optional(),
   description: z.string().optional(),
   is_public: z.boolean().optional(),
+  allow_unauthenticated: z.boolean().optional(),
 });
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ moduleId: string }> }) {
@@ -64,6 +65,10 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ module
 
   if (parsed.data.is_public !== undefined) {
     updatePayload.is_public = parsed.data.is_public;
+  }
+
+  if (parsed.data.allow_unauthenticated !== undefined) {
+    updatePayload.allow_unauthenticated = parsed.data.allow_unauthenticated;
   }
 
   if (Object.keys(updatePayload).length === 0) {

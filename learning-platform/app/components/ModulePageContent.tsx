@@ -26,6 +26,7 @@ type ModulePageContentProps = {
   onMarkComplete: () => Promise<void> | void;
   isExercise?: boolean;
   exportHref?: string;
+  hideAi?: boolean;
 };
 
 export default function ModulePageContent({
@@ -41,6 +42,7 @@ export default function ModulePageContent({
   onMarkComplete,
   isExercise = false,
   exportHref,
+  hideAi = false,
 }: ModulePageContentProps) {
   const { isInstructorMode } = useInstructorMode();
   const [showInstructorCard, setShowInstructorCard] = useState(false);
@@ -187,7 +189,7 @@ export default function ModulePageContent({
             </Box>
 
             {chunks.map((chunk, index) => (
-              <ContentCard key={chunk.id} chunk={chunk} aiTasks={aiTasks} sectionIndex={index + 1} />
+              <ContentCard key={chunk.id} chunk={chunk} aiTasks={hideAi ? [] : aiTasks} sectionIndex={index + 1} />
             ))}
 
             {isInstructorMode && hasInstructorNotes && showInstructorCard && instructorNote && (

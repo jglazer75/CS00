@@ -25,6 +25,7 @@ type ModuleData = {
   description: string | null;
   owner_user_id: string | null;
   is_public: boolean;
+  allow_unauthenticated: boolean;
   metadata: Record<string, unknown>;
 };
 
@@ -52,8 +53,14 @@ export default function ModuleOwnerPage() {
   const [editTerms, setEditTerms] = useState('');
   const [editDescription, setEditDescription] = useState('');
   const [editIsPublic, setEditIsPublic] = useState(false);
+  const [editAllowUnauthenticated, setEditAllowUnauthenticated] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
+
+  // Invite state
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [inviting, setInviting] = useState(false);
+  const [inviteMessage, setInviteMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   const fetchData = useCallback(async () => {
     if (!supabase || !user || !moduleId) return;
@@ -62,7 +69,7 @@ export default function ModuleOwnerPage() {
 
     const { data: mod, error: modError } = await supabase
       .from('modules')
-      .select('id, title, description, owner_user_id, is_public, metadata')
+      .select('id, title, description, owner_user_id, is_public, allow_unauthenticated, metadata')
       .eq('id', moduleId)
       .maybeSingle();
 
@@ -81,11 +88,13 @@ export default function ModuleOwnerPage() {
 
     setModuleData({
       ...mod,
+      allow_unauthenticated: mod.allow_unauthenticated ?? false,
       metadata: (mod.metadata as Record<string, unknown>) ?? {},
     });
     setEditTerms((mod.metadata as Record<string, unknown>)?.terms_of_use as string ?? '');
     setEditDescription(mod.description ?? '');
     setEditIsPublic(mod.is_public ?? false);
+    setEditAllowUnauthenticated(mod.allow_unauthenticated ?? false);
 
     // Fetch aggregate stats (no PII)
     const [{ count: enrolled }, { count: taskRuns }] = await Promise.all([
@@ -153,6 +162,7 @@ export default function ModuleOwnerPage() {
         },
         description: editDescription,
         is_public: editIsPublic,
+        allow_unauthenticated: editAllowUnauthenticated,
       }),
     });
 
@@ -164,6 +174,35 @@ export default function ModuleOwnerPage() {
       setModuleData((prev) => prev ? { ...prev, metadata: json.metadata ?? prev.metadata, description: editDescription, is_public: editIsPublic } : prev);
     }
     setSaving(false);
+  };
+
+  const handleInvite = async () => {
+    if (!user) return;
+    const email = inviteEmail.trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setInviteMessage({ type: 'error', text: 'Enter a valid email address.' });
+      return;
+    }
+    setInviting(true);
+    setInviteMessage(null);
+    const { data: { session } } = await getSupabaseBrowserClient().auth.getSession();
+    if (!session) { setInviting(false); return; }
+    const res = await fetch(`/api/module-owner/${moduleId}/invite`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
+      body: JSON.stringify({ email }),
+    });
+    const json = await res.json();
+    if (!res.ok) {
+      setInviteMessage({ type: 'error', text: json.error ?? 'Failed to send invite.' });
+    } else if (json.result === 'enrolled') {
+      setInviteMessage({ type: 'success', text: `${email} was already a user and has been enrolled.` });
+      setInviteEmail('');
+    } else {
+      setInviteMessage({ type: 'success', text: `Invite sent to ${email}.` });
+      setInviteEmail('');
+    }
+    setInviting(false);
   };
 
   if (loading) {
@@ -267,6 +306,39 @@ export default function ModuleOwnerPage() {
 
       <Divider sx={{ my: 3 }} />
 
+      {/* Invite students */}
+      <Typography variant="h6" sx={{ mb: 1 }}>Invite Student</Typography>
+      <Typography variant="body2" color="text.secondary" sx={{ mb: 1.5 }}>
+        If the email is already registered, the user will be enrolled immediately. Otherwise an invite email is sent.
+      </Typography>
+      <Box sx={{ display: 'flex', gap: 1.5, alignItems: 'flex-start', maxWidth: 480, mb: 1 }}>
+        <TextField
+          label="Email address"
+          type="email"
+          size="small"
+          value={inviteEmail}
+          onChange={(e) => setInviteEmail(e.target.value)}
+          disabled={inviting}
+          sx={{ flex: 1 }}
+          onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleInvite(); }}}
+        />
+        <Button
+          variant="contained"
+          onClick={handleInvite}
+          disabled={inviting || !inviteEmail.trim()}
+          startIcon={inviting ? <CircularProgress size={16} color="inherit" /> : null}
+        >
+          {inviting ? 'Sending…' : 'Invite'}
+        </Button>
+      </Box>
+      {inviteMessage && (
+        <Alert severity={inviteMessage.type} sx={{ maxWidth: 480, py: 0.5, mb: 2 }} onClose={() => setInviteMessage(null)}>
+          {inviteMessage.text}
+        </Alert>
+      )}
+
+      <Divider sx={{ my: 3 }} />
+
       {/* Edit form */}
       <Typography variant="h6" sx={{ mb: 2 }}>Edit Module Info</Typography>
       <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, maxWidth: 600 }}>
@@ -279,6 +351,20 @@ export default function ModuleOwnerPage() {
             />
           }
           label={editIsPublic ? 'Public — anyone can view this module' : 'Private — enrolled users only'}
+        />
+        <FormControlLabel
+          control={
+            <Switch
+              checked={editAllowUnauthenticated}
+              onChange={(e) => setEditAllowUnauthenticated(e.target.checked)}
+              color="warning"
+            />
+          }
+          label={
+            editAllowUnauthenticated
+              ? '⚠ Kill switch ON — unauthenticated access allowed, AI hidden'
+              : 'Kill switch OFF — normal auth required'
+          }
         />
         <TextField
           label="Description"

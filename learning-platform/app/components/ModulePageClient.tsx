@@ -14,9 +14,10 @@ type ModulePageClientProps = {
   pageData: ModulePage;
   teamName?: string | null;
   teamRole?: string | null;
+  hideAi?: boolean;
 };
 
-export default function ModulePageClient({ moduleId, slug, navData, pageData, teamName, teamRole }: ModulePageClientProps) {
+export default function ModulePageClient({ moduleId, slug, navData, pageData, teamName, teamRole, hideAi = false }: ModulePageClientProps) {
   const { slugs, currentNode } = useMemo(() => {
     const list: string[] = [];
     let found: ModuleStructureNode | undefined;
@@ -83,6 +84,7 @@ export default function ModulePageClient({ moduleId, slug, navData, pageData, te
           currentNode?.type === 'ai-interaction' || currentNode?.layout === 'workbench'
         }
         exportHref={`/api/modules/${moduleId}/export/${slug}/docx`}
+        hideAi={hideAi}
       />
     </Box>
   );

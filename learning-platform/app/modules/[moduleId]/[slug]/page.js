@@ -34,6 +34,7 @@ export default async function Page({ params }) {
   const userRoles = [];
   let teamName = null;
   let teamRole = null;
+  let allowUnauthenticated = false;
 
   if (user) {
     const supabase = getSupabaseServerClient();
@@ -46,7 +47,7 @@ export default async function Page({ params }) {
         // Single profile query used for both access control and role derivation
         const [{ data: profile }, { data: module }, { data: teamData }] = await Promise.all([
           supabase.from('profiles').select('is_instructor').eq('user_id', user.id).maybeSingle(),
-          supabase.from('modules').select('is_public').eq('id', moduleId).maybeSingle(),
+          supabase.from('modules').select('is_public, allow_unauthenticated').eq('id', moduleId).maybeSingle(),
           supabase
             .from('team_members')
             .select('teams!inner(role, module_id, name)')
@@ -97,7 +98,20 @@ export default async function Page({ params }) {
     redirect(fallback ? `/modules/${moduleId}/${fallback}` : `/modules/${moduleId}`);
   }
 
+  // Check kill switch for unauthenticated users
+  if (!user) {
+    const supabase = getSupabaseServerClient();
+    if (supabase) {
+      const { data: mod } = await supabase
+        .from('modules')
+        .select('allow_unauthenticated')
+        .eq('id', moduleId)
+        .maybeSingle();
+      allowUnauthenticated = mod?.allow_unauthenticated ?? false;
+    }
+  }
+
   const pageData = await getPageData(moduleId, slug);
 
-  return <ModulePageClient moduleId={moduleId} slug={slug} navData={navData} pageData={pageData} teamName={teamName} teamRole={teamRole} />;
+  return <ModulePageClient moduleId={moduleId} slug={slug} navData={navData} pageData={pageData} teamName={teamName} teamRole={teamRole} hideAi={allowUnauthenticated && !user} />;
 }
